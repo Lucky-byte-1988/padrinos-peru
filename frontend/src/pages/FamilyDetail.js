@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { LangContext } from '../App';
+import VideoThread from '../VideoThread';
 
 export default function FamilyDetail() {
   const { id } = useParams();
@@ -88,14 +89,10 @@ export default function FamilyDetail() {
           )}
         </div>
 
-        {/* Video */}
-        {videoEmbed && (
-          <div style={{margin:'0 1.2rem 1rem'}}>
-            <iframe width="100%" height="280" src={videoEmbed} title="Video"
-              frameBorder="0" allowFullScreen
-              style={{borderRadius:10, border:'1px solid #222'}} />
-          </div>
-        )}
+        {/* Hilo de videos estilo TikTok */}
+        <div style={{margin:'0 1.4rem 1.4rem'}}>
+          <VideoThread ninoId={id} ninoNombre={nino.nombre} videoInicial={nino.video_url} />
+        </div>
 
         {/* WhatsApp */}
         {nino.whatsapp && (

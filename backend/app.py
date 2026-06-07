@@ -63,6 +63,17 @@ class Comentario(db.Model):
     texto = db.Column(db.Text, nullable=False)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
+class VideoMensaje(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nino_id = db.Column(db.Integer, db.ForeignKey('nino.id'), nullable=False)
+    autor = db.Column(db.String(100), nullable=False)
+    de = db.Column(db.String(20), default='padrino')  # 'nino' o 'padrino'
+    pais = db.Column(db.String(100))
+    video_url = db.Column(db.String(300), nullable=False)
+    texto = db.Column(db.String(300))
+    likes = db.Column(db.Integer, default=0)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
 def save_file(file, prefix):
     if not file or file.filename == '':
         return ''
@@ -131,6 +142,44 @@ def add_comentario(id):
     db.session.add(c)
     db.session.commit()
     return jsonify({'mensaje': 'Comentario agregado'}), 201
+
+@app.route('/api/ninos/<int:id>/videos', methods=['GET'])
+def get_videos(id):
+    vids = VideoMensaje.query.filter_by(nino_id=id).order_by(VideoMensaje.fecha.asc()).all()
+    return jsonify([{
+        'id': v.id, 'autor': v.autor, 'de': v.de, 'pais': v.pais,
+        'video_url': v.video_url, 'texto': v.texto, 'likes': v.likes or 0,
+        'fecha': v.fecha.strftime('%d/%m/%Y %H:%M')
+    } for v in vids])
+
+@app.route('/api/ninos/<int:id>/videos', methods=['POST'])
+def add_video(id):
+    if request.content_type and 'multipart' in request.content_type:
+        data = request.form
+        video_url = save_file(request.files.get('video'), 'respuesta')
+    else:
+        data = request.json
+        video_url = data.get('video_url', '')
+    if not video_url:
+        return jsonify({'error': 'Falta el video'}), 400
+    v = VideoMensaje(
+        nino_id=id, autor=data['autor'], de=data.get('de', 'padrino'),
+        pais=data.get('pais', ''), video_url=video_url, texto=data.get('texto', '')
+    )
+    db.session.add(v)
+    db.session.commit()
+    # Notificar al admin de la nueva interacción
+    nino = Nino.query.get(id)
+    quien = 'El padrino' if v.de == 'padrino' else 'El niño'
+    enviar_whatsapp(f"🎥 {quien} {v.autor} respondió con un video en la conversación de *{nino.nombre}*")
+    return jsonify({'mensaje': 'Video publicado', 'id': v.id}), 201
+
+@app.route('/api/videos/<int:vid>/like', methods=['POST'])
+def like_video(vid):
+    v = VideoMensaje.query.get_or_404(vid)
+    v.likes = (v.likes or 0) + 1
+    db.session.commit()
+    return jsonify({'likes': v.likes})
 
 @app.route('/api/padrinos', methods=['POST'])
 def registrar_padrino():
