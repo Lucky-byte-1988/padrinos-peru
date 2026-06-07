@@ -3,6 +3,31 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { API } from '../config';
 import { LangContext } from '../App';
+import Reveal from '../Reveal';
+
+function HowItWorks() {
+  const pasos = [
+    { n: '01', icon: '✍️', t: 'El niño escribe su carta', d: 'La familia registra al niño y comparte su carta a Papá Noel, con foto y video.' },
+    { n: '02', icon: '🌎', t: 'El mundo la descubre', d: 'Personas de todo el planeta leen su historia, la comparten y dejan mensajes de aliento.' },
+    { n: '03', icon: '🎁', t: 'Un padrino la hace realidad', d: 'Alguien se convierte en su padrino y coordina directamente para cumplir su sueño de Navidad.' },
+  ];
+  return (
+    <section className="how">
+      <Reveal><h2 className="how-title">Cómo funciona</h2></Reveal>
+      <Reveal delay={80}><p className="how-sub">Tres pasos para cambiar una Navidad para siempre.</p></Reveal>
+      <div className="how-grid">
+        {pasos.map((p, i) => (
+          <Reveal key={p.n} delay={i * 140} className="how-card">
+            <span className="how-num">{p.n}</span>
+            <span className="how-icon">{p.icon}</span>
+            <h3 className="how-card-title">{p.t}</h3>
+            <p className="how-card-desc">{p.d}</p>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function CountdownNavidad() {
   const [t2, setT2] = useState({});
@@ -139,6 +164,9 @@ export default function Home() {
     <>
       <div className="hero">
         <div className="hero-snow" />
+        <div className="hero-orb orb-1" />
+        <div className="hero-orb orb-2" />
+        <div className="hero-orb orb-3" />
         <span className="hero-eyebrow"><span className="dot" /> {t.hero_eyebrow}</span>
         <h1>{t.hero_tagline}<br /><span className="accent">{t.hero_title}</span></h1>
         <p className="hero-sub">{t.hero_sub}</p>
@@ -160,6 +188,8 @@ export default function Home() {
           <div className="stat-item"><span className="stat-num">{regiones}</span><span className="stat-label">📍 Regiones</span></div>
         </div>
       )}
+
+      <HowItWorks />
 
       <div className="social-layout" id="feed">
         {/* FEED */}
@@ -191,7 +221,7 @@ export default function Home() {
 
           {loading ? <p className="loading">🎄 Cargando cartas...</p>
             : filtrados.length === 0 ? <p className="loading" style={{color:'#555'}}>Sin resultados.</p>
-            : filtrados.map(n => <PostCard key={n.id} n={n} t={t} />)
+            : filtrados.map((n, i) => <Reveal key={n.id} delay={Math.min(i, 5) * 90}><PostCard n={n} t={t} /></Reveal>)
           }
         </div>
 
