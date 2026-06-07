@@ -7,12 +7,25 @@ import { LangContext } from '../App';
 export default function Admin() {
   const { t } = useContext(LangContext);
   const [data, setData] = useState(null);
+  const [historial, setHistorial] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [tab, setTab] = useState('ninos');
 
-  useEffect(() => {
+  const cargar = () => {
     axios.get(API+'/api/admin').then(r => setData(r.data));
-  }, []);
+    axios.get(API+'/api/historial').then(r => setHistorial(r.data)).catch(()=>{});
+  };
+  useEffect(() => { cargar(); }, []);
+
+  const eliminarNino = async (n) => {
+    const motivo = window.prompt(
+      `Eliminar a "${n.nombre}" de ${n.provincia}.\n\nEsto borra su carta, fotos y comentarios, pero quedará registrado en el Historial.\n\nMotivo (ej: Regalo entregado):`,
+      'Regalo entregado'
+    );
+    if (motivo === null) return; // canceló
+    await axios.delete(`${API}/api/ninos/${n.id}`, { data: { motivo } });
+    cargar();
+  };
 
   if (!data) return <p className="loading">🎄 Cargando panel...</p>;
 
@@ -43,6 +56,9 @@ export default function Admin() {
         </button>
         <button className={`admin-tab ${tab === 'padrinos' ? 'active' : ''}`} onClick={() => setTab('padrinos')}>
           ❤️ Padrinos ({data.total_padrinos})
+        </button>
+        <button className={`admin-tab ${tab === 'historial' ? 'active' : ''}`} onClick={() => setTab('historial')}>
+          📋 Historial ({historial.length})
         </button>
       </div>
 
@@ -93,10 +109,16 @@ export default function Admin() {
                     </td>
                     <td>{n.fecha}</td>
                     <td>
-                      <Link to={`/carta/${n.id}`}
-                        style={{color:'#FFD700', fontSize:'0.8rem', textDecoration:'none'}}>
-                        👁 Ver
-                      </Link>
+                      <div style={{display:'flex', gap:'0.6rem', alignItems:'center'}}>
+                        <Link to={`/carta/${n.id}`}
+                          style={{color:'var(--red)', fontSize:'0.8rem', textDecoration:'none', fontWeight:600}}>
+                          👁 Ver
+                        </Link>
+                        <button onClick={() => eliminarNino(n)}
+                          style={{background:'#fef2f2', color:'#b91c1c', border:'1px solid #fecaca', borderRadius:'8px', padding:'0.3rem 0.6rem', fontSize:'0.78rem', fontWeight:600, cursor:'pointer'}}>
+                          🗑 Eliminar
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -133,6 +155,56 @@ export default function Admin() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {tab === 'historial' && (
+        <>
+          <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', marginBottom:'1rem'}}>
+            📋 Trazabilidad: registro permanente de los niños eliminados (regalo entregado u otro motivo).
+          </p>
+          <div style={{overflowX:'auto'}}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre</th>
+                  <th>Edad</th>
+                  <th>Provincia</th>
+                  <th>Región</th>
+                  <th>Tuvo padrino</th>
+                  <th>Padrino</th>
+                  <th>Motivo</th>
+                  <th>Registrado</th>
+                  <th>Eliminado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historial.length === 0 ? (
+                  <tr><td colSpan="10" style={{textAlign:'center', color:'var(--ink-faint)', padding:'1.5rem'}}>
+                    Aún no hay eliminaciones registradas.
+                  </td></tr>
+                ) : historial.map(h => (
+                  <tr key={h.id}>
+                    <td>{h.id}</td>
+                    <td style={{fontWeight:'bold'}}>{h.nombre}</td>
+                    <td>{h.edad}</td>
+                    <td>{h.provincia}</td>
+                    <td>{h.region}</td>
+                    <td>
+                      <span className={h.tuvo_padrino ? 'badge-si' : 'badge-no'}>
+                        {h.tuvo_padrino ? '✓ Sí' : '✗ No'}
+                      </span>
+                    </td>
+                    <td>{h.nombre_padrino || '—'}</td>
+                    <td>{h.motivo}</td>
+                    <td>{h.fecha_registro}</td>
+                    <td>{h.fecha_eliminacion}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

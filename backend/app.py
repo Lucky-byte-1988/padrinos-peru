@@ -76,6 +76,20 @@ class VideoMensaje(db.Model):
     likes = db.Column(db.Integer, default=0)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Historial(db.Model):
+    # Trazabilidad: queda registro de cada niño eliminado y por qué
+    id = db.Column(db.Integer, primary_key=True)
+    nino_id_original = db.Column(db.Integer)
+    nombre = db.Column(db.String(100))
+    edad = db.Column(db.Integer)
+    provincia = db.Column(db.String(100))
+    region = db.Column(db.String(100))
+    tuvo_padrino = db.Column(db.Boolean, default=False)
+    nombre_padrino = db.Column(db.String(100))
+    motivo = db.Column(db.String(200))
+    fecha_registro = db.Column(db.DateTime)
+    fecha_eliminacion = db.Column(db.DateTime, default=datetime.utcnow)
+
 def save_file(file, prefix):
     if not file or file.filename == '':
         return ''
@@ -217,12 +231,36 @@ def registrar_padrino():
 @app.route('/api/ninos/<int:id>', methods=['DELETE'])
 def borrar_nino(id):
     n = Nino.query.get_or_404(id)
+    data = request.get_json(silent=True) or {}
+    padrino = Padrino.query.filter_by(nino_id=id).first()
+    # Guardar trazabilidad antes de borrar
+    h = Historial(
+        nino_id_original=n.id, nombre=n.nombre, edad=n.edad,
+        provincia=n.provincia, region=n.region,
+        tuvo_padrino=n.tiene_padrino,
+        nombre_padrino=padrino.nombre if padrino else None,
+        motivo=data.get('motivo', 'Regalo entregado'),
+        fecha_registro=n.fecha
+    )
+    db.session.add(h)
     Comentario.query.filter_by(nino_id=id).delete()
     VideoMensaje.query.filter_by(nino_id=id).delete()
     Padrino.query.filter_by(nino_id=id).update({'nino_id': None})
     db.session.delete(n)
     db.session.commit()
-    return jsonify({'mensaje': 'Niño eliminado'})
+    return jsonify({'mensaje': 'Niño eliminado y registrado en el historial'})
+
+@app.route('/api/historial', methods=['GET'])
+def get_historial():
+    items = Historial.query.order_by(Historial.fecha_eliminacion.desc()).all()
+    return jsonify([{
+        'id': h.id, 'nombre': h.nombre, 'edad': h.edad,
+        'provincia': h.provincia, 'region': h.region,
+        'tuvo_padrino': h.tuvo_padrino, 'nombre_padrino': h.nombre_padrino,
+        'motivo': h.motivo,
+        'fecha_registro': h.fecha_registro.strftime('%Y-%m-%d') if h.fecha_registro else '—',
+        'fecha_eliminacion': h.fecha_eliminacion.strftime('%Y-%m-%d %H:%M') if h.fecha_eliminacion else '—',
+    } for h in items])
 
 @app.route('/api/padrino-panel', methods=['GET'])
 def padrino_panel():
