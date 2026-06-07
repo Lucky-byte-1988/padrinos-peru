@@ -357,8 +357,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .share-wa { background: #0d2e2a; }
 .share-fb { background: #0d1a3d; }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .hero h1 { font-size: 1.7rem; }
-  .navbar { padding: 0.7rem 1rem; }
-  .nav-links a { font-size: 0.78rem; padding: 0.35rem 0.6rem; }
+  .navbar { padding: 0.7rem 0.8rem; flex-wrap: wrap; gap: 0.5rem; }
+  .nav-brand { font-size: 1.1rem; }
+  .nav-links { gap: 0.2rem; flex-wrap: wrap; justify-content: flex-end; }
+  .nav-links a { font-size: 0.72rem; padding: 0.3rem 0.5rem; }
+  .lang-btn { font-size: 0.72rem; padding: 0.3rem 0.6rem; }
+  .stat-item { padding: 0.4rem 1rem; }
+  .countdown-box { min-width: 50px; padding: 0.4rem 0.6rem; }
+  .countdown-num { font-size: 1.5rem; }
 }
