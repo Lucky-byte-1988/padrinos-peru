@@ -17,6 +17,24 @@ export default function Admin() {
   };
   useEffect(() => { cargar(); }, []);
 
+  const exportarCSV = (filas, columnas, nombreArchivo) => {
+    const esc = (v) => {
+      const s = (v === null || v === undefined) ? '' : String(v);
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const header = columnas.map(c => esc(c.label)).join(',');
+    const body = filas.map(f => columnas.map(c => esc(f[c.key])).join(',')).join('\n');
+    // BOM para que Excel respete tildes y ñ
+    const csv = '﻿' + header + '\n' + body;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${nombreArchivo}_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const eliminarNino = async (n) => {
     const motivo = window.prompt(
       `Eliminar a "${n.nombre}" de ${n.provincia}.\n\nEsto borra su carta, fotos y comentarios, pero quedará registrado en el Historial.\n\nMotivo (ej: Regalo entregado):`,
@@ -64,13 +82,25 @@ export default function Admin() {
 
       {tab === 'ninos' && (
         <>
-          <input
-            className="filtro-buscar"
-            style={{marginBottom:'1rem', width:'100%'}}
-            placeholder="🔍 Buscar niño, provincia o región..."
-            value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-          />
+          <div style={{display:'flex', gap:'0.6rem', marginBottom:'1rem', alignItems:'center', flexWrap:'wrap'}}>
+            <input
+              className="filtro-buscar"
+              style={{flex:1, minWidth:200}}
+              placeholder="🔍 Buscar niño, provincia o región..."
+              value={busqueda}
+              onChange={e => setBusqueda(e.target.value)}
+            />
+            <button className="btn-export" onClick={() => exportarCSV(
+              filtrados,
+              [
+                {key:'id',label:'ID'},{key:'nombre',label:'Nombre'},{key:'edad',label:'Edad'},
+                {key:'provincia',label:'Provincia'},{key:'region',label:'Región'},
+                {key:'whatsapp',label:'WhatsApp'},{key:'tiene_padrino',label:'Tiene padrino'},
+                {key:'fecha',label:'Fecha registro'},
+              ],
+              'ninos_registrados'
+            )}>📊 Exportar a Excel</button>
+          </div>
           <div style={{overflowX:'auto'}}>
             <table className="admin-table">
               <thead>
@@ -159,9 +189,22 @@ export default function Admin() {
 
       {tab === 'historial' && (
         <>
-          <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', marginBottom:'1rem'}}>
-            📋 Trazabilidad: registro permanente de los niños eliminados (regalo entregado u otro motivo).
-          </p>
+          <div style={{display:'flex', gap:'0.6rem', marginBottom:'1rem', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap'}}>
+            <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', margin:0}}>
+              📋 Trazabilidad: registro permanente de los niños eliminados (regalo entregado u otro motivo).
+            </p>
+            <button className="btn-export" onClick={() => exportarCSV(
+              historial,
+              [
+                {key:'nombre',label:'Nombre'},{key:'edad',label:'Edad'},
+                {key:'provincia',label:'Provincia'},{key:'region',label:'Región'},
+                {key:'tuvo_padrino',label:'Tuvo padrino'},{key:'nombre_padrino',label:'Padrino'},
+                {key:'motivo',label:'Motivo'},{key:'fecha_registro',label:'Registrado'},
+                {key:'fecha_eliminacion',label:'Eliminado'},
+              ],
+              'historial_ninos_ayudados'
+            )}>📊 Exportar a Excel</button>
+          </div>
           <div style={{overflowX:'auto'}}>
             <table className="admin-table">
               <thead>
