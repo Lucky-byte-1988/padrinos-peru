@@ -5,6 +5,37 @@ import { API } from '../config';
 import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
 
+function Comentario({ c }) {
+  const [likes, setLikes] = useState(c.likes || 0);
+  const [liked, setLiked] = useState(false);
+  const like = async () => {
+    if (liked) return;
+    const r = await axios.post(`${API}/api/comentarios/${c.id}/like`);
+    setLikes(r.data.likes); setLiked(true);
+  };
+  return (
+    <div className="comment">
+      <div className="comment-avatar">{c.autor[0]?.toUpperCase()}</div>
+      <div style={{flex:1}}>
+        <div className="comment-body">
+          <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
+            <span className="comment-autor">{c.autor}</span>
+            {c.pais && <span className="comment-pais">🌍 {c.pais}</span>}
+          </div>
+          <div className="comment-texto">{c.texto}</div>
+        </div>
+        <div className="comment-meta">
+          <button className={`comment-like ${liked ? 'liked' : ''}`} onClick={like}>
+            {liked ? 'Te gusta' : 'Me gusta'}
+          </button>
+          {likes > 0 && <span className="comment-likes-count">❤️ {likes}</span>}
+          <span className="comment-time">{c.fecha}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function FamilyDetail() {
   const { id } = useParams();
   const { t } = useContext(LangContext);
@@ -153,17 +184,7 @@ export default function FamilyDetail() {
         <div className="comments-section">
           <h4>💬 Mensajes de apoyo ({comentarios.length})</h4>
           {comentarios.map(c => (
-            <div className="comment" key={c.id}>
-              <div className="comment-avatar">{c.autor[0]?.toUpperCase()}</div>
-              <div className="comment-body">
-                <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
-                  <span className="comment-autor">{c.autor}</span>
-                  {c.pais && <span className="comment-pais">🌍 {c.pais}</span>}
-                  <span className="comment-pais" style={{marginLeft:'auto'}}>{c.fecha}</span>
-                </div>
-                <div className="comment-texto">{c.texto}</div>
-              </div>
-            </div>
+            <Comentario key={c.id} c={c} />
           ))}
 
           <form onSubmit={handleComment}>

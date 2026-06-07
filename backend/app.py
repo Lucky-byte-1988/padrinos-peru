@@ -61,6 +61,7 @@ class Comentario(db.Model):
     autor = db.Column(db.String(100), nullable=False)
     pais = db.Column(db.String(100))
     texto = db.Column(db.Text, nullable=False)
+    likes = db.Column(db.Integer, default=0)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
 class VideoMensaje(db.Model):
@@ -134,7 +135,15 @@ def like_nino(id):
 def get_comentarios(id):
     coms = Comentario.query.filter_by(nino_id=id).order_by(Comentario.fecha.desc()).all()
     return jsonify([{'id':c.id,'autor':c.autor,'pais':c.pais,'texto':c.texto,
+                     'likes': c.likes or 0,
                      'fecha':c.fecha.strftime('%d/%m/%Y %H:%M')} for c in coms])
+
+@app.route('/api/comentarios/<int:cid>/like', methods=['POST'])
+def like_comentario(cid):
+    c = Comentario.query.get_or_404(cid)
+    c.likes = (c.likes or 0) + 1
+    db.session.commit()
+    return jsonify({'likes': c.likes})
 
 @app.route('/api/ninos/<int:id>/comentarios', methods=['POST'])
 def add_comentario(id):
