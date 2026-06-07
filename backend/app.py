@@ -254,8 +254,10 @@ def seed_data():
             db.session.add(n)
         db.session.commit()
 
+# Crear tablas y datos iniciales al arrancar (funciona con gunicorn y en local)
+with app.app_context():
+    db.create_all()
+    seed_data()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        seed_data()
     app.run(debug=True, port=5003)
