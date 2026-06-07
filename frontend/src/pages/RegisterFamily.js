@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
+import { API } from '../config';
 import { LangContext } from '../App';
 
 const REGIONES = ['Amazonas','Áncash','Apurímac','Arequipa','Ayacucho','Cajamarca','Callao','Cusco','Huancavelica','Huánuco','Ica','Junín','La Libertad','Lambayeque','Lima','Loreto','Madre de Dios','Moquegua','Pasco','Piura','Puno','San Martín','Tacna','Tumbes','Ucayali'];
@@ -60,7 +61,7 @@ export default function RegisterFamily() {
     if (files.carta_foto) formData.append('carta_foto', files.carta_foto);
     if (files.foto_familia) formData.append('foto_familia', files.foto_familia);
     if (files.video) formData.append('video', files.video);
-    await axios.post('http://localhost:5003/api/ninos', formData, {
+    await axios.post(API+'/api/ninos', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     setLoading(false);

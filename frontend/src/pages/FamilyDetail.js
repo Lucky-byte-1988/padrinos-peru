@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { API } from '../config';
 import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
 
@@ -17,23 +18,23 @@ export default function FamilyDetail() {
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:5003/api/ninos/${id}`).then(r => {
+    axios.get(`${API}/api/ninos/${id}`).then(r => {
       setNino(r.data); setLikes(r.data.likes || 0);
     });
-    axios.get(`http://localhost:5003/api/ninos/${id}/comentarios`).then(r => setComentarios(r.data));
+    axios.get(`${API}/api/ninos/${id}/comentarios`).then(r => setComentarios(r.data));
   }, [id]);
 
   const handleLike = async () => {
     if (liked) return;
-    const res = await axios.post(`http://localhost:5003/api/ninos/${id}/like`);
+    const res = await axios.post(`${API}/api/ninos/${id}/like`);
     setLikes(res.data.likes); setLiked(true);
   };
 
   const handleComment = async e => {
     e.preventDefault();
     if (!comForm.texto.trim()) return;
-    await axios.post(`http://localhost:5003/api/ninos/${id}/comentarios`, comForm);
-    const res = await axios.get(`http://localhost:5003/api/ninos/${id}/comentarios`);
+    await axios.post(`${API}/api/ninos/${id}/comentarios`, comForm);
+    const res = await axios.get(`${API}/api/ninos/${id}/comentarios`);
     setComentarios(res.data);
     setComForm({ autor: '', pais: '', texto: '' });
   };
@@ -41,7 +42,7 @@ export default function FamilyDetail() {
   const handlePadrino = async e => {
     e.preventDefault();
     setEnviando(true);
-    await axios.post('http://localhost:5003/api/padrinos', { ...padrinoForm, nino_id: parseInt(id) });
+    await axios.post(API+'/api/padrinos', { ...padrinoForm, nino_id: parseInt(id) });
     setEnviando(false); setSuccess(true);
     setNino(prev => ({ ...prev, tiene_padrino: true }));
   };

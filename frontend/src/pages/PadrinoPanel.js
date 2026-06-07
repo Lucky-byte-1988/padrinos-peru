@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
+import { API } from '../config';
 import { Link } from 'react-router-dom';
 import { LangContext } from '../App';
 
@@ -16,7 +17,7 @@ export default function PadrinoPanel() {
     setError('');
     setNino(null);
     try {
-      const res = await axios.get(`http://localhost:5003/api/padrino-panel?email=${encodeURIComponent(email)}`);
+      const res = await axios.get(`${API}/api/padrino-panel?email=${encodeURIComponent(email)}`);
       setNino(res.data);
     } catch {
       setError('No encontramos un padrino con ese email. Verifica que sea el mismo email con el que te registraste.');

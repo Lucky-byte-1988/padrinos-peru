@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-
-const API = 'http://localhost:5003';
+import { API } from './config';
 
 function VideoCard({ v, onLike }) {
   const ref = useRef(null);

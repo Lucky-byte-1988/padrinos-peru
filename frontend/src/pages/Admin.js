@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { API } from '../config';
 import { Link } from 'react-router-dom';
 import { LangContext } from '../App';
 
@@ -10,7 +11,7 @@ export default function Admin() {
   const [tab, setTab] = useState('ninos');
 
   useEffect(() => {
-    axios.get('http://localhost:5003/api/admin').then(r => setData(r.data));
+    axios.get(API+'/api/admin').then(r => setData(r.data));
   }, []);
 
   if (!data) return <p className="loading">🎄 Cargando panel...</p>;

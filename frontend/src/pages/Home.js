@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { API } from '../config';
 import { LangContext } from '../App';
 
 function CountdownNavidad() {
@@ -43,7 +44,7 @@ function PostCard({ n, t }) {
 
   const handleLike = async () => {
     if (liked) return;
-    const res = await axios.post(`http://localhost:5003/api/ninos/${n.id}/like`);
+    const res = await axios.post(`${API}/api/ninos/${n.id}/like`);
     setLikes(res.data.likes);
     setLiked(true);
   };
@@ -118,7 +119,7 @@ export default function Home() {
   const [filtro, setFiltro] = useState('todos');
 
   useEffect(() => {
-    axios.get('http://localhost:5003/api/ninos')
+    axios.get(API+'/api/ninos')
       .then(r => { setNinos(r.data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
