@@ -8,12 +8,14 @@ export default function Admin() {
   const { t } = useContext(LangContext);
   const [data, setData] = useState(null);
   const [historial, setHistorial] = useState([]);
+  const [mensajes, setMensajes] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [tab, setTab] = useState('ninos');
 
   const cargar = () => {
     axios.get(API+'/api/admin').then(r => setData(r.data));
     axios.get(API+'/api/historial').then(r => setHistorial(r.data)).catch(()=>{});
+    axios.get(API+'/api/mensajes-privados').then(r => setMensajes(r.data)).catch(()=>{});
   };
   useEffect(() => { cargar(); }, []);
 
@@ -74,6 +76,9 @@ export default function Admin() {
         </button>
         <button className={`admin-tab ${tab === 'padrinos' ? 'active' : ''}`} onClick={() => setTab('padrinos')}>
           ❤️ Padrinos ({data.total_padrinos})
+        </button>
+        <button className={`admin-tab ${tab === 'mensajes' ? 'active' : ''}`} onClick={() => setTab('mensajes')}>
+          💌 Mensajes ({mensajes.length})
         </button>
         <button className={`admin-tab ${tab === 'historial' ? 'active' : ''}`} onClick={() => setTab('historial')}>
           📋 Historial ({historial.length})
@@ -185,6 +190,39 @@ export default function Admin() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {tab === 'mensajes' && (
+        <>
+          <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', marginBottom:'1rem'}}>
+            💌 Mensajes privados enviados a las familias (no aparecen en el muro público).
+          </p>
+          <div style={{overflowX:'auto'}}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Para (niño)</th><th>De</th><th>Email</th><th>Mensaje</th><th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mensajes.length === 0 ? (
+                  <tr><td colSpan="6" style={{textAlign:'center', color:'var(--ink-faint)', padding:'1.5rem'}}>
+                    Aún no hay mensajes privados.
+                  </td></tr>
+                ) : mensajes.map(m => (
+                  <tr key={m.id}>
+                    <td>{m.id}</td>
+                    <td style={{fontWeight:'bold'}}>{m.nino_nombre}</td>
+                    <td>{m.autor}</td>
+                    <td>{m.email || '—'}</td>
+                    <td style={{maxWidth:320}}>{m.texto}</td>
+                    <td>{m.fecha}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {tab === 'historial' && (

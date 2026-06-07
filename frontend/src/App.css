@@ -30,6 +30,7 @@
 }
 
 html { scroll-behavior: smooth; }
+html, body { overflow-x: hidden; max-width: 100%; }
 body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
@@ -39,6 +40,10 @@ body {
   letter-spacing: -0.011em;
   line-height: 1.5;
 }
+/* Nada (imágenes, videos) puede salirse de la pantalla — comportamiento de app nativa */
+img, video, iframe { max-width: 100%; }
+.post-img, .detail-post .post-img { width: 100%; height: auto; max-height: 70vh; object-fit: cover; }
+.carta-handwritten, .file-preview-img { max-width: 100%; height: auto; }
 
 /* ═══ SCROLL REVEAL ═══ */
 .reveal {
@@ -480,6 +485,22 @@ body {
   box-shadow: 0 6px 18px rgba(21,128,61,0.25);
 }
 .btn-export:hover { background: #166534; transform: translateY(-2px); }
+
+/* ═══ MENSAJE PRIVADO ═══ */
+.msg-priv-btn {
+  width: 100%; background: var(--bg-warm); color: var(--ink); border: none;
+  padding: 1rem; border-radius: 18px; font-size: 0.98rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: all 0.25s var(--ease);
+}
+.msg-priv-btn:hover { background: #ece5da; transform: translateY(-2px); }
+.msg-priv-form { background: var(--bg-warm); border-radius: 22px; padding: 1.6rem; }
+.msg-priv-form h4 { font-size: 1.15rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+.msg-priv-hint { font-size: 0.84rem; color: var(--ink-soft); margin: 0.3rem 0 1rem; }
+.msg-priv-input { width: 100%; background: var(--surface); border: none; border-radius: 14px; padding: 0.8rem 1.1rem; font-size: 0.95rem; font-family: inherit; color: var(--ink); box-shadow: var(--sh-sm); }
+.msg-priv-input:focus { outline: 2px solid var(--red); }
+.msg-priv-cancel { flex: 1; background: transparent; color: var(--ink-soft); border: none; padding: 0.85rem; border-radius: 980px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.msg-priv-send { flex: 2; background: var(--red); color: #fff; border: none; padding: 0.85rem; border-radius: 980px; font-weight: 600; cursor: pointer; font-family: inherit; box-shadow: var(--sh-red); }
+.msg-priv-send:disabled { opacity: 0.5; }
 
 /* ═══ FOOTER ═══ */
 .footer { background: var(--ink); color: rgba(255,255,255,0.55); text-align: center; padding: 2.5rem; font-size: 0.88rem; }

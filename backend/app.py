@@ -76,6 +76,16 @@ class VideoMensaje(db.Model):
     likes = db.Column(db.Integer, default=0)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
+class MensajePrivado(db.Model):
+    # Mensaje privado a la familia (no se muestra en el feed público)
+    id = db.Column(db.Integer, primary_key=True)
+    nino_id = db.Column(db.Integer, db.ForeignKey('nino.id'), nullable=False)
+    autor = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120))
+    texto = db.Column(db.Text, nullable=False)
+    leido = db.Column(db.Boolean, default=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Historial(db.Model):
     # Trazabilidad: queda registro de cada niño eliminado y por qué
     id = db.Column(db.Integer, primary_key=True)
@@ -249,6 +259,31 @@ def borrar_nino(id):
     db.session.delete(n)
     db.session.commit()
     return jsonify({'mensaje': 'Niño eliminado y registrado en el historial'})
+
+@app.route('/api/ninos/<int:id>/mensaje-privado', methods=['POST'])
+def enviar_mensaje_privado(id):
+    nino = Nino.query.get_or_404(id)
+    data = request.json
+    m = MensajePrivado(nino_id=id, autor=data['autor'],
+                       email=data.get('email', ''), texto=data['texto'])
+    db.session.add(m)
+    db.session.commit()
+    enviar_whatsapp(
+        f"💌 *Mensaje privado para {nino.nombre}*\n"
+        f"De: {m.autor} ({m.email or 'sin email'})\n\n"
+        f"\"{m.texto}\""
+    )
+    return jsonify({'mensaje': 'Mensaje privado enviado'}), 201
+
+@app.route('/api/mensajes-privados', methods=['GET'])
+def get_mensajes_privados():
+    msgs = MensajePrivado.query.order_by(MensajePrivado.fecha.desc()).all()
+    return jsonify([{
+        'id': m.id, 'nino_id': m.nino_id,
+        'nino_nombre': (Nino.query.get(m.nino_id).nombre if Nino.query.get(m.nino_id) else 'Eliminado'),
+        'autor': m.autor, 'email': m.email, 'texto': m.texto,
+        'fecha': m.fecha.strftime('%d/%m/%Y %H:%M')
+    } for m in msgs])
 
 @app.route('/api/historial', methods=['GET'])
 def get_historial():
