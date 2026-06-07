@@ -4,6 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os, uuid, requests as req
 
+# Cloudinary: almacenamiento permanente de fotos y videos (lee CLOUDINARY_URL del entorno)
+try:
+    import cloudinary, cloudinary.uploader
+    CLOUDINARY_ON = bool(os.environ.get('CLOUDINARY_URL'))
+except Exception:
+    CLOUDINARY_ON = False
+
 ADMIN_WHATSAPP = os.environ.get('ADMIN_WA_PHONE', '51965717319')
 CALLMEBOT_APIKEY = os.environ.get('CALLMEBOT_APIKEY', '')
 
@@ -103,12 +110,21 @@ class Historial(db.Model):
 def save_file(file, prefix):
     if not file or file.filename == '':
         return ''
+    # Si Cloudinary está configurado, sube ahí (almacenamiento permanente)
+    if CLOUDINARY_ON:
+        try:
+            res = cloudinary.uploader.upload(
+                file, folder='cartasanoel', resource_type='auto',
+                public_id=f"{prefix}_{uuid.uuid4().hex}"
+            )
+            return res.get('secure_url', '')
+        except Exception as e:
+            print(f"[Cloudinary error] {e}")
+    # Respaldo local (efímero) si no hay Cloudinary
     ext = os.path.splitext(file.filename)[1].lower()
     filename = f"{prefix}_{uuid.uuid4().hex}{ext}"
     path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(path)
-    # Construir la URL absoluta a partir del dominio real de la petición
-    # (funciona en local y en producción sin configurar nada).
     base_url = os.environ.get('BASE_URL') or request.host_url.rstrip('/')
     return f"{base_url}/uploads/{filename}"
 
