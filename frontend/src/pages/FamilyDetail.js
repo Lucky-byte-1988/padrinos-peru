@@ -4,46 +4,14 @@ import axios from 'axios';
 import { API } from '../config';
 import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
-
-function Comentario({ c }) {
-  const [likes, setLikes] = useState(c.likes || 0);
-  const [liked, setLiked] = useState(false);
-  const like = async () => {
-    if (liked) return;
-    const r = await axios.post(`${API}/api/comentarios/${c.id}/like`);
-    setLikes(r.data.likes); setLiked(true);
-  };
-  return (
-    <div className="comment">
-      <div className="comment-avatar">{c.autor[0]?.toUpperCase()}</div>
-      <div style={{flex:1}}>
-        <div className="comment-body">
-          <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
-            <span className="comment-autor">{c.autor}</span>
-            {c.pais && <span className="comment-pais">🌍 {c.pais}</span>}
-          </div>
-          <div className="comment-texto">{c.texto}</div>
-        </div>
-        <div className="comment-meta">
-          <button className={`comment-like ${liked ? 'liked' : ''}`} onClick={like}>
-            {liked ? 'Te gusta' : 'Me gusta'}
-          </button>
-          {likes > 0 && <span className="comment-likes-count">❤️ {likes}</span>}
-          <span className="comment-time">{c.fecha}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
+import Comments from '../Comments';
 
 export default function FamilyDetail() {
   const { id } = useParams();
   const { t } = useContext(LangContext);
   const [nino, setNino] = useState(null);
-  const [comentarios, setComentarios] = useState([]);
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
-  const [comForm, setComForm] = useState({ autor: '', pais: '', texto: '' });
   const [padrinoForm, setPadrinoForm] = useState({ nombre: '', email: '', pais: '' });
   const [success, setSuccess] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -52,22 +20,12 @@ export default function FamilyDetail() {
     axios.get(`${API}/api/ninos/${id}`).then(r => {
       setNino(r.data); setLikes(r.data.likes || 0);
     });
-    axios.get(`${API}/api/ninos/${id}/comentarios`).then(r => setComentarios(r.data));
   }, [id]);
 
   const handleLike = async () => {
     if (liked) return;
     const res = await axios.post(`${API}/api/ninos/${id}/like`);
     setLikes(res.data.likes); setLiked(true);
-  };
-
-  const handleComment = async e => {
-    e.preventDefault();
-    if (!comForm.texto.trim()) return;
-    await axios.post(`${API}/api/ninos/${id}/comentarios`, comForm);
-    const res = await axios.get(`${API}/api/ninos/${id}/comentarios`);
-    setComentarios(res.data);
-    setComForm({ autor: '', pais: '', texto: '' });
   };
 
   const handlePadrino = async e => {
@@ -142,9 +100,9 @@ export default function FamilyDetail() {
           <button className={`action-btn ${liked?'liked':''}`} onClick={handleLike}>
             <span>{liked?'❤️':'🤍'}</span> {likes}
           </button>
-          <span className="action-btn" style={{cursor:'default'}}>
-            <span>💬</span> {comentarios.length}
-          </span>
+          <a href="#comentarios" className="action-btn" style={{textDecoration:'none'}}>
+            <span>💬</span> Comentar
+          </a>
           <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${nino.nombre}: ${window.location.href}`}
             target="_blank" rel="noreferrer" className="action-btn" style={{textDecoration:'none'}}>
             <span>💬</span> WhatsApp
@@ -180,27 +138,8 @@ export default function FamilyDetail() {
         )}
         {success && <div className="success-msg" style={{margin:'0 1.2rem 1.2rem'}}>🎄 {t.godfather_success}</div>}
 
-        {/* Comentarios */}
-        <div className="comments-section">
-          <h4>💬 Mensajes de apoyo ({comentarios.length})</h4>
-          {comentarios.map(c => (
-            <Comentario key={c.id} c={c} />
-          ))}
-
-          <form onSubmit={handleComment}>
-            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem', marginBottom:'0.6rem'}}>
-              <input className="comment-input" placeholder="Tu nombre" style={{borderRadius:8}}
-                value={comForm.autor} onChange={e=>setComForm({...comForm,autor:e.target.value})} required />
-              <input className="comment-input" placeholder="Tu país (opcional)" style={{borderRadius:8}}
-                value={comForm.pais} onChange={e=>setComForm({...comForm,pais:e.target.value})} />
-            </div>
-            <div className="comment-form">
-              <input className="comment-input" placeholder="Escribe un mensaje de aliento para esta familia..."
-                value={comForm.texto} onChange={e=>setComForm({...comForm,texto:e.target.value})} required />
-              <button type="submit" className="comment-submit">Enviar</button>
-            </div>
-          </form>
-        </div>
+        {/* Comentarios estilo Facebook */}
+        <Comments ninoId={id} />
       </div>
     </div>
   );

@@ -58,6 +58,7 @@ class Padrino(db.Model):
 class Comentario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nino_id = db.Column(db.Integer, db.ForeignKey('nino.id'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('comentario.id'), nullable=True)
     autor = db.Column(db.String(100), nullable=False)
     pais = db.Column(db.String(100))
     texto = db.Column(db.Text, nullable=False)
@@ -133,9 +134,9 @@ def like_nino(id):
 
 @app.route('/api/ninos/<int:id>/comentarios', methods=['GET'])
 def get_comentarios(id):
-    coms = Comentario.query.filter_by(nino_id=id).order_by(Comentario.fecha.desc()).all()
-    return jsonify([{'id':c.id,'autor':c.autor,'pais':c.pais,'texto':c.texto,
-                     'likes': c.likes or 0,
+    coms = Comentario.query.filter_by(nino_id=id).order_by(Comentario.fecha.asc()).all()
+    return jsonify([{'id':c.id,'parent_id':c.parent_id,'autor':c.autor,'pais':c.pais,
+                     'texto':c.texto,'likes': c.likes or 0,
                      'fecha':c.fecha.strftime('%d/%m/%Y %H:%M')} for c in coms])
 
 @app.route('/api/comentarios/<int:cid>/like', methods=['POST'])
@@ -149,10 +150,10 @@ def like_comentario(cid):
 def add_comentario(id):
     data = request.json
     c = Comentario(nino_id=id, autor=data['autor'], pais=data.get('pais',''),
-                   texto=data['texto'])
+                   texto=data['texto'], parent_id=data.get('parent_id'))
     db.session.add(c)
     db.session.commit()
-    return jsonify({'mensaje': 'Comentario agregado'}), 201
+    return jsonify({'mensaje': 'Comentario agregado', 'id': c.id}), 201
 
 @app.route('/api/ninos/<int:id>/videos', methods=['GET'])
 def get_videos(id):
