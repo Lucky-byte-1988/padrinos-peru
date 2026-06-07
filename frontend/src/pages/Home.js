@@ -269,6 +269,26 @@ export default function Home() {
           </div>
         </aside>
       </div>
+
+      {/* CTA de cierre cinematográfico */}
+      <section className="cta-final">
+        <div className="cta-orb cta-orb-1" />
+        <div className="cta-orb cta-orb-2" />
+        <Reveal>
+          <h2 className="cta-title">Esta Navidad, sé el milagro de un niño.</h2>
+        </Reveal>
+        <Reveal delay={100}>
+          <p className="cta-sub">
+            Cada carta es real. Cada niño espera. Un gesto tuyo puede cambiarlo todo.
+          </p>
+        </Reveal>
+        <Reveal delay={180}>
+          <div className="cta-btns">
+            <a href="#feed" className="cta-btn-white">{t.hero_btn}</a>
+            <Link to="/registrar" className="cta-btn-ghost">{t.hero_btn2}</Link>
+          </div>
+        </Reveal>
+      </section>
     </>
   );
 }

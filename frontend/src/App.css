@@ -444,6 +444,35 @@ body {
 .fb-comment .fb-composer { margin-top: 0.6rem; margin-bottom: 0.3rem; }
 .fb-comment .fb-comment { margin-top: 0.8rem; }
 
+/* ═══ CTA FINAL CINEMATOGRÁFICO ═══ */
+.cta-final {
+  position: relative; overflow: hidden;
+  margin: 2rem 1.5rem 0; border-radius: 32px;
+  background: linear-gradient(135deg, #2a0a0a 0%, #7f1d1d 55%, #b91c1c 100%);
+  padding: 5rem 2rem; text-align: center; color: #fff;
+  max-width: 1080px; margin-left: auto; margin-right: auto;
+}
+.cta-orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+.cta-orb-1 { width: 340px; height: 340px; top: -120px; left: -60px; background: radial-gradient(circle, rgba(255,200,120,0.4), transparent 70%); animation: floatSlow 18s ease-in-out infinite; }
+.cta-orb-2 { width: 300px; height: 300px; bottom: -120px; right: -40px; background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%); animation: floatSlow 21s ease-in-out infinite reverse; }
+.cta-title {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.08; position: relative; z-index: 1; max-width: 640px; margin: 0 auto;
+}
+.cta-sub { font-size: 1.15rem; opacity: 0.85; margin: 1.2rem auto 2.4rem; max-width: 500px; position: relative; z-index: 1; line-height: 1.55; }
+.cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+.cta-btn-white {
+  background: #fff; color: var(--red); padding: 0.95rem 2.2rem; border-radius: 980px;
+  font-weight: 700; text-decoration: none; font-size: 1.02rem; transition: all 0.3s var(--ease);
+}
+.cta-btn-white:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+.cta-btn-ghost {
+  background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.4);
+  padding: 0.95rem 2.2rem; border-radius: 980px; font-weight: 600; text-decoration: none;
+  font-size: 1.02rem; transition: all 0.3s var(--ease); backdrop-filter: blur(8px);
+}
+.cta-btn-ghost:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+
 /* ═══ FOOTER ═══ */
 .footer { background: var(--ink); color: rgba(255,255,255,0.55); text-align: center; padding: 2.5rem; font-size: 0.88rem; }
 
