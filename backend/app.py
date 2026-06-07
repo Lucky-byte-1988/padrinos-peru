@@ -81,7 +81,9 @@ def save_file(file, prefix):
     filename = f"{prefix}_{uuid.uuid4().hex}{ext}"
     path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(path)
-    base_url = os.environ.get('BASE_URL', 'http://localhost:5003')
+    # Construir la URL absoluta a partir del dominio real de la petición
+    # (funciona en local y en producción sin configurar nada).
+    base_url = os.environ.get('BASE_URL') or request.host_url.rstrip('/')
     return f"{base_url}/uploads/{filename}"
 
 @app.route('/uploads/<filename>')
@@ -201,6 +203,16 @@ def registrar_padrino():
             f"❤️ Total padrinos: {Padrino.query.count()}"
         )
     return jsonify({'mensaje': 'Padrino registrado', 'id': padrino.id}), 201
+
+@app.route('/api/ninos/<int:id>', methods=['DELETE'])
+def borrar_nino(id):
+    n = Nino.query.get_or_404(id)
+    Comentario.query.filter_by(nino_id=id).delete()
+    VideoMensaje.query.filter_by(nino_id=id).delete()
+    Padrino.query.filter_by(nino_id=id).update({'nino_id': None})
+    db.session.delete(n)
+    db.session.commit()
+    return jsonify({'mensaje': 'Niño eliminado'})
 
 @app.route('/api/padrino-panel', methods=['GET'])
 def padrino_panel():
