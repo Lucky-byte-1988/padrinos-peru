@@ -19,15 +19,15 @@ function App() {
     <LangContext.Provider value={{ lang, t }}>
       <Router>
         <nav className="navbar">
-          <Link to="/" className="nav-brand">❤️ {t.title}</Link>
+          <Link to="/" className="nav-brand"><span className="brand-mark">✉</span> {t.title}<span className="brand-dot">.pe</span></Link>
           <div className="nav-links">
             <Link to="/">{t.nav_home}</Link>
             <Link to="/registrar">{t.nav_registro}</Link>
-            <Link to="/nosotros">🌟 Nosotros</Link>
-            <Link to="/mi-nino">❤️ Mi Niño</Link>
+            <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
+            <Link to="/mi-nino">{lang === 'es' ? 'Mi niño' : 'My child'}</Link>
             <Link to="/admin">{t.nav_admin}</Link>
             <button className="lang-btn" onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>
-              {lang === 'es' ? '🇺🇸 EN' : '🇵🇪 ES'}
+              {lang === 'es' ? 'EN' : 'ES'}
             </button>
           </div>
         </nav>

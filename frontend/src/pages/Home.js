@@ -139,8 +139,8 @@ export default function Home() {
     <>
       <div className="hero">
         <div className="hero-snow" />
-        <h1>{t.hero_title}</h1>
-        <p className="hero-tagline">{t.hero_tagline}</p>
+        <span className="hero-eyebrow"><span className="dot" /> {t.hero_eyebrow}</span>
+        <h1>{t.hero_tagline}<br /><span className="accent">{t.hero_title}</span></h1>
         <p className="hero-sub">{t.hero_sub}</p>
         <CountdownNavidad />
         <div className="hero-btns">

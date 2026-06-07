@@ -56,9 +56,16 @@ body {
   position: sticky; top: 0; z-index: 100;
 }
 .nav-brand {
-  color: var(--ink); font-size: 1.3rem; font-weight: 800; text-decoration: none;
-  letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.1rem;
+  color: var(--ink); font-size: 1.25rem; font-weight: 800; text-decoration: none;
+  letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.45rem;
 }
+.brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--red); color: #fff; font-size: 0.95rem;
+  box-shadow: var(--sh-red);
+}
+.brand-dot { color: var(--red); font-weight: 700; }
 .nav-links { display: flex; gap: 0.15rem; align-items: center; }
 .nav-links a {
   color: var(--ink-soft); text-decoration: none; font-size: 0.88rem; font-weight: 500;
