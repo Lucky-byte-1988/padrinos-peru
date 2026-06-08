@@ -534,4 +534,9 @@ img, video, iframe { max-width: 100%; }
   .detail-carta-full p { font-size: 1.2rem; }
   .detail-wrapper { padding: 1.5rem 1rem 4rem; }
   .fb-comments, .godfather-form, .wa-contact, .detail-carta-full { margin-left: 1.1rem; margin-right: 1.1rem; }
+
+  /* Acciones del post se acomodan sin desbordar en móvil */
+  .post-actions { flex-wrap: wrap; gap: 0.2rem; padding: 0.6rem 1rem 1rem; }
+  .action-btn { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
+  .action-btn-primary { margin-left: 0; margin-top: 0.4rem; width: 100%; text-align: center; }
 }
