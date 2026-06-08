@@ -551,6 +551,18 @@ img, video, iframe { max-width: 100%; }
 .mini-name { font-weight: 700; color: var(--ink); font-size: 1.05rem; }
 .mini-loc { font-size: 0.82rem; color: var(--ink-soft); margin-top: 0.15rem; }
 
+/* ═══ PESTAÑAS DEL DETALLE (Mensajes / Videos) ═══ */
+.detail-tabs {
+  display: flex; gap: 0.4rem; margin: 0 1.8rem 1.4rem;
+  background: var(--bg-warm); padding: 0.35rem; border-radius: 980px;
+}
+.detail-tab {
+  flex: 1; padding: 0.7rem; border: none; background: transparent;
+  color: var(--ink-soft); font-weight: 700; font-size: 0.92rem; cursor: pointer;
+  font-family: inherit; border-radius: 980px; transition: all 0.25s var(--ease);
+}
+.detail-tab.active { background: var(--surface); color: var(--ink); box-shadow: var(--sh-sm); }
+
 /* ═══ FOOTER ═══ */
 .footer { background: var(--ink); color: rgba(255,255,255,0.55); text-align: center; padding: 2.5rem; font-size: 0.88rem; }
 

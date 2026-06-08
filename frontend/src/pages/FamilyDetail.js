@@ -21,6 +21,7 @@ export default function FamilyDetail() {
   const [msgForm, setMsgForm] = useState({ autor: '', email: '', texto: '' });
   const [msgEnviado, setMsgEnviado] = useState(false);
   const [msgEnviando, setMsgEnviando] = useState(false);
+  const [tab, setTab] = useState('mensajes'); // 'mensajes' | 'videos'
 
   const handleMensajePrivado = async e => {
     e.preventDefault();
@@ -95,12 +96,43 @@ export default function FamilyDetail() {
           )}
         </div>
 
-        {/* Hilo de videos estilo TikTok */}
-        <div style={{margin:'0 1.4rem 1.4rem'}}>
-          <VideoThread ninoId={id} ninoNombre={nino.nombre} videoInicial={nino.video_url} />
+        {/* Acciones rápidas */}
+        <div className="post-actions">
+          <button className={`action-btn ${liked?'liked':''}`} onClick={handleLike}>
+            <span>{liked?'❤️':'🤍'}</span> {likes}
+          </button>
+          <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${nino.nombre}: ${window.location.href}`}
+            target="_blank" rel="noreferrer" className="action-btn" style={{textDecoration:'none'}}>
+            <span>↗️</span> Compartir
+          </a>
         </div>
 
-        {/* WhatsApp */}
+        {/* Ser padrino (CTA principal) */}
+        {!nino.tiene_padrino && !success && (
+          <div className="godfather-form">
+            <h4>❤️ {t.godfather_title}</h4>
+            <form onSubmit={handlePadrino}>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.8rem', marginBottom:'0.8rem'}}>
+                <div className="form-group" style={{marginBottom:0}}>
+                  <label>{t.godfather_name}</label>
+                  <input value={padrinoForm.nombre} onChange={e=>setPadrinoForm({...padrinoForm,nombre:e.target.value})} required />
+                </div>
+                <div className="form-group" style={{marginBottom:0}}>
+                  <label>{t.godfather_country}</label>
+                  <input value={padrinoForm.pais} onChange={e=>setPadrinoForm({...padrinoForm,pais:e.target.value})} placeholder="Perú, España..." />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>{t.godfather_email}</label>
+                <input type="email" value={padrinoForm.email} onChange={e=>setPadrinoForm({...padrinoForm,email:e.target.value})} required />
+              </div>
+              <button className="submit-btn" disabled={enviando}>{enviando ? '⏳...' : t.godfather_btn}</button>
+            </form>
+          </div>
+        )}
+        {success && <div className="success-msg" style={{margin:'0 1.8rem 1.4rem'}}>🎄 {t.godfather_success}</div>}
+
+        {/* Contacto con la familia */}
         {nino.whatsapp && (
           <a href={`https://wa.me/51${nino.whatsapp}`} target="_blank" rel="noreferrer" className="wa-contact">
             <span style={{fontSize:'1.6rem'}}>💬</span>
@@ -110,9 +142,7 @@ export default function FamilyDetail() {
             </div>
           </a>
         )}
-
-        {/* Mensaje privado tipo Messenger */}
-        <div style={{margin:'0 1.8rem 1.4rem'}}>
+        <div style={{margin:'0 1.8rem 1.6rem'}}>
           {!showMsg && !msgEnviado && (
             <button className="msg-priv-btn" onClick={() => setShowMsg(true)}>
               💌 Enviar mensaje privado a la familia
@@ -143,51 +173,22 @@ export default function FamilyDetail() {
           )}
         </div>
 
-        {/* Acciones */}
-        <div className="post-actions">
-          <button className={`action-btn ${liked?'liked':''}`} onClick={handleLike}>
-            <span>{liked?'❤️':'🤍'}</span> {likes}
+        {/* Pestañas: Mensajes / Videos (todo ordenado y limpio) */}
+        <div className="detail-tabs">
+          <button className={`detail-tab ${tab==='mensajes'?'active':''}`} onClick={()=>setTab('mensajes')}>
+            💬 Mensajes
           </button>
-          <a href="#comentarios" className="action-btn" style={{textDecoration:'none'}}>
-            <span>💬</span> Comentar
-          </a>
-          <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${nino.nombre}: ${window.location.href}`}
-            target="_blank" rel="noreferrer" className="action-btn" style={{textDecoration:'none'}}>
-            <span>💬</span> WhatsApp
-          </a>
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
-            target="_blank" rel="noreferrer" className="action-btn" style={{textDecoration:'none'}}>
-            <span>📘</span> Facebook
-          </a>
+          <button className={`detail-tab ${tab==='videos'?'active':''}`} onClick={()=>setTab('videos')}>
+            🎬 Videos
+          </button>
         </div>
 
-        {/* Ser padrino */}
-        {!nino.tiene_padrino && !success && (
-          <div className="godfather-form">
-            <h4>❤️ {t.godfather_title}</h4>
-            <form onSubmit={handlePadrino}>
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.8rem', marginBottom:'0.8rem'}}>
-                <div className="form-group" style={{marginBottom:0}}>
-                  <label>{t.godfather_name}</label>
-                  <input value={padrinoForm.nombre} onChange={e=>setPadrinoForm({...padrinoForm,nombre:e.target.value})} required />
-                </div>
-                <div className="form-group" style={{marginBottom:0}}>
-                  <label>{t.godfather_country}</label>
-                  <input value={padrinoForm.pais} onChange={e=>setPadrinoForm({...padrinoForm,pais:e.target.value})} placeholder="Perú, España..." />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>{t.godfather_email}</label>
-                <input type="email" value={padrinoForm.email} onChange={e=>setPadrinoForm({...padrinoForm,email:e.target.value})} required />
-              </div>
-              <button className="submit-btn" disabled={enviando}>{enviando ? '⏳...' : t.godfather_btn}</button>
-            </form>
-          </div>
-        )}
-        {success && <div className="success-msg" style={{margin:'0 1.2rem 1.2rem'}}>🎄 {t.godfather_success}</div>}
-
-        {/* Comentarios estilo Facebook */}
-        <Comments ninoId={id} />
+        {tab === 'mensajes'
+          ? <Comments ninoId={id} />
+          : <div style={{margin:'0 1.8rem 1.8rem'}}>
+              <VideoThread ninoId={id} ninoNombre={nino.nombre} videoInicial={nino.video_url} />
+            </div>
+        }
       </div>
     </div>
   );
