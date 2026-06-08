@@ -30,12 +30,6 @@ function HowItWorks() {
           </Reveal>
         ))}
       </div>
-      <Reveal delay={120}>
-        <div className="how-video">
-          <video src="/como-funciona.mp4" autoPlay loop muted playsInline
-            poster="/como-funciona.gif" aria-label="Animación de cómo funciona la plataforma" />
-        </div>
-      </Reveal>
     </section>
   );
 }
