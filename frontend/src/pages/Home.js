@@ -5,7 +5,10 @@ import { API, cld } from '../config';
 import { LangContext } from '../App';
 import Reveal from '../Reveal';
 import StoryViewer from '../StoryViewer';
-import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, WhatsAppIcon } from '../Icons';
+import Modal from '../Modal';
+import Comments from '../Comments';
+import PadrinoForm from '../PadrinoForm';
+import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, WhatsAppIcon, GiftIcon } from '../Icons';
 
 function HowItWorks() {
   const pasos = [
@@ -68,6 +71,8 @@ function CountdownNavidad() {
 function PostCard({ n, t }) {
   const [likes, setLikes] = useState(n.likes || 0);
   const [liked, setLiked] = useState(false);
+  const [modal, setModal] = useState(null); // 'carta' | 'comentarios' | 'padrino' | null
+  const [tienePadrino, setTienePadrino] = useState(n.tiene_padrino);
 
   const handleLike = async () => {
     if (liked) return;
@@ -89,8 +94,8 @@ function PostCard({ n, t }) {
           <div className="post-name">🎄 {n.nombre}</div>
           <div className="post-location">📍 {n.provincia}, {n.region} · {n.edad} años</div>
         </div>
-        <span className={`post-badge ${n.tiene_padrino ? 'con' : 'sin'}`}>
-          {n.tiene_padrino ? '✓ Apadrinado' : 'Busca padrino'}
+        <span className={`post-badge ${tienePadrino ? 'con' : 'sin'}`}>
+          {tienePadrino ? '✓ Apadrinado' : 'Busca padrino'}
         </span>
       </div>
 
@@ -108,27 +113,59 @@ function PostCard({ n, t }) {
         </div>
       )}
 
-      {/* Acciones estilo Instagram */}
+      {/* Acciones estilo Instagram — abren ventanitas (popups) */}
       <div className="ig-actions">
         <div className="ig-actions-left">
           <button className={`ig-btn ${liked ? 'liked' : ''}`} onClick={handleLike} aria-label="Me gusta">
             <HeartIcon filled={liked} />
           </button>
-          <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Comentar">
+          <button className="ig-btn" onClick={() => setModal('comentarios')} aria-label="Mensajes">
             <CommentIcon />
-          </Link>
-          <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${n.nombre} esta Navidad: ${window.location.origin}/carta/${n.id}`}
-            target="_blank" rel="noreferrer" className="ig-btn" aria-label="Compartir">
-            <ShareIcon />
-          </a>
+          </button>
+          {!tienePadrino && (
+            <button className="ig-btn" onClick={() => setModal('padrino')} aria-label="Ser padrino" title="Ser su padrino">
+              <GiftIcon />
+            </button>
+          )}
           {n.whatsapp && (
             <a href={`https://wa.me/51${n.whatsapp}`} target="_blank" rel="noreferrer" className="ig-btn" aria-label="Contactar por WhatsApp">
               <WhatsAppIcon />
             </a>
           )}
+          <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${n.nombre} esta Navidad: ${window.location.origin}/carta/${n.id}`}
+            target="_blank" rel="noreferrer" className="ig-btn" aria-label="Compartir">
+            <ShareIcon />
+          </a>
         </div>
-        <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Ver carta" title="Ver carta"><LetterIcon /></Link>
+        <button className="ig-btn" onClick={() => setModal('carta')} aria-label="Ver carta" title="Ver carta"><LetterIcon /></button>
       </div>
+
+      {/* VENTANITAS EMERGENTES */}
+      <Modal open={modal==='carta'} onClose={()=>setModal(null)} title={`Carta de ${n.nombre}`}>
+        {n.foto_familia && (
+          <img src={cld(n.foto_familia, 'w_700,q_auto,f_auto,c_limit')} alt={n.nombre}
+            style={{width:'100%', borderRadius:16, marginBottom:'1rem', maxHeight:'40vh', objectFit:'cover'}} />
+        )}
+        <p style={{fontSize:'1.05rem', lineHeight:1.7, color:'var(--ink)'}}>"{n.carta_texto}"</p>
+        {n.carta_foto && (
+          <img src={cld(n.carta_foto, 'w_700,q_auto,f_auto,c_limit')} alt="Carta a mano"
+            style={{width:'100%', borderRadius:14, marginTop:'1rem'}} />
+        )}
+        <p style={{color:'var(--ink-faint)', fontSize:'0.85rem', marginTop:'0.8rem'}}>
+          📍 {n.provincia}, {n.region} · {n.edad} años
+        </p>
+        <Link to={`/carta/${n.id}`} className="auth-submit" style={{display:'block', textAlign:'center', textDecoration:'none', marginTop:'1rem'}}>
+          Ver videos y más →
+        </Link>
+      </Modal>
+
+      <Modal open={modal==='comentarios'} onClose={()=>setModal(null)} title={`Mensajes para ${n.nombre}`}>
+        <Comments ninoId={n.id} />
+      </Modal>
+
+      <Modal open={modal==='padrino'} onClose={()=>setModal(null)} title={`Ser padrino de ${n.nombre}`}>
+        <PadrinoForm ninoId={n.id} ninoNombre={n.nombre} onSuccess={()=>setTienePadrino(true)} />
+      </Modal>
 
       {/* Conteo de me gusta */}
       <div className="ig-likes">{likes.toLocaleString('es')} me gusta</div>
@@ -136,9 +173,9 @@ function PostCard({ n, t }) {
       {/* Comentarios */}
       {n.num_comentarios > 0 && (
         <div className="post-comments-preview">
-          <Link to={`/carta/${n.id}`} style={{color:'var(--ink-soft)', textDecoration:'none'}}>
-            Ver los {n.num_comentarios} comentario{n.num_comentarios !== 1 ? 's' : ''}
-          </Link>
+          <button onClick={()=>setModal('comentarios')} style={{background:'none', border:'none', padding:0, cursor:'pointer', color:'var(--ink-soft)', fontFamily:'inherit', fontSize:'0.88rem'}}>
+            Ver los {n.num_comentarios} mensaje{n.num_comentarios !== 1 ? 's' : ''}
+          </button>
         </div>
       )}
       <div style={{paddingBottom:'1rem'}} />

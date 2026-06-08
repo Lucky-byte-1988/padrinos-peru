@@ -31,6 +31,16 @@ export const WhatsAppIcon = ({ size = 25 }) => (
   </svg>
 );
 
+export const GiftIcon = ({ size = 25 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="8" width="18" height="4" rx="1"/>
+    <path d="M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/>
+    <line x1="12" y1="8" x2="12" y2="21"/>
+    <path d="M12 8S10.5 3.5 8 4.5C6.3 5.2 7 8 9 8z"/>
+    <path d="M12 8s1.5-4.5 4-3.5C17.7 5.2 17 8 15 8z"/>
+  </svg>
+);
+
 export const LetterIcon = ({ size = 25 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect x="3" y="5" width="18" height="14" rx="2.5"/>
