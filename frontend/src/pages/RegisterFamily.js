@@ -27,7 +27,6 @@ function FileUpload({ label, name, accept, capture, preview, onChange, icon }) {
           type="file"
           name={name}
           accept={accept}
-          capture={capture}
           onChange={onChange}
           style={{ display: 'none' }}
         />

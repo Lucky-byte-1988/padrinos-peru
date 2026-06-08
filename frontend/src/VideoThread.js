@@ -150,7 +150,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
                 <small>Desde tu cámara o galería</small>
               </div>
             )}
-            <input type="file" accept="video/*" capture="user" onChange={handleFile} style={{display:'none'}} />
+            <input type="file" accept="video/*" onChange={handleFile} style={{display:'none'}} />
           </label>
 
           <div className="vthread-form-row">
