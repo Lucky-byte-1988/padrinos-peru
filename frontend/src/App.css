@@ -451,31 +451,37 @@ img, video, iframe { max-width: 100%; }
 /* ═══ CTA FINAL CINEMATOGRÁFICO ═══ */
 .cta-final {
   position: relative; overflow: hidden;
-  margin: 2rem 1.5rem 0; border-radius: 32px;
-  background: linear-gradient(135deg, #2a0a0a 0%, #7f1d1d 55%, #b91c1c 100%);
-  padding: 5rem 2rem; text-align: center; color: #fff;
-  max-width: 1080px; margin-left: auto; margin-right: auto;
+  margin: 4rem auto 1rem; border-radius: 40px;
+  background:
+    radial-gradient(ellipse 60% 80% at 15% 20%, rgba(217,68,54,0.10), transparent 60%),
+    radial-gradient(ellipse 50% 70% at 85% 80%, rgba(176,137,39,0.12), transparent 60%),
+    linear-gradient(180deg, #fff 0%, var(--bg-warm) 100%);
+  border: 1px solid var(--line);
+  padding: 5.5rem 2rem; text-align: center; color: var(--ink);
+  max-width: 1080px; width: calc(100% - 3rem);
+  box-shadow: var(--sh);
 }
-.cta-orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
-.cta-orb-1 { width: 340px; height: 340px; top: -120px; left: -60px; background: radial-gradient(circle, rgba(255,200,120,0.4), transparent 70%); animation: floatSlow 18s ease-in-out infinite; }
-.cta-orb-2 { width: 300px; height: 300px; bottom: -120px; right: -40px; background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%); animation: floatSlow 21s ease-in-out infinite reverse; }
+.cta-orb { position: absolute; border-radius: 50%; filter: blur(70px); pointer-events: none; opacity: 0.5; }
+.cta-orb-1 { width: 360px; height: 360px; top: -130px; left: -70px; background: radial-gradient(circle, rgba(217,68,54,0.30), transparent 70%); animation: floatSlow 18s ease-in-out infinite; }
+.cta-orb-2 { width: 320px; height: 320px; bottom: -130px; right: -50px; background: radial-gradient(circle, rgba(176,137,39,0.28), transparent 70%); animation: floatSlow 21s ease-in-out infinite reverse; }
 .cta-title {
-  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.04em;
-  line-height: 1.08; position: relative; z-index: 1; max-width: 640px; margin: 0 auto;
+  font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.045em;
+  line-height: 1.06; position: relative; z-index: 1; max-width: 660px; margin: 0 auto; color: var(--ink);
 }
-.cta-sub { font-size: 1.15rem; opacity: 0.85; margin: 1.2rem auto 2.4rem; max-width: 500px; position: relative; z-index: 1; line-height: 1.55; }
+.cta-sub { font-size: 1.18rem; color: var(--ink-soft); margin: 1.3rem auto 2.6rem; max-width: 520px; position: relative; z-index: 1; line-height: 1.55; }
 .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
 .cta-btn-white {
-  background: #fff; color: var(--red); padding: 0.95rem 2.2rem; border-radius: 980px;
-  font-weight: 700; text-decoration: none; font-size: 1.02rem; transition: all 0.3s var(--ease);
+  background: var(--red); color: #fff; padding: 1rem 2.4rem; border-radius: 980px;
+  font-weight: 700; text-decoration: none; font-size: 1.05rem; transition: all 0.3s var(--ease);
+  box-shadow: var(--sh-red);
 }
-.cta-btn-white:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+.cta-btn-white:hover { background: var(--red-bright); transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 36px rgba(192,57,43,0.32); }
 .cta-btn-ghost {
-  background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.4);
-  padding: 0.95rem 2.2rem; border-radius: 980px; font-weight: 600; text-decoration: none;
-  font-size: 1.02rem; transition: all 0.3s var(--ease); backdrop-filter: blur(8px);
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  padding: 1rem 2.4rem; border-radius: 980px; font-weight: 600; text-decoration: none;
+  font-size: 1.05rem; transition: all 0.3s var(--ease);
 }
-.cta-btn-ghost:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+.cta-btn-ghost:hover { background: #fff; border-color: var(--ink-faint); transform: translateY(-2px); box-shadow: var(--sh-sm); }
 
 /* ═══ BOTÓN EXPORTAR ═══ */
 .btn-export {
