@@ -388,9 +388,26 @@ def seed_data():
             db.session.add(n)
         db.session.commit()
 
+def migrate():
+    # Agrega columnas nuevas a tablas existentes (PostgreSQL no las añade solo)
+    from sqlalchemy import text
+    stmts = [
+        "ALTER TABLE nino ADD COLUMN IF NOT EXISTS owner_email VARCHAR(120)",
+        "ALTER TABLE nino ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0",
+        "ALTER TABLE comentario ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0",
+        "ALTER TABLE comentario ADD COLUMN IF NOT EXISTS parent_id INTEGER",
+    ]
+    for s in stmts:
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(text(s)); conn.commit()
+        except Exception as e:
+            print(f"[migrate omitido] {e}")
+
 # Crear tablas y datos iniciales al arrancar (funciona con gunicorn y en local)
 with app.app_context():
     db.create_all()
+    migrate()
     seed_data()
 
 if __name__ == '__main__':
