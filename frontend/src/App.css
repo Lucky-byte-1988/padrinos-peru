@@ -565,7 +565,8 @@ img, video, iframe { max-width: 100%; }
   background: var(--bg-warm); color: var(--ink-soft); font-size: 1rem; transition: all 0.2s;
 }
 .modal-close:hover { background: var(--line); color: var(--ink); }
-.modal-body { padding: 1.4rem; overflow-y: auto; flex: 1; min-height: 0; -webkit-overflow-scrolling: touch; }
+.modal-body { padding: 1.4rem; overflow-y: auto; flex: 1; min-height: 0; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.modal-overlay { overscroll-behavior: contain; }
 .modal-body .fb-comments { margin: 0; }
 
 /* Hoja deslizante desde abajo (estilo Instagram) */
