@@ -5,6 +5,7 @@ import { API, cld } from '../config';
 import { LangContext } from '../App';
 import Reveal from '../Reveal';
 import StoryViewer from '../StoryViewer';
+import { HeartIcon, CommentIcon, ShareIcon, BookmarkIcon } from '../Icons';
 
 function HowItWorks() {
   const pasos = [
@@ -107,28 +108,39 @@ function PostCard({ n, t }) {
         </div>
       )}
 
-      {/* Acciones */}
-      <div className="post-actions">
-        <button className={`action-btn ${liked ? 'liked' : ''}`} onClick={handleLike}>
-          <span>{liked ? '❤️' : '🤍'}</span> {likes}
-        </button>
-        <Link to={`/carta/${n.id}`} className="action-btn" style={{textDecoration:'none'}}>
-          <span>💬</span> {n.num_comentarios}
-        </Link>
-        <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${n.nombre} esta Navidad: ${window.location.origin}/carta/${n.id}`}
-          target="_blank" rel="noreferrer" className="action-btn" style={{textDecoration:'none'}}>
-          <span>↗️</span> Compartir
-        </a>
-        {!n.tiene_padrino && (
-          <Link to={`/carta/${n.id}`} className="action-btn-primary">❤️ Ser padrino</Link>
-        )}
+      {/* Acciones estilo Instagram */}
+      <div className="ig-actions">
+        <div className="ig-actions-left">
+          <button className={`ig-btn ${liked ? 'liked' : ''}`} onClick={handleLike} aria-label="Me gusta">
+            <HeartIcon filled={liked} />
+          </button>
+          <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Comentar">
+            <CommentIcon />
+          </Link>
+          <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${n.nombre} esta Navidad: ${window.location.origin}/carta/${n.id}`}
+            target="_blank" rel="noreferrer" className="ig-btn" aria-label="Compartir">
+            <ShareIcon />
+          </a>
+        </div>
+        <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Ver"><BookmarkIcon /></Link>
       </div>
 
+      {/* Conteo de me gusta */}
+      <div className="ig-likes">{likes.toLocaleString('es')} me gusta</div>
+
+      {/* Comentarios */}
       {n.num_comentarios > 0 && (
         <div className="post-comments-preview">
-          <Link to={`/carta/${n.id}`} style={{color:'#666', textDecoration:'none'}}>
+          <Link to={`/carta/${n.id}`} style={{color:'var(--ink-soft)', textDecoration:'none'}}>
             Ver los {n.num_comentarios} comentario{n.num_comentarios !== 1 ? 's' : ''}
           </Link>
+        </div>
+      )}
+
+      {/* CTA Ser padrino */}
+      {!n.tiene_padrino && (
+        <div style={{padding:'0.4rem 1.4rem 1.3rem'}}>
+          <Link to={`/carta/${n.id}`} className="ig-padrino">❤️ Ser su padrino</Link>
         </div>
       )}
     </div>

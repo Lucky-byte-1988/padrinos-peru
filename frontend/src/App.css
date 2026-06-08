@@ -508,6 +508,18 @@ img, video, iframe { max-width: 100%; }
 .msg-priv-send { flex: 2; background: var(--red); color: #fff; border: none; padding: 0.85rem; border-radius: 980px; font-weight: 600; cursor: pointer; font-family: inherit; box-shadow: var(--sh-red); }
 .msg-priv-send:disabled { opacity: 0.5; }
 
+/* ═══ ACCIONES ESTILO INSTAGRAM ═══ */
+.ig-actions { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1.3rem 0.3rem; }
+.ig-actions-left { display: flex; align-items: center; gap: 1rem; }
+.ig-btn { background: none; border: none; padding: 0; cursor: pointer; color: var(--ink); display: inline-flex; align-items: center; transition: transform 0.15s var(--ease), color 0.2s; }
+.ig-btn:hover { color: var(--ink-soft); transform: scale(1.08); }
+.ig-btn.liked { color: #e0245e; }
+.ig-btn.liked:hover { color: #e0245e; }
+.ig-likes { padding: 0.1rem 1.4rem 0.2rem; font-weight: 700; font-size: 0.95rem; color: var(--ink); }
+.ig-padrino { display: block; text-align: center; background: var(--red); color: #fff; text-decoration: none; padding: 0.8rem; border-radius: 980px; font-weight: 700; font-size: 0.95rem; box-shadow: var(--sh-red); transition: all 0.25s var(--ease); }
+.ig-padrino:hover { background: var(--red-bright); transform: translateY(-2px); }
+.post-comments-preview { padding: 0.1rem 1.4rem 0.6rem; }
+
 /* ═══ SESIÓN (navbar) ═══ */
 .session-login { background: var(--ink); color: #fff !important; padding: 0.45rem 1.1rem !important; border-radius: 980px; font-weight: 600 !important; }
 .session-login:hover { background: var(--red) !important; }
