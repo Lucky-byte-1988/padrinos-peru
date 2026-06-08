@@ -199,7 +199,10 @@ export default function Home() {
         <div>
           {/* Stories — al tocar se abren como historias de Instagram */}
           <div className="stories-bar">
-            <Link to="/registrar" className="story-add" title="Registrar niño">➕</Link>
+            <Link to="/registrar" className="story" title="Registrar niño">
+              <div className="story-add"><span>＋</span></div>
+              <span className="story-name">Agregar</span>
+            </Link>
             {ninos.slice(0, 12).map((n, i) => (
               <button type="button" className="story" key={n.id} onClick={() => setStoryIdx(i)}>
                 <div className="story-ring">
