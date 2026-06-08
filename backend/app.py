@@ -84,6 +84,21 @@ class VideoMensaje(db.Model):
     likes = db.Column(db.Integer, default=0)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
+SUPER_ADMIN = 'rimapaivan@gmail.com'  # dueño, siempre admin, no se puede quitar
+
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+def es_admin(email):
+    if not email:
+        return False
+    email = email.lower().strip()
+    if email == SUPER_ADMIN:
+        return True
+    return Admin.query.filter(db.func.lower(Admin.email) == email).first() is not None
+
 class MensajePrivado(db.Model):
     # Mensaje privado a la familia (no se muestra en el feed público)
     id = db.Column(db.Integer, primary_key=True)
@@ -334,6 +349,45 @@ def get_historial():
         'fecha_registro': h.fecha_registro.strftime('%Y-%m-%d') if h.fecha_registro else '—',
         'fecha_eliminacion': h.fecha_eliminacion.strftime('%Y-%m-%d %H:%M') if h.fecha_eliminacion else '—',
     } for h in items])
+
+@app.route('/api/admins', methods=['GET'])
+def listar_admins():
+    admins = Admin.query.order_by(Admin.fecha.asc()).all()
+    return jsonify({
+        'super_admin': SUPER_ADMIN,
+        'admins': [{'id': a.id, 'email': a.email} for a in admins]
+    })
+
+@app.route('/api/admins', methods=['POST'])
+def agregar_admin():
+    data = request.json or {}
+    if not es_admin(data.get('by')):
+        return jsonify({'error': 'No autorizado'}), 403
+    email = (data.get('email') or '').lower().strip()
+    if not email or '@' not in email:
+        return jsonify({'error': 'Correo no válido'}), 400
+    if email == SUPER_ADMIN or Admin.query.filter(db.func.lower(Admin.email) == email).first():
+        return jsonify({'mensaje': 'Ya es administrador'}), 200
+    db.session.add(Admin(email=email))
+    db.session.commit()
+    return jsonify({'mensaje': 'Administrador agregado'}), 201
+
+@app.route('/api/admins/<int:aid>', methods=['DELETE'])
+def quitar_admin(aid):
+    by = request.args.get('by') or (request.get_json(silent=True) or {}).get('by')
+    if not es_admin(by):
+        return jsonify({'error': 'No autorizado'}), 403
+    a = Admin.query.get_or_404(aid)
+    if a.email.lower() == SUPER_ADMIN:
+        return jsonify({'error': 'No se puede quitar al dueño'}), 400
+    db.session.delete(a)
+    db.session.commit()
+    return jsonify({'mensaje': 'Administrador eliminado'})
+
+@app.route('/api/es-admin', methods=['GET'])
+def check_admin():
+    email = request.args.get('email', '')
+    return jsonify({'es_admin': es_admin(email)})
 
 @app.route('/api/padrinos/<int:pid>', methods=['DELETE'])
 def borrar_padrino(pid):

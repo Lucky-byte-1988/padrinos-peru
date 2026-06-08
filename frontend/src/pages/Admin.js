@@ -3,12 +3,16 @@ import axios from 'axios';
 import { API } from '../config';
 import { Link } from 'react-router-dom';
 import { LangContext } from '../App';
+import { useAuth } from '../AuthContext';
 
 export default function Admin() {
   const { t } = useContext(LangContext);
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [historial, setHistorial] = useState([]);
   const [mensajes, setMensajes] = useState([]);
+  const [admins, setAdmins] = useState({ super_admin: '', admins: [] });
+  const [nuevoAdmin, setNuevoAdmin] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [tab, setTab] = useState('ninos');
 
@@ -16,8 +20,23 @@ export default function Admin() {
     axios.get(API+'/api/admin').then(r => setData(r.data));
     axios.get(API+'/api/historial').then(r => setHistorial(r.data)).catch(()=>{});
     axios.get(API+'/api/mensajes-privados').then(r => setMensajes(r.data)).catch(()=>{});
+    axios.get(API+'/api/admins').then(r => setAdmins(r.data)).catch(()=>{});
   };
   useEffect(() => { cargar(); }, []);
+
+  const agregarAdmin = async (e) => {
+    e.preventDefault();
+    if (!nuevoAdmin.trim()) return;
+    const r = await axios.post(`${API}/api/admins`, { email: nuevoAdmin.trim(), by: user?.email });
+    setNuevoAdmin('');
+    cargar();
+    alert(r.data.mensaje || 'Listo');
+  };
+  const quitarAdmin = async (a) => {
+    if (!window.confirm(`¿Quitar como administrador a ${a.email}?`)) return;
+    await axios.delete(`${API}/api/admins/${a.id}?by=${encodeURIComponent(user?.email)}`);
+    cargar();
+  };
 
   const exportarCSV = (filas, columnas, nombreArchivo) => {
     const esc = (v) => {
@@ -88,6 +107,9 @@ export default function Admin() {
         </button>
         <button className={`admin-tab ${tab === 'historial' ? 'active' : ''}`} onClick={() => setTab('historial')}>
           📋 Historial ({historial.length})
+        </button>
+        <button className={`admin-tab ${tab === 'admins' ? 'active' : ''}`} onClick={() => setTab('admins')}>
+          🔑 Administradores
         </button>
       </div>
 
@@ -295,6 +317,51 @@ export default function Admin() {
                     <td>{h.fecha_eliminacion}</td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {tab === 'admins' && (
+        <>
+          <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', marginBottom:'1.2rem'}}>
+            🔑 Personas con acceso al Panel Admin. Agrega el correo de quien quieras que también administre la página.
+          </p>
+          <form onSubmit={agregarAdmin} style={{display:'flex', gap:'0.6rem', marginBottom:'1.5rem', flexWrap:'wrap'}}>
+            <input className="filtro-buscar" style={{flex:1, minWidth:220}} type="email"
+              placeholder="correo@ejemplo.com" value={nuevoAdmin}
+              onChange={e=>setNuevoAdmin(e.target.value)} required />
+            <button className="btn-export" style={{background:'var(--red)'}} type="submit">＋ Agregar administrador</button>
+          </form>
+          <div style={{overflowX:'auto'}}>
+            <table className="admin-table">
+              <thead>
+                <tr><th>Correo</th><th>Rol</th><th>Acción</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{fontWeight:'bold'}}>{admins.super_admin}</td>
+                  <td><span className="badge-si">👑 Dueño</span></td>
+                  <td style={{color:'var(--ink-faint)', fontSize:'0.8rem'}}>No se puede quitar</td>
+                </tr>
+                {admins.admins?.map(a => (
+                  <tr key={a.id}>
+                    <td>{a.email}</td>
+                    <td><span className="badge-si" style={{background:'#eef2ff', color:'#4f46e5'}}>Administrador</span></td>
+                    <td>
+                      <button onClick={() => quitarAdmin(a)}
+                        style={{background:'#fef2f2', color:'#b91c1c', border:'1px solid #fecaca', borderRadius:'8px', padding:'0.3rem 0.6rem', fontSize:'0.78rem', fontWeight:600, cursor:'pointer'}}>
+                        🗑 Quitar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {(!admins.admins || admins.admins.length === 0) && (
+                  <tr><td colSpan="3" style={{textAlign:'center', color:'var(--ink-faint)', padding:'1.2rem'}}>
+                    Aún no has agregado otros administradores.
+                  </td></tr>
+                )}
               </tbody>
             </table>
           </div>

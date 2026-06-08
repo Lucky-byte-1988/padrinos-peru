@@ -1,8 +1,6 @@
-// Solo estos correos pueden entrar al Panel Admin.
-// Agrega aquí tu correo (con el que inicias sesión) para ser el único administrador.
-export const ADMIN_EMAILS = [
-  'rimapaivan@gmail.com',
-];
+// El dueño siempre es administrador (acceso instantáneo, sin depender del servidor).
+export const SUPER_ADMIN = 'rimapaivan@gmail.com';
 
-export const esAdmin = (email) =>
-  !!email && ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase());
+// Los demás administradores se gestionan desde el Panel Admin (se guardan en la base de datos).
+export const esSuperAdmin = (email) =>
+  !!email && email.toLowerCase() === SUPER_ADMIN.toLowerCase();

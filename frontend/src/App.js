@@ -8,12 +8,11 @@ import PadrinoPanel from './pages/PadrinoPanel';
 import Nosotros from './pages/Nosotros';
 import Login from './pages/Login';
 import { AuthProvider, useAuth } from './AuthContext';
-import { esAdmin } from './adminConfig';
 import { translations } from './i18n';
 import './App.css';
 
 function AdminGuard({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   if (loading) return <p className="loading">Cargando…</p>;
   if (!user) {
     return (
@@ -25,7 +24,7 @@ function AdminGuard({ children }) {
       </div>
     );
   }
-  if (!esAdmin(user.email)) {
+  if (!isAdmin) {
     return (
       <div className="form-page" style={{textAlign:'center'}}>
         <div style={{fontSize:'3rem'}}>⛔</div>
@@ -57,7 +56,7 @@ function SessionButton() {
 
 function Nav() {
   const { lang, setLang, t } = React.useContext(LangContext);
-  const { user } = useAuth();
+  const { isAdmin } = useAuth();
   return (
     <nav className="navbar">
       <Link to="/" className="nav-brand"><span className="brand-mark">✉</span> {t.title}<span className="brand-dot">.pe</span></Link>
@@ -66,7 +65,7 @@ function Nav() {
         <Link to="/registrar">{t.nav_registro}</Link>
         <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
         <Link to="/mi-nino">{lang === 'es' ? 'Mi niño' : 'My child'}</Link>
-        {esAdmin(user?.email) && <Link to="/admin">{t.nav_admin}</Link>}
+        {isAdmin && <Link to="/admin">{t.nav_admin}</Link>}
         <button className="lang-btn" onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>
           {lang === 'es' ? 'EN' : 'ES'}
         </button>
