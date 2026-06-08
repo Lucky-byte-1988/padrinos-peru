@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-export default function Modal({ open, onClose, title, children, maxWidth = 480 }) {
+export default function Modal({ open, onClose, title, children, maxWidth = 480, sheet = false }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -12,11 +12,11 @@ export default function Modal({ open, onClose, title, children, maxWidth = 480 }
 
   if (!open) return null;
 
-  // Portal a <body> para que el popup quede centrado en la pantalla
-  // (y no lo afecten las animaciones/transform de las tarjetas)
+  // sheet = hoja deslizante desde abajo (estilo Instagram)
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" style={{ maxWidth }} onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay ${sheet ? 'is-sheet' : ''}`} onClick={onClose}>
+      <div className={`modal-card ${sheet ? 'modal-sheet' : ''}`} style={sheet ? {} : { maxWidth }} onClick={(e) => e.stopPropagation()}>
+        {sheet && <div className="sheet-handle" />}
         <div className="modal-head">
           <h3 className="modal-title">{title}</h3>
           <button className="modal-close" onClick={onClose} aria-label="Cerrar">✕</button>

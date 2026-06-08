@@ -159,7 +159,7 @@ function PostCard({ n, t }) {
         </Link>
       </Modal>
 
-      <Modal open={modal==='comentarios'} onClose={()=>setModal(null)} title={`Mensajes para ${n.nombre}`}>
+      <Modal open={modal==='comentarios'} onClose={()=>setModal(null)} title="Mensajes" sheet>
         <Comments ninoId={n.id} />
       </Modal>
 
