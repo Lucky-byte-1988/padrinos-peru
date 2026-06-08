@@ -335,6 +335,18 @@ def get_historial():
         'fecha_eliminacion': h.fecha_eliminacion.strftime('%Y-%m-%d %H:%M') if h.fecha_eliminacion else '—',
     } for h in items])
 
+@app.route('/api/padrinos/<int:pid>', methods=['DELETE'])
+def borrar_padrino(pid):
+    p = Padrino.query.get_or_404(pid)
+    # Si tenía un niño asignado, lo libera (vuelve a "busca padrino")
+    if p.nino_id:
+        nino = Nino.query.get(p.nino_id)
+        if nino:
+            nino.tiene_padrino = False
+    db.session.delete(p)
+    db.session.commit()
+    return jsonify({'mensaje': 'Padrino eliminado'})
+
 @app.route('/api/padrino-panel', methods=['GET'])
 def padrino_panel():
     email = request.args.get('email', '')

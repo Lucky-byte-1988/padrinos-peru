@@ -8,8 +8,35 @@ import PadrinoPanel from './pages/PadrinoPanel';
 import Nosotros from './pages/Nosotros';
 import Login from './pages/Login';
 import { AuthProvider, useAuth } from './AuthContext';
+import { esAdmin } from './adminConfig';
 import { translations } from './i18n';
 import './App.css';
+
+function AdminGuard({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <p className="loading">Cargando…</p>;
+  if (!user) {
+    return (
+      <div className="form-page" style={{textAlign:'center'}}>
+        <div style={{fontSize:'3rem'}}>🔒</div>
+        <h2>Área privada</h2>
+        <p className="form-desc">Este panel es solo para administradores. Inicia sesión.</p>
+        <Link to="/login" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.9rem 2rem'}}>Iniciar sesión</Link>
+      </div>
+    );
+  }
+  if (!esAdmin(user.email)) {
+    return (
+      <div className="form-page" style={{textAlign:'center'}}>
+        <div style={{fontSize:'3rem'}}>⛔</div>
+        <h2>Acceso restringido</h2>
+        <p className="form-desc">Tu cuenta ({user.email}) no tiene permisos de administrador.</p>
+        <Link to="/" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.9rem 2rem'}}>Volver al inicio</Link>
+      </div>
+    );
+  }
+  return children;
+}
 
 export const LangContext = React.createContext();
 
@@ -30,6 +57,7 @@ function SessionButton() {
 
 function Nav() {
   const { lang, setLang, t } = React.useContext(LangContext);
+  const { user } = useAuth();
   return (
     <nav className="navbar">
       <Link to="/" className="nav-brand"><span className="brand-mark">✉</span> {t.title}<span className="brand-dot">.pe</span></Link>
@@ -38,7 +66,7 @@ function Nav() {
         <Link to="/registrar">{t.nav_registro}</Link>
         <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
         <Link to="/mi-nino">{lang === 'es' ? 'Mi niño' : 'My child'}</Link>
-        <Link to="/admin">{t.nav_admin}</Link>
+        {esAdmin(user?.email) && <Link to="/admin">{t.nav_admin}</Link>}
         <button className="lang-btn" onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>
           {lang === 'es' ? 'EN' : 'ES'}
         </button>
@@ -61,7 +89,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/registrar" element={<RegisterFamily />} />
             <Route path="/carta/:id" element={<FamilyDetail />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin" element={<AdminGuard><Admin /></AdminGuard>} />
             <Route path="/mi-nino" element={<PadrinoPanel />} />
             <Route path="/nosotros" element={<Nosotros />} />
             <Route path="/login" element={<Login />} />

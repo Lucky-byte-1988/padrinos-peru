@@ -37,6 +37,12 @@ export default function Admin() {
     URL.revokeObjectURL(url);
   };
 
+  const eliminarPadrino = async (p) => {
+    if (!window.confirm(`¿Eliminar al padrino "${p.nombre}" (${p.email})?\nEl niño que apadrinaba volverá a "busca padrino".`)) return;
+    await axios.delete(`${API}/api/padrinos/${p.id}`);
+    cargar();
+  };
+
   const eliminarNino = async (n) => {
     const motivo = window.prompt(
       `Eliminar a "${n.nombre}" de ${n.provincia}.\n\nEsto borra su carta, fotos y comentarios, pero quedará registrado en el Historial.\n\nMotivo (ej: Regalo entregado):`,
@@ -174,6 +180,7 @@ export default function Admin() {
                 <th>País</th>
                 <th>Niño apadrinado</th>
                 <th>Fecha</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -185,6 +192,12 @@ export default function Admin() {
                   <td>{p.pais || '—'}</td>
                   <td>{p.nino_nombre || '—'}</td>
                   <td>{p.fecha}</td>
+                  <td>
+                    <button onClick={() => eliminarPadrino(p)}
+                      style={{background:'#fef2f2', color:'#b91c1c', border:'1px solid #fecaca', borderRadius:'8px', padding:'0.3rem 0.6rem', fontSize:'0.78rem', fontWeight:600, cursor:'pointer'}}>
+                      🗑 Eliminar
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
