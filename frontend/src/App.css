@@ -211,7 +211,7 @@ img, video, iframe { max-width: 100%; }
 
 /* ═══ LAYOUT ═══ */
 .social-layout { max-width: 1120px; margin: 0 auto; padding: 3rem 1.5rem; display: grid; grid-template-columns: 1fr 360px; gap: 2.5rem; align-items: start; }
-@media (max-width: 920px) { .social-layout { grid-template-columns: 1fr; } .sidebar { display: none; } }
+@media (max-width: 920px) { .social-layout { grid-template-columns: minmax(0, 1fr); } .sidebar { display: none; } }
 
 /* ═══ STORIES ═══ */
 .stories-bar {
@@ -534,6 +534,12 @@ img, video, iframe { max-width: 100%; }
   .detail-carta-full p { font-size: 1.2rem; }
   .detail-wrapper { padding: 1.5rem 1rem 4rem; }
   .fb-comments, .godfather-form, .wa-contact, .detail-carta-full { margin-left: 1.1rem; margin-right: 1.1rem; }
+
+  /* Filtros apilados en móvil para no forzar el ancho */
+  .filtros { flex-direction: column; align-items: stretch; }
+  .filtro-buscar { min-width: 0; width: 100%; }
+  .filtro-tabs { width: 100%; justify-content: space-between; }
+  .social-layout { padding: 2rem 1rem; }
 
   /* Acciones del post se acomodan sin desbordar en móvil */
   .post-actions { flex-wrap: wrap; gap: 0.2rem; padding: 0.6rem 1rem 1rem; }
