@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { API } from '../config';
+import { API, cld } from '../config';
 import { LangContext } from '../App';
 import Reveal from '../Reveal';
 
@@ -79,7 +79,7 @@ function PostCard({ n, t }) {
       {/* Header */}
       <div className="post-header">
         {n.foto_familia
-          ? <img className="post-avatar" src={n.foto_familia} alt={n.nombre}
+          ? <img className="post-avatar" src={cld(n.foto_familia, 'w_120,h_120,q_auto,f_auto,c_fill,g_face')} alt={n.nombre}
               onError={e => { e.target.style.display='none'; }} />
           : <div className="post-avatar-placeholder">🎁</div>
         }
@@ -94,7 +94,8 @@ function PostCard({ n, t }) {
 
       {/* Imagen */}
       {n.foto_familia && (
-        <img className="post-img" src={n.foto_familia} alt={n.nombre}
+        <img className="post-img" src={cld(n.foto_familia)} alt={n.nombre}
+          loading="lazy"
           onError={e => { e.target.style.display='none'; }} />
       )}
 
@@ -200,7 +201,7 @@ export default function Home() {
             {ninos.slice(0, 8).map(n => (
               <Link to={`/carta/${n.id}`} className="story" key={n.id}>
                 <div className="story-ring">
-                  <img src={n.foto_familia || 'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'}
+                  <img src={cld(n.foto_familia, 'w_140,h_140,q_auto,f_auto,c_fill,g_face') || 'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'}
                     alt={n.nombre} onError={e => { e.target.src='https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'; }} />
                 </div>
                 <span className="story-name">{n.nombre}</span>

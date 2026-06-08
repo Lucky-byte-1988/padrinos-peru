@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { API } from '../config';
+import { API, cld } from '../config';
 import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
 import Comments from '../Comments';
@@ -64,7 +64,7 @@ export default function FamilyDetail() {
         {/* Header */}
         <div className="post-header">
           {nino.foto_familia
-            ? <img className="post-avatar" src={nino.foto_familia} alt={nino.nombre} />
+            ? <img className="post-avatar" src={cld(nino.foto_familia, 'w_120,h_120,q_auto,f_auto,c_fill,g_face')} alt={nino.nombre} />
             : <div className="post-avatar-placeholder">🎁</div>
           }
           <div className="post-meta">
@@ -78,8 +78,7 @@ export default function FamilyDetail() {
 
         {/* Foto */}
         {nino.foto_familia && (
-          <img className="post-img" src={nino.foto_familia} alt={nino.nombre}
-            style={{maxHeight:450}} />
+          <img className="post-img" src={cld(nino.foto_familia, 'w_1000,q_auto,f_auto,c_limit')} alt={nino.nombre} />
         )}
 
         {/* Carta completa */}
@@ -87,7 +86,7 @@ export default function FamilyDetail() {
           <h4>📜 {t.detail_letter}</h4>
           <p>{nino.carta_texto}</p>
           {nino.carta_foto && (
-            <img className="carta-handwritten" src={nino.carta_foto} alt="Carta escrita a mano" />
+            <img className="carta-handwritten" src={cld(nino.carta_foto, 'w_1000,q_auto,f_auto,c_limit')} alt="Carta escrita a mano" />
           )}
         </div>
 
