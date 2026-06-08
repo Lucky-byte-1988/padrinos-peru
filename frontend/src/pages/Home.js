@@ -5,7 +5,7 @@ import { API, cld } from '../config';
 import { LangContext } from '../App';
 import Reveal from '../Reveal';
 import StoryViewer from '../StoryViewer';
-import { HeartIcon, CommentIcon, ShareIcon, BookmarkIcon, WhatsAppIcon } from '../Icons';
+import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, WhatsAppIcon } from '../Icons';
 
 function HowItWorks() {
   const pasos = [
@@ -127,7 +127,7 @@ function PostCard({ n, t }) {
             </a>
           )}
         </div>
-        <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Ver"><BookmarkIcon /></Link>
+        <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Ver carta" title="Ver carta"><LetterIcon /></Link>
       </div>
 
       {/* Conteo de me gusta */}
@@ -141,13 +141,7 @@ function PostCard({ n, t }) {
           </Link>
         </div>
       )}
-
-      {/* CTA Ser padrino */}
-      {!n.tiene_padrino && (
-        <div style={{padding:'0.4rem 1.4rem 1.3rem'}}>
-          <Link to={`/carta/${n.id}`} className="ig-padrino">❤️ Ser su padrino</Link>
-        </div>
-      )}
+      <div style={{paddingBottom:'1rem'}} />
     </div>
   );
 }
