@@ -5,7 +5,7 @@ import { API, cld } from '../config';
 import { LangContext } from '../App';
 import Reveal from '../Reveal';
 import StoryViewer from '../StoryViewer';
-import { HeartIcon, CommentIcon, ShareIcon, BookmarkIcon } from '../Icons';
+import { HeartIcon, CommentIcon, ShareIcon, BookmarkIcon, WhatsAppIcon } from '../Icons';
 
 function HowItWorks() {
   const pasos = [
@@ -121,6 +121,11 @@ function PostCard({ n, t }) {
             target="_blank" rel="noreferrer" className="ig-btn" aria-label="Compartir">
             <ShareIcon />
           </a>
+          {n.whatsapp && (
+            <a href={`https://wa.me/51${n.whatsapp}`} target="_blank" rel="noreferrer" className="ig-btn" aria-label="Contactar por WhatsApp">
+              <WhatsAppIcon />
+            </a>
+          )}
         </div>
         <Link to={`/carta/${n.id}`} className="ig-btn" aria-label="Ver"><BookmarkIcon /></Link>
       </div>

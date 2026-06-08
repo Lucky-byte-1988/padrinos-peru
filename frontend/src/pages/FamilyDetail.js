@@ -6,6 +6,7 @@ import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
 import Comments from '../Comments';
 import { useAuth } from '../AuthContext';
+import { HeartIcon, ShareIcon, WhatsAppIcon } from '../Icons';
 
 export default function FamilyDetail() {
   const { id } = useParams();
@@ -96,16 +97,24 @@ export default function FamilyDetail() {
           )}
         </div>
 
-        {/* Acciones rápidas */}
-        <div className="post-actions">
-          <button className={`action-btn ${liked?'liked':''}`} onClick={handleLike}>
-            <span>{liked?'❤️':'🤍'}</span> {likes}
-          </button>
-          <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${nino.nombre}: ${window.location.href}`}
-            target="_blank" rel="noreferrer" className="action-btn" style={{textDecoration:'none'}}>
-            <span>↗️</span> Compartir
-          </a>
+        {/* Acciones estilo Instagram */}
+        <div className="ig-actions">
+          <div className="ig-actions-left">
+            <button className={`ig-btn ${liked?'liked':''}`} onClick={handleLike} aria-label="Me gusta">
+              <HeartIcon filled={liked} />
+            </button>
+            <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${nino.nombre}: ${window.location.href}`}
+              target="_blank" rel="noreferrer" className="ig-btn" aria-label="Compartir">
+              <ShareIcon />
+            </a>
+            {nino.whatsapp && (
+              <a href={`https://wa.me/51${nino.whatsapp}`} target="_blank" rel="noreferrer" className="ig-btn" aria-label="Contactar por WhatsApp">
+                <WhatsAppIcon />
+              </a>
+            )}
+          </div>
         </div>
+        <div className="ig-likes">{likes.toLocaleString('es')} me gusta</div>
 
         {/* Ser padrino (CTA principal) */}
         {!nino.tiene_padrino && !success && (
@@ -132,16 +141,7 @@ export default function FamilyDetail() {
         )}
         {success && <div className="success-msg" style={{margin:'0 1.8rem 1.4rem'}}>🎄 {t.godfather_success}</div>}
 
-        {/* Contacto con la familia */}
-        {nino.whatsapp && (
-          <a href={`https://wa.me/51${nino.whatsapp}`} target="_blank" rel="noreferrer" className="wa-contact">
-            <span style={{fontSize:'1.6rem'}}>💬</span>
-            <div>
-              <div style={{fontWeight:'bold', fontSize:'0.9rem'}}>Contactar familia por WhatsApp</div>
-              <div style={{opacity:0.7, fontSize:'0.78rem'}}>+51 {nino.whatsapp}</div>
-            </div>
-          </a>
-        )}
+        {/* Mensaje privado a la familia */}
         <div style={{margin:'0 1.8rem 1.6rem'}}>
           {!showMsg && !msgEnviado && (
             <button className="msg-priv-btn" onClick={() => setShowMsg(true)}>
