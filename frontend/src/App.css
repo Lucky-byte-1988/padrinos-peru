@@ -565,14 +565,15 @@ img, video, iframe { max-width: 100%; }
   background: var(--bg-warm); color: var(--ink-soft); font-size: 1rem; transition: all 0.2s;
 }
 .modal-close:hover { background: var(--line); color: var(--ink); }
-.modal-body { padding: 1.4rem; overflow-y: auto; }
+.modal-body { padding: 1.4rem; overflow-y: auto; flex: 1; min-height: 0; -webkit-overflow-scrolling: touch; }
 .modal-body .fb-comments { margin: 0; }
 
 /* Hoja deslizante desde abajo (estilo Instagram) */
-.modal-overlay.is-sheet { align-items: flex-end; padding: 0; }
+.modal-overlay.is-sheet { align-items: flex-end; padding: 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .modal-sheet {
   max-width: 520px; width: 100%; border-radius: 22px 22px 0 0 !important;
-  max-height: 85vh; animation: sheetUp 0.32s var(--ease);
+  height: 75vh; max-height: 75vh; animation: sheetUp 0.32s var(--ease);
+  box-shadow: 0 -10px 40px rgba(20,17,15,0.18);
 }
 @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .sheet-handle { width: 42px; height: 5px; border-radius: 3px; background: var(--line); margin: 10px auto 0; }
