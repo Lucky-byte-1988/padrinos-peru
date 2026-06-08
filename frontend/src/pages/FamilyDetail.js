@@ -5,10 +5,12 @@ import { API, cld } from '../config';
 import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
 import Comments from '../Comments';
+import { useAuth } from '../AuthContext';
 
 export default function FamilyDetail() {
   const { id } = useParams();
   const { t } = useContext(LangContext);
+  const { user } = useAuth();
   const [nino, setNino] = useState(null);
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
@@ -43,7 +45,10 @@ export default function FamilyDetail() {
   const handlePadrino = async e => {
     e.preventDefault();
     setEnviando(true);
-    await axios.post(API+'/api/padrinos', { ...padrinoForm, nino_id: parseInt(id) });
+    // Si está logueado, su email de cuenta es el oficial (para vincular en "Mi niño")
+    const email = user?.email || padrinoForm.email;
+    const nombre = padrinoForm.nombre || user?.displayName || '';
+    await axios.post(API+'/api/padrinos', { ...padrinoForm, nombre, email, nino_id: parseInt(id) });
     setEnviando(false); setSuccess(true);
     setNino(prev => ({ ...prev, tiene_padrino: true }));
   };

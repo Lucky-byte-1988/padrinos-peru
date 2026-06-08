@@ -52,6 +52,7 @@ class Nino(db.Model):
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
     tiene_padrino = db.Column(db.Boolean, default=False)
     likes = db.Column(db.Integer, default=0)
+    owner_email = db.Column(db.String(120))   # email de la familia que lo registró
     comentarios = db.relationship('Comentario', backref='nino', lazy=True)
 
 class Padrino(db.Model):
@@ -159,11 +160,32 @@ def registrar_nino():
         provincia=data.get('provincia', ''), region=data.get('region', ''),
         carta_texto=data.get('carta_texto', ''), carta_foto=carta_foto_url,
         foto_familia=foto_familia_url, video_url=video_url,
-        whatsapp=data.get('whatsapp', '')
+        whatsapp=data.get('whatsapp', ''),
+        owner_email=(data.get('owner_email') or '').lower().strip()
     )
     db.session.add(nino)
     db.session.commit()
     return jsonify({'mensaje': 'Carta enviada', 'id': nino.id}), 201
+
+@app.route('/api/mis-ninos', methods=['GET'])
+def mis_ninos():
+    # Niños registrados por una familia (su email)
+    email = (request.args.get('email') or '').lower().strip()
+    if not email:
+        return jsonify([])
+    ninos = Nino.query.filter_by(owner_email=email).order_by(Nino.fecha.desc()).all()
+    return jsonify([_nino_dict(n) for n in ninos])
+
+@app.route('/api/mis-apadrinados', methods=['GET'])
+def mis_apadrinados():
+    # Niños que un padrino (su email) ha apadrinado
+    email = (request.args.get('email') or '').lower().strip()
+    if not email:
+        return jsonify([])
+    padrinos = Padrino.query.filter(db.func.lower(Padrino.email) == email).all()
+    ids = [p.nino_id for p in padrinos if p.nino_id]
+    ninos = Nino.query.filter(Nino.id.in_(ids)).all() if ids else []
+    return jsonify([_nino_dict(n) for n in ninos])
 
 @app.route('/api/ninos/<int:id>/like', methods=['POST'])
 def like_nino(id):
@@ -341,6 +363,7 @@ def _nino_dict(n):
         'carta_texto':n.carta_texto,'carta_foto':n.carta_foto,'foto_familia':n.foto_familia,
         'video_url':n.video_url,'whatsapp':n.whatsapp,'tiene_padrino':n.tiene_padrino,
         'likes': n.likes or 0,
+        'owner_email': n.owner_email or '',
         'num_comentarios': len(n.comentarios),
         'fecha':n.fecha.strftime('%Y-%m-%d')
     }

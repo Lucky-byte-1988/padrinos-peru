@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { API } from '../config';
 import { LangContext } from '../App';
+import { useAuth } from '../AuthContext';
 
 const REGIONES = ['Amazonas','Áncash','Apurímac','Arequipa','Ayacucho','Cajamarca','Callao','Cusco','Huancavelica','Huánuco','Ica','Junín','La Libertad','Lambayeque','Lima','Loreto','Madre de Dios','Moquegua','Pasco','Piura','Puno','San Martín','Tacna','Tumbes','Ucayali'];
 
@@ -37,6 +38,7 @@ function FileUpload({ label, name, accept, capture, preview, onChange, icon }) {
 
 export default function RegisterFamily() {
   const { t } = useContext(LangContext);
+  const { user } = useAuth();
   const [form, setForm] = useState({ nombre: '', edad: '', provincia: '', region: '', carta_texto: '', whatsapp: '' });
   const [files, setFiles] = useState({ carta_foto: null, foto_familia: null, video: null });
   const [previews, setPreviews] = useState({ carta_foto: null, foto_familia: null, video: null });
@@ -57,6 +59,7 @@ export default function RegisterFamily() {
     setLoading(true);
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+    if (user?.email) formData.append('owner_email', user.email);
     if (files.carta_foto) formData.append('carta_foto', files.carta_foto);
     if (files.foto_familia) formData.append('foto_familia', files.foto_familia);
     if (files.video) formData.append('video', files.video);

@@ -1,108 +1,105 @@
-import React, { useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { API } from '../config';
 import { Link } from 'react-router-dom';
-import { LangContext } from '../App';
+import { API, cld } from '../config';
+import { useAuth } from '../AuthContext';
+
+function NinoMini({ n }) {
+  return (
+    <Link to={`/carta/${n.id}`} className="mini-card">
+      {n.foto_familia
+        ? <img src={cld(n.foto_familia, 'w_160,h_160,q_auto,f_auto,c_fill,g_face')} alt={n.nombre} />
+        : <div className="mini-ph">🎁</div>}
+      <div className="mini-body">
+        <div className="mini-name">{n.nombre}</div>
+        <div className="mini-loc">📍 {n.provincia}, {n.region} · {n.edad} años</div>
+        <span className={`post-badge ${n.tiene_padrino ? 'con' : 'sin'}`} style={{display:'inline-block', marginTop:'0.4rem'}}>
+          {n.tiene_padrino ? '✓ Apadrinado' : 'Busca padrino'}
+        </span>
+      </div>
+    </Link>
+  );
+}
 
 export default function PadrinoPanel() {
-  const { t } = useContext(LangContext);
-  const [email, setEmail] = useState('');
-  const [nino, setNino] = useState(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { user, rol, loading } = useAuth();
+  const [apadrinados, setApadrinados] = useState([]);
+  const [misNinos, setMisNinos] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
-  const buscar = async e => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setNino(null);
-    try {
-      const res = await axios.get(`${API}/api/padrino-panel?email=${encodeURIComponent(email)}`);
-      setNino(res.data);
-    } catch {
-      setError('No encontramos un padrino con ese email. Verifica que sea el mismo email con el que te registraste.');
-    }
-    setLoading(false);
-  };
+  useEffect(() => {
+    if (!user) { setCargando(false); return; }
+    const email = encodeURIComponent(user.email);
+    Promise.all([
+      axios.get(`${API}/api/mis-apadrinados?email=${email}`).then(r => setApadrinados(r.data)).catch(()=>{}),
+      axios.get(`${API}/api/mis-ninos?email=${email}`).then(r => setMisNinos(r.data)).catch(()=>{}),
+    ]).finally(() => setCargando(false));
+  }, [user]);
+
+  if (loading) return <p className="loading">Cargando…</p>;
+
+  // No logueado
+  if (!user) {
+    return (
+      <div className="form-page" style={{textAlign:'center'}}>
+        <div style={{fontSize:'3.5rem', marginBottom:'0.5rem'}}>🔒</div>
+        <h2>Tu espacio personal</h2>
+        <p className="form-desc">Inicia sesión para ver a los niños que apadrinaste o las cartas que registraste.</p>
+        <Link to="/login" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.9rem 2rem'}}>
+          Iniciar sesión
+        </Link>
+      </div>
+    );
+  }
+
+  const esFamilia = rol === 'familia';
 
   return (
-    <div className="form-page" style={{maxWidth: 700}}>
-      <h2>❤️ Panel del Padrino</h2>
-      <p className="form-desc">Ingresa tu email para ver la carta del niño que apadrinaste.</p>
-
-      <form onSubmit={buscar}>
-        <div className="form-group">
-          <label>Tu email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            placeholder="tu@email.com"
-          />
+    <div className="panel-personal">
+      <div className="panel-hero">
+        <div className="panel-avatar">{(user.displayName || user.email)[0].toUpperCase()}</div>
+        <div>
+          <h1>Hola, {user.displayName || user.email.split('@')[0]} 👋</h1>
+          <p>{esFamilia ? 'Panel de Familia' : 'Panel de Padrino'} · {user.email}</p>
         </div>
-        <button type="submit" className="submit-btn" disabled={loading}>
-          {loading ? '⏳ Buscando...' : '🔍 Ver mi niño apadrinado'}
-        </button>
-      </form>
+      </div>
 
-      {error && (
-        <div style={{background:'#3d0000', color:'#ff9999', padding:'1rem', borderRadius:'10px', marginTop:'1rem'}}>
-          ⚠️ {error}
-        </div>
-      )}
-
-      {nino && (
-        <div style={{marginTop:'2rem'}}>
-          <div style={{background:'linear-gradient(135deg,#1a4d1a,#2ecc71)', borderRadius:'14px', padding:'1rem 1.5rem', marginBottom:'1.5rem', color:'white', textAlign:'center'}}>
-            🎄 Eres el padrino de <strong>{nino.nombre}</strong>
-          </div>
-
-          {nino.foto_familia && (
-            <img
-              src={nino.foto_familia}
-              alt={nino.nombre}
-              style={{width:'100%', borderRadius:'14px', maxHeight:'280px', objectFit:'cover', marginBottom:'1rem', border:'2px solid #FFD700'}}
-            />
+      {cargando ? <p className="loading">Cargando tu información…</p> : (
+        <>
+          {/* Para PADRINOS: niños que apadrinó */}
+          {!esFamilia && (
+            <section className="panel-sec">
+              <h2>❤️ Mis niños apadrinados ({apadrinados.length})</h2>
+              {apadrinados.length === 0 ? (
+                <div className="panel-empty">
+                  <p>Aún no apadrinas a ningún niño.</p>
+                  <Link to="/" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.8rem 1.6rem', marginTop:'0.6rem'}}>
+                    Ver cartas y apadrinar
+                  </Link>
+                </div>
+              ) : (
+                <div className="mini-grid">{apadrinados.map(n => <NinoMini key={n.id} n={n} />)}</div>
+              )}
+            </section>
           )}
 
-          <h3 style={{color:'#FFD700', marginBottom:'0.3rem'}}>{nino.nombre}</h3>
-          <p style={{color:'#888', marginBottom:'1.2rem'}}>
-            🎂 {nino.edad} años · 📍 {nino.provincia}, {nino.region}
-          </p>
-
-          <div className="carta-box">
-            <h3>📜 Su carta a Papá Noel</h3>
-            <p>{nino.carta_texto}</p>
-            {nino.carta_foto && (
-              <img src={nino.carta_foto} alt="carta" className="carta-img" />
-            )}
-          </div>
-
-          {nino.video_url && (
-            <video controls style={{width:'100%', borderRadius:'12px', border:'2px solid #FFD700', marginBottom:'1rem'}}>
-              <source src={nino.video_url} />
-            </video>
+          {/* Para FAMILIAS: niños que registró */}
+          {esFamilia && (
+            <section className="panel-sec">
+              <h2>👨‍👩‍👧 Mis cartas registradas ({misNinos.length})</h2>
+              {misNinos.length === 0 ? (
+                <div className="panel-empty">
+                  <p>Aún no has registrado a ningún niño.</p>
+                  <Link to="/registrar" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.8rem 1.6rem', marginTop:'0.6rem'}}>
+                    Registrar un niño
+                  </Link>
+                </div>
+              ) : (
+                <div className="mini-grid">{misNinos.map(n => <NinoMini key={n.id} n={n} />)}</div>
+              )}
+            </section>
           )}
-
-          {nino.whatsapp && (
-            <a
-              href={`https://wa.me/51${nino.whatsapp}`}
-              target="_blank" rel="noreferrer"
-              style={{display:'flex', alignItems:'center', gap:'1rem', background:'#075e54', color:'white', borderRadius:'12px', padding:'1rem 1.5rem', textDecoration:'none', marginBottom:'1rem'}}
-            >
-              <span style={{fontSize:'1.8rem'}}>💬</span>
-              <div>
-                <div style={{fontWeight:'bold'}}>Contactar a la familia por WhatsApp</div>
-                <div style={{opacity:0.8, fontSize:'0.85rem'}}>+51 {nino.whatsapp}</div>
-              </div>
-            </a>
-          )}
-
-          <Link to="/" style={{display:'block', textAlign:'center', color:'#FFD700', marginTop:'1rem'}}>
-            ← Ver todas las cartas
-          </Link>
-        </div>
+        </>
       )}
     </div>
   );
