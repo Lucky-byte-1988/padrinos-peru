@@ -227,6 +227,8 @@ img, video, iframe { max-width: 100%; }
 .how-icon { font-size: 2.6rem; display: block; margin-bottom: 1.1rem; }
 .how-card-title { font-size: 1.25rem; font-weight: 700; color: var(--ink); margin-bottom: 0.6rem; letter-spacing: -0.02em; }
 .how-card-desc { font-size: 0.98rem; color: var(--ink-soft); line-height: 1.6; }
+.how-video { margin-top: 2.5rem; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--sh-lg); border: 1px solid var(--line); background: #fff; }
+.how-video video { width: 100%; display: block; }
 
 /* ═══ LAYOUT ═══ */
 .social-layout { max-width: 1120px; margin: 0 auto; padding: 3rem 1.5rem; display: grid; grid-template-columns: 1fr 360px; gap: 2.5rem; align-items: start; }
