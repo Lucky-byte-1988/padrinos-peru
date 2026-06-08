@@ -4,6 +4,7 @@ import axios from 'axios';
 import { API, cld } from '../config';
 import { LangContext } from '../App';
 import Reveal from '../Reveal';
+import StoryViewer from '../StoryViewer';
 
 function HowItWorks() {
   const pasos = [
@@ -141,6 +142,7 @@ export default function Home() {
   const [ninos, setNinos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
+  const [storyIdx, setStoryIdx] = useState(null);
   const [region, setRegion] = useState('Todas');
   const [filtro, setFiltro] = useState('todos');
 
@@ -195,17 +197,17 @@ export default function Home() {
       <div className="social-layout" id="feed">
         {/* FEED */}
         <div>
-          {/* Stories */}
+          {/* Stories — al tocar se abren como historias de Instagram */}
           <div className="stories-bar">
             <Link to="/registrar" className="story-add" title="Registrar niño">➕</Link>
-            {ninos.slice(0, 8).map(n => (
-              <Link to={`/carta/${n.id}`} className="story" key={n.id}>
+            {ninos.slice(0, 12).map((n, i) => (
+              <button type="button" className="story" key={n.id} onClick={() => setStoryIdx(i)}>
                 <div className="story-ring">
                   <img src={cld(n.foto_familia, 'w_140,h_140,q_auto,f_auto,c_fill,g_face') || 'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'}
                     alt={n.nombre} onError={e => { e.target.src='https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'; }} />
                 </div>
                 <span className="story-name">{n.nombre}</span>
-              </Link>
+              </button>
             ))}
           </div>
 
@@ -290,6 +292,14 @@ export default function Home() {
           </div>
         </Reveal>
       </section>
+
+      {storyIdx !== null && (
+        <StoryViewer
+          ninos={ninos.slice(0, 12)}
+          startIndex={storyIdx}
+          onClose={() => setStoryIdx(null)}
+        />
+      )}
     </>
   );
 }
