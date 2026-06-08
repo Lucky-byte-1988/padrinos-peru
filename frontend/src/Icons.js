@@ -42,9 +42,13 @@ export const GiftIcon = ({ size = 25 }) => (
 );
 
 export const LetterIcon = ({ size = 25 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="3" y="5" width="18" height="14" rx="2.5"/>
-    <path d="M3.5 6.5 L12 13 L20.5 6.5"/>
+  // Hoja de carta escrita a mano (papel con líneas + lápiz)
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/>
+    <line x1="7.5" y1="8" x2="13" y2="8"/>
+    <line x1="7.5" y1="12" x2="11.5" y2="12"/>
+    <line x1="7.5" y1="16" x2="10" y2="16"/>
+    <path d="M18.5 12.5l2.5 2.5-5 5-2.6.1.1-2.6 5-5z"/>
   </svg>
 );
 

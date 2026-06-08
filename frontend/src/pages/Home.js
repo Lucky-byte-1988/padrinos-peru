@@ -154,9 +154,6 @@ function PostCard({ n, t }) {
         <p style={{color:'var(--ink-faint)', fontSize:'0.85rem', marginTop:'0.8rem'}}>
           📍 {n.provincia}, {n.region} · {n.edad} años
         </p>
-        <Link to={`/carta/${n.id}`} className="auth-submit" style={{display:'block', textAlign:'center', textDecoration:'none', marginTop:'1rem'}}>
-          Ver videos y más →
-        </Link>
       </Modal>
 
       <Modal open={modal==='comentarios'} onClose={()=>setModal(null)} title="Mensajes" sheet>
