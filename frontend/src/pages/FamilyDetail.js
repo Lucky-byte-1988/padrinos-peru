@@ -18,19 +18,7 @@ export default function FamilyDetail() {
   const [padrinoForm, setPadrinoForm] = useState({ nombre: '', email: '', pais: '' });
   const [success, setSuccess] = useState(false);
   const [enviando, setEnviando] = useState(false);
-  const [showMsg, setShowMsg] = useState(false);
-  const [msgForm, setMsgForm] = useState({ autor: '', email: '', texto: '' });
-  const [msgEnviado, setMsgEnviado] = useState(false);
-  const [msgEnviando, setMsgEnviando] = useState(false);
   const [tab, setTab] = useState('mensajes'); // 'mensajes' | 'videos'
-
-  const handleMensajePrivado = async e => {
-    e.preventDefault();
-    setMsgEnviando(true);
-    await axios.post(`${API}/api/ninos/${id}/mensaje-privado`, msgForm);
-    setMsgEnviando(false); setMsgEnviado(true);
-    setMsgForm({ autor: '', email: '', texto: '' });
-  };
 
   useEffect(() => {
     axios.get(`${API}/api/ninos/${id}`).then(r => {
@@ -140,38 +128,6 @@ export default function FamilyDetail() {
           </div>
         )}
         {success && <div className="success-msg" style={{margin:'0 1.8rem 1.4rem'}}>🎄 {t.godfather_success}</div>}
-
-        {/* Mensaje privado a la familia */}
-        <div style={{margin:'0 1.8rem 1.6rem'}}>
-          {!showMsg && !msgEnviado && (
-            <button className="msg-priv-btn" onClick={() => setShowMsg(true)}>
-              Enviar mensaje privado a la familia
-            </button>
-          )}
-          {showMsg && !msgEnviado && (
-            <form className="msg-priv-form" onSubmit={handleMensajePrivado}>
-              <h4>Mensaje privado para la familia de {nino.nombre}</h4>
-              <p className="msg-priv-hint">Solo la familia y el equipo lo verán. No aparece en el muro público.</p>
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem', marginBottom:'0.6rem'}}>
-                <input className="msg-priv-input" placeholder="Tu nombre" required
-                  value={msgForm.autor} onChange={e=>setMsgForm({...msgForm,autor:e.target.value})} />
-                <input className="msg-priv-input" type="email" placeholder="Tu email (para que te respondan)"
-                  value={msgForm.email} onChange={e=>setMsgForm({...msgForm,email:e.target.value})} />
-              </div>
-              <textarea className="msg-priv-input" rows="3" placeholder="Escribe tu mensaje privado…" required
-                value={msgForm.texto} onChange={e=>setMsgForm({...msgForm,texto:e.target.value})} style={{resize:'vertical'}} />
-              <div style={{display:'flex', gap:'0.6rem', marginTop:'0.6rem'}}>
-                <button type="button" className="msg-priv-cancel" onClick={()=>setShowMsg(false)}>Cancelar</button>
-                <button type="submit" className="msg-priv-send" disabled={msgEnviando}>
-                  {msgEnviando ? 'Enviando…' : 'Enviar mensaje'}
-                </button>
-              </div>
-            </form>
-          )}
-          {msgEnviado && (
-            <div className="success-msg" style={{margin:0}}>💌 Tu mensaje privado fue enviado a la familia.</div>
-          )}
-        </div>
 
         {/* Pestañas: Mensajes / Videos (todo ordenado y limpio) */}
         <div className="detail-tabs">
