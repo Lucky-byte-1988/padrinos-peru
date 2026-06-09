@@ -308,6 +308,7 @@ def borrar_nino(id):
     db.session.add(h)
     Comentario.query.filter_by(nino_id=id).delete()
     VideoMensaje.query.filter_by(nino_id=id).delete()
+    MensajePrivado.query.filter_by(nino_id=id).delete()
     Padrino.query.filter_by(nino_id=id).update({'nino_id': None})
     db.session.delete(n)
     db.session.commit()

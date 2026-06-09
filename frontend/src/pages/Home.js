@@ -142,16 +142,22 @@ function PostCard({ n, t }) {
 
       {/* VENTANITAS EMERGENTES */}
       <Modal open={modal==='carta'} onClose={()=>setModal(null)} title={`Carta de ${n.nombre}`}>
-        {n.foto_familia && (
-          <img src={cld(n.foto_familia, 'w_700,q_auto,f_auto,c_limit')} alt={n.nombre}
-            style={{width:'100%', borderRadius:16, marginBottom:'1rem', maxHeight:'40vh', objectFit:'cover'}} />
-        )}
-        <p style={{fontSize:'1.05rem', lineHeight:1.7, color:'var(--ink)'}}>"{n.carta_texto}"</p>
+        <p style={{fontSize:'1.08rem', lineHeight:1.7, color:'var(--ink)'}}>"{n.carta_texto}"</p>
         {n.carta_foto && (
-          <img src={cld(n.carta_foto, 'w_700,q_auto,f_auto,c_limit')} alt="Carta a mano"
-            style={{width:'100%', borderRadius:14, marginTop:'1rem'}} />
+          <>
+            <p style={{color:'var(--ink-faint)', fontSize:'0.78rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:'1.2rem 0 0.5rem'}}>✍️ Carta escrita a mano</p>
+            <img src={cld(n.carta_foto, 'w_700,q_auto,f_auto,c_limit')} alt="Carta a mano"
+              style={{width:'100%', borderRadius:14}} />
+          </>
         )}
-        <p style={{color:'var(--ink-faint)', fontSize:'0.85rem', marginTop:'0.8rem'}}>
+        {n.video_url && (
+          <>
+            <p style={{color:'var(--ink-faint)', fontSize:'0.78rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:'1.2rem 0 0.5rem'}}>🎬 Video del niño</p>
+            <video src={n.video_url} controls playsInline preload="metadata"
+              style={{width:'100%', borderRadius:14, background:'#000', maxHeight:'50vh'}} />
+          </>
+        )}
+        <p style={{color:'var(--ink-faint)', fontSize:'0.85rem', marginTop:'1rem'}}>
           📍 {n.provincia}, {n.region} · {n.edad} años
         </p>
       </Modal>
