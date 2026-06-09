@@ -26,7 +26,15 @@ export default function Modal({ open, onClose, title, children, maxWidth = 480, 
       document.body.style.left = '';
       document.body.style.right = '';
       document.body.style.width = '';
+      // Restaurar la posición SIN animación. El html tiene scroll-behavior:smooth,
+      // que al volver a la posición anterior haría un "barrido/carrusel" visible.
+      // Desactivamos el suave solo durante la restauración instantánea.
+      const html = document.documentElement;
+      const prev = html.style.scrollBehavior;
+      html.style.scrollBehavior = 'auto';
       window.scrollTo(0, scrollY);
+      // Restaurar el valor original en el siguiente frame
+      requestAnimationFrame(() => { html.style.scrollBehavior = prev; });
     };
   }, [open]);
 
