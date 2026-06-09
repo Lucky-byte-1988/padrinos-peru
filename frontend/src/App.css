@@ -616,14 +616,14 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .fb-comment .fb-comment { margin-top: 0.8rem; }
 
 /* ═══ TESTIMONIOS ═══ */
-.testi { max-width: 1080px; margin: 0 auto; padding: 4rem 1.5rem 1rem; text-align: center; }
-.testi-title { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
-.testi-sub { font-size: 1.1rem; color: var(--ink-soft); margin: 0.6rem auto 2.6rem; }
-.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
-@media (max-width: 800px) { .testi-grid { grid-template-columns: 1fr; } .testi { padding-top: 3rem; } }
-.testi-card { background: var(--surface); border-radius: var(--r); padding: 1.8rem; text-align: left; box-shadow: var(--sh); border: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 1.2rem; transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease); }
-.testi-card:hover { transform: translateY(-5px); box-shadow: var(--sh-lg); }
-.testi-quote { font-size: 1.02rem; line-height: 1.6; color: var(--ink); font-style: italic; flex: 1; }
+.testi { max-width: 1100px; margin: 0 auto; padding: 6rem 1.5rem 2rem; text-align: center; }
+.testi-title { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; letter-spacing: -0.045em; color: var(--ink); line-height: 1.05; }
+.testi-sub { font-size: 1.2rem; color: var(--ink-soft); margin: 0.8rem auto 3.2rem; max-width: 520px; }
+.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+@media (max-width: 800px) { .testi-grid { grid-template-columns: 1fr; } .testi { padding-top: 4rem; } }
+.testi-card { background: var(--surface); border-radius: var(--r-lg); padding: 2.2rem; text-align: left; box-shadow: var(--sh); border: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 1.4rem; transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease); }
+.testi-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); }
+.testi-quote { font-size: 1.08rem; line-height: 1.65; color: var(--ink); flex: 1; letter-spacing: -0.01em; }
 .testi-author { display: flex; align-items: center; gap: 0.8rem; }
 .testi-avatar { width: 46px; height: 46px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
 .testi-name { font-weight: 700; color: var(--ink); font-size: 0.95rem; }
@@ -653,11 +653,12 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .cta-sub { font-size: 1.18rem; color: var(--ink-soft); margin: 1.3rem auto 2.6rem; max-width: 520px; position: relative; z-index: 1; line-height: 1.55; }
 .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
 .cta-btn-white {
-  background: var(--red); color: #fff; padding: 1rem 2.4rem; border-radius: 980px;
-  font-weight: 700; text-decoration: none; font-size: 1.05rem; transition: all 0.3s var(--ease);
-  box-shadow: var(--sh-red);
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #fb7185 100%);
+  background-size: 180% 180%; color: #fff; padding: 1rem 2.4rem; border-radius: 980px;
+  font-weight: 700; text-decoration: none; font-size: 1.05rem; transition: all 0.35s var(--ease);
+  box-shadow: 0 8px 26px rgba(225,29,72,0.42), inset 0 1px 0 rgba(255,255,255,0.25); border: none;
 }
-.cta-btn-white:hover { background: var(--red-bright); transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 36px rgba(192,57,43,0.32); }
+.cta-btn-white:hover { background-position: 100% 50%; transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 42px rgba(225,29,72,0.52), inset 0 1px 0 rgba(255,255,255,0.3); }
 .cta-btn-ghost {
   background: var(--surface); color: var(--ink); border: 1px solid var(--line);
   padding: 1rem 2.4rem; border-radius: 980px; font-weight: 600; text-decoration: none;
