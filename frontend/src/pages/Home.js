@@ -10,11 +10,56 @@ import Comments from '../Comments';
 import PadrinoForm from '../PadrinoForm';
 import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, WhatsAppIcon, GiftIcon } from '../Icons';
 
+function StepAnim({ type }) {
+  if (type === 'carta') {
+    return (
+      <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
+        <rect x="28" y="26" width="64" height="74" rx="8" fill="#fff" stroke="#fbcfd6" strokeWidth="2"/>
+        <line className="ln ln1" x1="40" y1="46" x2="80" y2="46" stroke="#fbcfd6" strokeWidth="4" strokeLinecap="round"/>
+        <line className="ln ln2" x1="40" y1="60" x2="80" y2="60" stroke="#fbcfd6" strokeWidth="4" strokeLinecap="round"/>
+        <line className="ln ln3" x1="40" y1="74" x2="66" y2="74" stroke="#fbcfd6" strokeWidth="4" strokeLinecap="round"/>
+        <g className="pencil">
+          <rect x="-6" y="-26" width="10" height="30" rx="3" fill="#e11d48" transform="rotate(40)"/>
+          <polygon points="0,0 6,2 2,8" fill="#fbbf24" transform="rotate(40)"/>
+        </g>
+      </svg>
+    );
+  }
+  if (type === 'mundo') {
+    return (
+      <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
+        <circle className="ring r1" cx="60" cy="60" r="26" fill="none" stroke="#93c5fd" strokeWidth="3"/>
+        <circle className="ring r2" cx="60" cy="60" r="26" fill="none" stroke="#93c5fd" strokeWidth="3"/>
+        <circle cx="60" cy="60" r="24" fill="#3b82f6"/>
+        <path d="M60 36 a24 24 0 0 0 0 48 M60 36 a24 24 0 0 1 0 48 M36 60 h48" fill="none" stroke="#bfdbfe" strokeWidth="2.5"/>
+        <text className="heart h1" x="86" y="44" fontSize="16">❤</text>
+        <text className="heart h2" x="22" y="50" fontSize="13">❤</text>
+      </svg>
+    );
+  }
+  return (
+    <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
+      <rect x="36" y="58" width="48" height="40" rx="6" fill="#fff" stroke="#fde68a" strokeWidth="2"/>
+      <rect x="56" y="58" width="8" height="40" fill="#fbbf24"/>
+      <g className="lid">
+        <rect x="32" y="48" width="56" height="16" rx="5" fill="#fbbf24"/>
+        <rect x="56" y="48" width="8" height="16" fill="#f59e0b"/>
+        <path d="M60 48 C46 30 32 42 52 48 M60 48 C74 30 88 42 68 48" fill="none" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round"/>
+      </g>
+      <g className="sparkles" fill="#fbbf24">
+        <circle className="sp s1" cx="34" cy="42" r="2.5"/>
+        <circle className="sp s2" cx="88" cy="46" r="2.5"/>
+        <circle className="sp s3" cx="60" cy="30" r="3"/>
+      </g>
+    </svg>
+  );
+}
+
 function HowItWorks() {
   const pasos = [
-    { n: '01', icon: '✍️', t: 'El niño escribe su carta', d: 'La familia registra al niño y comparte su carta a Papá Noel, con foto y video.' },
-    { n: '02', icon: '🌎', t: 'El mundo la descubre', d: 'Personas de todo el planeta leen su historia, la comparten y dejan mensajes de aliento.' },
-    { n: '03', icon: '🎁', t: 'Un padrino la hace realidad', d: 'Alguien se convierte en su padrino y coordina directamente para cumplir su sueño de Navidad.' },
+    { n: '01', anim: 'carta', t: 'El niño escribe su carta', d: 'La familia registra al niño y comparte su carta a Papá Noel, con foto y video.' },
+    { n: '02', anim: 'mundo', t: 'El mundo la descubre', d: 'Personas de todo el planeta leen su historia, la comparten y dejan mensajes de aliento.' },
+    { n: '03', anim: 'regalo', t: 'Un padrino la hace realidad', d: 'Alguien se convierte en su padrino y coordina directamente para cumplir su sueño de Navidad.' },
   ];
   return (
     <section className="how">
@@ -24,7 +69,7 @@ function HowItWorks() {
         {pasos.map((p, i) => (
           <Reveal key={p.n} delay={i * 140} className="how-card">
             <span className="how-num">{p.n}</span>
-            <span className="how-icon">{p.icon}</span>
+            <div className="how-anim"><StepAnim type={p.anim} /></div>
             <h3 className="how-card-title">{p.t}</h3>
             <p className="how-card-desc">{p.d}</p>
           </Reveal>
