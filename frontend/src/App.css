@@ -6,8 +6,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #fdfcfb;
-  --bg-warm: #fdf2f0;
+  --bg: #fffdfc;
+  --bg-warm: #fff5f3;
   --surface: #ffffff;
   --ink: #16131a;
   --ink-soft: #6b6675;
@@ -164,11 +164,13 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: rgba(185,28,28,0.08); color: var(--red);
-  padding: 0.45rem 1.1rem; border-radius: 980px; font-size: 0.82rem; font-weight: 600;
+  background: linear-gradient(135deg, rgba(225,29,72,0.14), rgba(245,158,11,0.14));
+  color: var(--red-deep);
+  padding: 0.5rem 1.2rem; border-radius: 980px; font-size: 0.82rem; font-weight: 700;
   margin-bottom: 1.8rem; position: relative; z-index: 1;
   animation: fadeUp 0.7s var(--ease) both;
-  border: 1px solid rgba(185,28,28,0.12);
+  border: 1px solid rgba(225,29,72,0.20);
+  box-shadow: 0 4px 14px rgba(225,29,72,0.10);
 }
 .hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: fadeIn 2s infinite alternate; }
 .hero h1 {
@@ -188,11 +190,13 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 }
 .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; animation: fadeUp 0.7s var(--ease) 0.18s both; }
 .btn-gold {
-  background: var(--red); color: #fff; padding: 0.95rem 2.2rem; border-radius: 980px;
-  font-weight: 600; text-decoration: none; font-size: 1.02rem; transition: all 0.35s var(--ease);
-  box-shadow: var(--sh-red);
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #fb7185 100%);
+  background-size: 180% 180%; color: #fff; padding: 0.95rem 2.2rem; border-radius: 980px;
+  font-weight: 700; text-decoration: none; font-size: 1.02rem; transition: all 0.35s var(--ease);
+  box-shadow: 0 8px 24px rgba(225,29,72,0.40), inset 0 1px 0 rgba(255,255,255,0.25);
+  border: none;
 }
-.btn-gold:hover { background: var(--red-bright); transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 32px rgba(185,28,28,0.35); }
+.btn-gold:hover { background-position: 100% 50%; transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 40px rgba(225,29,72,0.50), inset 0 1px 0 rgba(255,255,255,0.3); }
 .btn-outline {
   background: rgba(255,255,255,0.6); color: var(--ink); padding: 0.95rem 2.2rem; border-radius: 980px;
   font-weight: 600; text-decoration: none; font-size: 1.02rem; transition: all 0.35s var(--ease);
@@ -350,8 +354,9 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .story:hover { transform: translateY(-3px); }
 .story-ring {
   width: 70px; height: 70px; border-radius: 50%;
-  background: conic-gradient(from 135deg, var(--red), var(--gold), var(--red-bright), var(--red)); padding: 3px;
+  background: conic-gradient(from 135deg, #f43f5e, #fb923c, #f59e0b, #e11d48, #ec4899, #f43f5e); padding: 3px;
   transition: transform 0.3s var(--ease);
+  box-shadow: 0 4px 14px rgba(244,63,94,0.28);
 }
 .story:hover .story-ring { transform: scale(1.06); }
 .story-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--surface); }
@@ -827,10 +832,10 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .story-tap-right { right: 0; width: 65%; }
 .story-content { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; padding: 1.6rem 1.4rem 1.8rem; text-align: left; }
 .story-carta { color: #fff; font-size: 1.1rem; line-height: 1.5; font-weight: 500; margin-bottom: 1rem; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
-.story-badge { display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); color: #fff; padding: 0.4rem 0.9rem; border-radius: 980px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(255,255,255,0.3); }
-.story-badge.con { background: rgba(21,128,61,0.5); }
-.story-cta { display: block; width: 100%; margin-top: 1rem; background: #fff; color: var(--ink); border: none; padding: 0.95rem; border-radius: 980px; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: inherit; transition: transform 0.2s; }
-.story-cta:hover { transform: scale(1.02); }
+.story-badge { display: inline-block; background: linear-gradient(135deg, #f43f5e, #fb923c); color: #fff; padding: 0.45rem 1rem; border-radius: 980px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(255,255,255,0.35); box-shadow: 0 4px 14px rgba(244,63,94,0.4); }
+.story-badge.con { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 4px 14px rgba(22,163,74,0.4); }
+.story-cta { display: block; width: 100%; margin-top: 1rem; background: #fff; color: var(--red-deep); border: none; padding: 0.95rem; border-radius: 980px; font-weight: 800; font-size: 1rem; cursor: pointer; font-family: inherit; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+.story-cta:hover { transform: scale(1.03); box-shadow: 0 10px 28px rgba(0,0,0,0.3); }
 
 /* ═══ FOOTER ═══ */
 .footer { background: var(--ink); color: rgba(255,255,255,0.55); text-align: center; padding: 2.5rem; font-size: 0.88rem; }
