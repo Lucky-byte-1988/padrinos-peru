@@ -75,8 +75,8 @@ export default function FamilyDetail() {
             : <div className="post-avatar-placeholder">🎁</div>
           }
           <div className="post-meta">
-            <div className="post-name">🎄 {nino.nombre}</div>
-            <div className="post-location">📍 {nino.provincia}, {nino.region} · {nino.edad} años · {nino.fecha}</div>
+            <div className="post-name">{nino.nombre}</div>
+            <div className="post-location">{nino.provincia}, {nino.region} · {nino.edad} años · {nino.fecha}</div>
           </div>
           <span className={`post-badge ${nino.tiene_padrino ? 'con' : 'sin'}`}>
             {nino.tiene_padrino ? '✓ Apadrinado' : 'Busca padrino'}
@@ -90,7 +90,7 @@ export default function FamilyDetail() {
 
         {/* Carta completa */}
         <div className="detail-carta-full">
-          <h4>📜 {t.detail_letter}</h4>
+          <h4>{t.detail_letter}</h4>
           <p>{nino.carta_texto}</p>
           {nino.carta_foto && (
             <img className="carta-handwritten" src={cld(nino.carta_foto, 'w_1000,q_auto,f_auto,c_limit')} alt="Carta escrita a mano" />
@@ -119,7 +119,7 @@ export default function FamilyDetail() {
         {/* Ser padrino (CTA principal) */}
         {!nino.tiene_padrino && !success && (
           <div className="godfather-form">
-            <h4>❤️ {t.godfather_title}</h4>
+            <h4>{t.godfather_title}</h4>
             <form onSubmit={handlePadrino}>
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.8rem', marginBottom:'0.8rem'}}>
                 <div className="form-group" style={{marginBottom:0}}>
@@ -145,12 +145,12 @@ export default function FamilyDetail() {
         <div style={{margin:'0 1.8rem 1.6rem'}}>
           {!showMsg && !msgEnviado && (
             <button className="msg-priv-btn" onClick={() => setShowMsg(true)}>
-              💌 Enviar mensaje privado a la familia
+              Enviar mensaje privado a la familia
             </button>
           )}
           {showMsg && !msgEnviado && (
             <form className="msg-priv-form" onSubmit={handleMensajePrivado}>
-              <h4>💌 Mensaje privado para la familia de {nino.nombre}</h4>
+              <h4>Mensaje privado para la familia de {nino.nombre}</h4>
               <p className="msg-priv-hint">Solo la familia y el equipo lo verán. No aparece en el muro público.</p>
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem', marginBottom:'0.6rem'}}>
                 <input className="msg-priv-input" placeholder="Tu nombre" required
@@ -163,7 +163,7 @@ export default function FamilyDetail() {
               <div style={{display:'flex', gap:'0.6rem', marginTop:'0.6rem'}}>
                 <button type="button" className="msg-priv-cancel" onClick={()=>setShowMsg(false)}>Cancelar</button>
                 <button type="submit" className="msg-priv-send" disabled={msgEnviando}>
-                  {msgEnviando ? 'Enviando…' : '🚀 Enviar mensaje'}
+                  {msgEnviando ? 'Enviando…' : 'Enviar mensaje'}
                 </button>
               </div>
             </form>
@@ -176,10 +176,10 @@ export default function FamilyDetail() {
         {/* Pestañas: Mensajes / Videos (todo ordenado y limpio) */}
         <div className="detail-tabs">
           <button className={`detail-tab ${tab==='mensajes'?'active':''}`} onClick={()=>setTab('mensajes')}>
-            💬 Mensajes
+            Mensajes
           </button>
           <button className={`detail-tab ${tab==='videos'?'active':''}`} onClick={()=>setTab('videos')}>
-            🎬 Videos
+            Videos
           </button>
         </div>
 

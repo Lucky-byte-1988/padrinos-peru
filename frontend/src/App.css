@@ -420,8 +420,8 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .comment-submit:hover { transform: scale(1.03); }
 
 /* ═══ GODFATHER FORM ═══ */
-.godfather-form { margin: 0 1.8rem 1.8rem; background: var(--bg-warm); border: none; border-radius: 24px; padding: 2rem; }
-.godfather-form h4 { color: var(--ink); margin-bottom: 1.3rem; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.02em; }
+.godfather-form { margin: 0 1.8rem 1.8rem; background: var(--gray-bg); border: none; border-radius: var(--r-lg); padding: 2rem; }
+.godfather-form h4 { color: var(--ink); margin-bottom: 1.4rem; font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em; }
 
 /* ═══ FORMS ═══ */
 .form-page { max-width: 660px; margin: 3rem auto; padding: 2.6rem; background: var(--surface); border: none; border-radius: var(--r-lg); box-shadow: var(--sh); animation: scaleIn 0.5s var(--ease); }
@@ -429,12 +429,12 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .form-desc { color: var(--ink-soft); margin-bottom: 2rem; font-size: 0.98rem; line-height: 1.6; }
 .form-group { margin-bottom: 1.3rem; }
 .form-group label { display: block; font-weight: 600; margin-bottom: 0.55rem; color: var(--ink); font-size: 0.9rem; }
-.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.9rem 1.2rem; background: var(--bg-warm); border: 1px solid var(--line); border-radius: 14px; font-size: 0.96rem; color: var(--ink); font-family: inherit; transition: all 0.3s var(--ease); }
-.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--red); background: var(--surface); box-shadow: 0 0 0 4px rgba(185,28,28,0.07); }
-.form-group textarea { min-height: 140px; resize: vertical; font-family: Georgia, serif; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.9rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; font-size: 1rem; color: var(--ink); font-family: inherit; transition: all 0.25s var(--ease); }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 4px rgba(225,29,72,0.12); }
+.form-group textarea { min-height: 140px; resize: vertical; }
 .carta-hint { font-size: 0.82rem; color: var(--ink-faint); margin-top: 0.45rem; font-style: italic; }
-.submit-btn { background: var(--red); color: #fff; border: none; padding: 1rem 2rem; border-radius: 980px; font-size: 1.02rem; font-weight: 600; font-family: inherit; cursor: pointer; width: 100%; transition: all 0.3s var(--ease); box-shadow: var(--sh-red); }
-.submit-btn:hover:not(:disabled) { background: var(--red-bright); transform: translateY(-2px); }
+.submit-btn { background: var(--red); color: #fff; border: none; padding: 0.95rem 2rem; border-radius: 980px; font-size: 1.05rem; font-weight: 500; font-family: inherit; cursor: pointer; width: 100%; transition: all 0.25s var(--ease); letter-spacing: -0.01em; }
+.submit-btn:hover:not(:disabled) { background: var(--red-bright); transform: scale(1.01); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .success-msg { background: linear-gradient(135deg,#f0fdf4,#dcfce7); color: var(--green); padding: 1.4rem; border-radius: 16px; margin-top: 1rem; text-align: center; font-weight: 600; border: 1px solid #bbf7d0; }
 
@@ -663,7 +663,8 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .msg-priv-input { width: 100%; background: var(--surface); border: none; border-radius: 14px; padding: 0.8rem 1.1rem; font-size: 0.95rem; font-family: inherit; color: var(--ink); box-shadow: var(--sh-sm); }
 .msg-priv-input:focus { outline: 2px solid var(--red); }
 .msg-priv-cancel { flex: 1; background: transparent; color: var(--ink-soft); border: none; padding: 0.85rem; border-radius: 980px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.msg-priv-send { flex: 2; background: var(--red); color: #fff; border: none; padding: 0.85rem; border-radius: 980px; font-weight: 600; cursor: pointer; font-family: inherit; box-shadow: var(--sh-red); }
+.msg-priv-send { flex: 2; background: var(--red); color: #fff; border: none; padding: 0.85rem; border-radius: 980px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.25s var(--ease); }
+.msg-priv-send:hover:not(:disabled) { background: var(--red-bright); }
 .msg-priv-send:disabled { opacity: 0.5; }
 
 /* ═══ ACCIONES ESTILO INSTAGRAM ═══ */
@@ -769,16 +770,16 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 
 /* ═══ PESTAÑAS DEL DETALLE (Mensajes / Videos) ═══ */
 .detail-tabs {
-  display: flex; gap: 0.4rem; margin: 0 1.8rem 1.4rem;
-  background: rgba(244,239,231,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  padding: 0.35rem; border-radius: 980px; border: 1px solid rgba(255,255,255,0.5);
+  display: flex; gap: 0.25rem; margin: 0 1.8rem 1.4rem;
+  background: var(--gray-bg);
+  padding: 0.3rem; border-radius: 12px; border: none;
 }
 .detail-tab {
-  flex: 1; padding: 0.7rem; border: none; background: transparent;
-  color: var(--ink-soft); font-weight: 700; font-size: 0.92rem; cursor: pointer;
-  font-family: inherit; border-radius: 980px; transition: all 0.25s var(--ease);
+  flex: 1; padding: 0.65rem; border: none; background: transparent;
+  color: var(--ink-soft); font-weight: 500; font-size: 0.95rem; cursor: pointer;
+  font-family: inherit; border-radius: 9px; transition: all 0.25s var(--ease);
 }
-.detail-tab.active { background: var(--surface); color: var(--ink); box-shadow: var(--sh-sm); }
+.detail-tab.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.08); font-weight: 600; }
 
 /* ═══ VISOR DE HISTORIAS (Instagram style) ═══ */
 .story-overlay {
