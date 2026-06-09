@@ -1,10 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 export default function Modal({ open, onClose, title, children, maxWidth = 480, sheet = false }) {
+  // Guardamos onClose en una ref para que el efecto de congelado SOLO dependa de `open`.
+  // Si dependiera de onClose, cada re-render del padre re-ejecutaría el efecto,
+  // leería scrollY=0 (el body ya está fijo) y al cerrar saltaría de posición ("carrusel").
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => { if (e.key === 'Escape') onCloseRef.current(); };
     window.addEventListener('keydown', onKey);
     // Congelar el fondo por completo (método a prueba de iOS): el fondo no se mueve
     const scrollY = window.scrollY;
@@ -22,7 +28,7 @@ export default function Modal({ open, onClose, title, children, maxWidth = 480, 
       document.body.style.width = '';
       window.scrollTo(0, scrollY);
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 

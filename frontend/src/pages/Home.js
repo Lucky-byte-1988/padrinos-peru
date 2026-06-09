@@ -14,13 +14,29 @@ function StepAnim({ type }) {
   if (type === 'carta') {
     return (
       <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
-        <rect x="28" y="26" width="64" height="74" rx="8" fill="#fff" stroke="#fbcfd6" strokeWidth="2"/>
-        <line className="ln ln1" x1="40" y1="46" x2="80" y2="46" stroke="#fbcfd6" strokeWidth="4" strokeLinecap="round"/>
-        <line className="ln ln2" x1="40" y1="60" x2="80" y2="60" stroke="#fbcfd6" strokeWidth="4" strokeLinecap="round"/>
-        <line className="ln ln3" x1="40" y1="74" x2="66" y2="74" stroke="#fbcfd6" strokeWidth="4" strokeLinecap="round"/>
+        <defs>
+          <linearGradient id="paperG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff"/><stop offset="100%" stopColor="#fff1f2"/>
+          </linearGradient>
+          <linearGradient id="pencilG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fb7185"/><stop offset="100%" stopColor="#e11d48"/>
+          </linearGradient>
+          <filter id="softSh" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#e11d48" floodOpacity="0.18"/>
+          </filter>
+        </defs>
+        <g filter="url(#softSh)">
+          <rect x="26" y="24" width="62" height="78" rx="10" fill="url(#paperG)" stroke="#fbcfd6" strokeWidth="1.5"/>
+        </g>
+        <line className="ln ln1" x1="38" y1="44" x2="76" y2="44" stroke="#f9a8b4" strokeWidth="3.5" strokeLinecap="round"/>
+        <line className="ln ln2" x1="38" y1="58" x2="76" y2="58" stroke="#f9a8b4" strokeWidth="3.5" strokeLinecap="round"/>
+        <line className="ln ln3" x1="38" y1="72" x2="62" y2="72" stroke="#f9a8b4" strokeWidth="3.5" strokeLinecap="round"/>
+        <path className="seal" d="M57 88 a5 5 0 0 1 7 0 a5 5 0 0 1 7 0 q0 5 -7 9 q-7 -4 -7 -9 Z" fill="#e11d48"/>
         <g className="pencil">
-          <rect x="-6" y="-26" width="10" height="30" rx="3" fill="#e11d48" transform="rotate(40)"/>
-          <polygon points="0,0 6,2 2,8" fill="#fbbf24" transform="rotate(40)"/>
+          <rect x="-5" y="-30" width="9" height="34" rx="3.5" fill="url(#pencilG)" transform="rotate(42)"/>
+          <rect x="-5" y="-30" width="9" height="6" rx="2" fill="#fbbf24" transform="rotate(42)"/>
+          <polygon points="0,0 6,2.5 2.5,8" fill="#fcd9b6" transform="rotate(42)"/>
+          <polygon points="1.4,3.2 3.4,4 2,6" fill="#3b2a1f" transform="rotate(42)"/>
         </g>
       </svg>
     );
@@ -28,28 +44,68 @@ function StepAnim({ type }) {
   if (type === 'mundo') {
     return (
       <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
-        <circle className="ring r1" cx="60" cy="60" r="26" fill="none" stroke="#93c5fd" strokeWidth="3"/>
-        <circle className="ring r2" cx="60" cy="60" r="26" fill="none" stroke="#93c5fd" strokeWidth="3"/>
-        <circle cx="60" cy="60" r="24" fill="#3b82f6"/>
-        <path d="M60 36 a24 24 0 0 0 0 48 M60 36 a24 24 0 0 1 0 48 M36 60 h48" fill="none" stroke="#bfdbfe" strokeWidth="2.5"/>
-        <text className="heart h1" x="86" y="44" fontSize="16">❤</text>
-        <text className="heart h2" x="22" y="50" fontSize="13">❤</text>
+        <defs>
+          <radialGradient id="globeG" cx="38%" cy="32%" r="75%">
+            <stop offset="0%" stopColor="#7dd3fc"/>
+            <stop offset="55%" stopColor="#3b82f6"/>
+            <stop offset="100%" stopColor="#1e40af"/>
+          </radialGradient>
+          <clipPath id="globeClip"><circle cx="60" cy="60" r="30"/></clipPath>
+          <filter id="globeSh" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#1e40af" floodOpacity="0.30"/>
+          </filter>
+        </defs>
+        <circle className="ring r1" cx="60" cy="60" r="30" fill="none" stroke="#60a5fa" strokeWidth="2.5"/>
+        <circle className="ring r2" cx="60" cy="60" r="30" fill="none" stroke="#60a5fa" strokeWidth="2.5"/>
+        <g filter="url(#globeSh)">
+          <circle cx="60" cy="60" r="30" fill="url(#globeG)"/>
+        </g>
+        <g clipPath="url(#globeClip)">
+          <g className="globe-spin">
+            <path d="M44 46 q8 -6 16 -2 q6 3 4 9 q-3 6 -10 5 q-8 -1 -11 -6 q-2 -4 1 -6 Z" fill="#34d399" opacity="0.9"/>
+            <path d="M66 66 q9 -3 14 3 q3 5 -2 9 q-7 4 -13 0 q-5 -4 -3 -8 q1 -3 4 -4 Z" fill="#34d399" opacity="0.9"/>
+            <path d="M40 72 q6 -2 9 2 q2 4 -2 6 q-6 2 -9 -2 q-2 -4 2 -6 Z" fill="#6ee7b7" opacity="0.85"/>
+            <ellipse cx="60" cy="60" rx="12" ry="30" fill="none" stroke="#bfdbfe" strokeWidth="1.4" opacity="0.6"/>
+            <ellipse cx="60" cy="60" rx="24" ry="30" fill="none" stroke="#bfdbfe" strokeWidth="1.4" opacity="0.45"/>
+          </g>
+          <line x1="30" y1="60" x2="90" y2="60" stroke="#bfdbfe" strokeWidth="1.4" opacity="0.5"/>
+          <ellipse cx="50" cy="48" rx="12" ry="8" fill="#ffffff" opacity="0.28"/>
+        </g>
+        <g className="orbit">
+          <g transform="translate(60,18)">
+            <path className="pin-beat" d="M0 -3 a3.5 3.5 0 0 1 5 0 a3.5 3.5 0 0 1 5 0 q0 4 -5 7 q-5 -3 -5 -7 Z" fill="#ef4444"/>
+          </g>
+        </g>
       </svg>
     );
   }
   return (
     <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
-      <rect x="36" y="58" width="48" height="40" rx="6" fill="#fff" stroke="#fde68a" strokeWidth="2"/>
-      <rect x="56" y="58" width="8" height="40" fill="#fbbf24"/>
-      <g className="lid">
-        <rect x="32" y="48" width="56" height="16" rx="5" fill="#fbbf24"/>
-        <rect x="56" y="48" width="8" height="16" fill="#f59e0b"/>
-        <path d="M60 48 C46 30 32 42 52 48 M60 48 C74 30 88 42 68 48" fill="none" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round"/>
+      <defs>
+        <linearGradient id="boxG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff7ed"/><stop offset="100%" stopColor="#fde68a"/>
+        </linearGradient>
+        <linearGradient id="bowG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fbbf24"/><stop offset="100%" stopColor="#f59e0b"/>
+        </linearGradient>
+        <filter id="giftSh" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#f59e0b" floodOpacity="0.30"/>
+        </filter>
+      </defs>
+      <g filter="url(#giftSh)">
+        <rect x="34" y="58" width="52" height="42" rx="8" fill="url(#boxG)" stroke="#fcd34d" strokeWidth="1.5"/>
+        <rect x="55" y="58" width="10" height="42" fill="url(#bowG)"/>
       </g>
-      <g className="sparkles" fill="#fbbf24">
-        <circle className="sp s1" cx="34" cy="42" r="2.5"/>
-        <circle className="sp s2" cx="88" cy="46" r="2.5"/>
-        <circle className="sp s3" cx="60" cy="30" r="3"/>
+      <g className="lid">
+        <rect x="30" y="48" width="60" height="16" rx="6" fill="url(#bowG)"/>
+        <rect x="55" y="48" width="10" height="16" fill="#ea9b08"/>
+        <path d="M60 48 C45 28 28 42 52 48 M60 48 C75 28 92 42 68 48" fill="none" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round"/>
+        <circle cx="60" cy="46" r="4" fill="#fbbf24"/>
+      </g>
+      <g className="sparkles">
+        <path className="sp s1" d="M30 40 l1.6 4 l4 1.6 l-4 1.6 l-1.6 4 l-1.6 -4 l-4 -1.6 l4 -1.6 Z" fill="#fbbf24"/>
+        <path className="sp s2" d="M92 46 l1.3 3.2 l3.2 1.3 l-3.2 1.3 l-1.3 3.2 l-1.3 -3.2 l-3.2 -1.3 l3.2 -1.3 Z" fill="#f59e0b"/>
+        <path className="sp s3" d="M60 24 l1.8 4.4 l4.4 1.8 l-4.4 1.8 l-1.8 4.4 l-1.8 -4.4 l-4.4 -1.8 l4.4 -1.8 Z" fill="#fbbf24"/>
       </g>
     </svg>
   );

@@ -291,20 +291,23 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
   75%, 100% { transform: translate(78px, 22px); }
 }
 
-/* Paso 2 — el mundo gira y emite ondas + corazones */
+/* Paso 2 — el mundo gira, emite ondas y un pin lo orbita */
 .stepanim .ring { transform-origin: 60px 60px; opacity: 0; animation: ripple 3s ease-out infinite; }
 .stepanim .r2 { animation-delay: 1.5s; }
 @keyframes ripple {
-  0% { transform: scale(0.6); opacity: 0.8; }
-  100% { transform: scale(1.6); opacity: 0; }
+  0% { transform: scale(0.85); opacity: 0.7; }
+  100% { transform: scale(1.5); opacity: 0; }
 }
-.stepanim .heart { fill: #ef4444; opacity: 0; animation: floatHeart 3s ease-in infinite; }
-.stepanim .h2 { animation-delay: 1.4s; }
-@keyframes floatHeart {
-  0% { opacity: 0; transform: translateY(0) scale(0.6); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-22px) scale(1.1); }
+.stepanim .globe-spin { transform-origin: 60px 60px; animation: globeSpin 9s linear infinite; }
+@keyframes globeSpin {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-20px); }
 }
+.stepanim .orbit { transform-origin: 60px 60px; animation: orbit 6s linear infinite; }
+@keyframes orbit { to { transform: rotate(360deg); } }
+.stepanim .pin-beat { transform-origin: center; animation: pinBeat 1.6s ease-in-out infinite; }
+@keyframes pinBeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+.stepanim .seal { transform-origin: 64px 92px; animation: pinBeat 2s ease-in-out infinite; }
 
 /* Paso 3 — el regalo se abre y brillan destellos */
 .stepanim .lid { transform-origin: 60px 64px; animation: openLid 2.8s ease-in-out infinite; }
@@ -325,7 +328,7 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .how-anim, .stepanim * { animation: none !important; }
   .stepanim .ln { stroke-dashoffset: 0; }
-  .stepanim .heart, .stepanim .sp { opacity: 1; }
+  .stepanim .sp { opacity: 1; }
 }
 .how-card-title { font-size: 1.25rem; font-weight: 700; color: var(--ink); margin-bottom: 0.6rem; letter-spacing: -0.02em; }
 .how-card-desc { font-size: 0.98rem; color: var(--ink-soft); line-height: 1.6; }
