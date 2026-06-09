@@ -34,6 +34,34 @@ function HowItWorks() {
   );
 }
 
+function Testimonios() {
+  const items = [
+    { ini: 'M', color: '#e11d48', texto: 'Apadrinar a Lucía fue la mejor decisión de mi Navidad. Ver su carita al recibir su mochila no tiene precio.', nombre: 'María G.', rol: 'Madrina · Madrid, España' },
+    { ini: 'C', color: '#2563eb', texto: 'Como familia agradecemos esta plataforma. Mi hijo Josué recibió sus zapatillas y un mensaje hermoso de su padrino.', nombre: 'Carmen M.', rol: 'Mamá · Azángaro, Puno' },
+    { ini: 'J', color: '#f59e0b', texto: 'Vivo en USA y siempre quise ayudar en mi país. Aquí puedo ver al niño, su carta y coordinar directo. Transparente y real.', nombre: 'Jorge R.', rol: 'Padrino · Nueva Jersey, EE.UU.' },
+  ];
+  return (
+    <section className="testi">
+      <Reveal><h2 className="testi-title">Historias que ya cambiaron una Navidad</h2></Reveal>
+      <Reveal delay={80}><p className="testi-sub">Lo que dicen padrinos y familias de CartasANoel</p></Reveal>
+      <div className="testi-grid">
+        {items.map((it, i) => (
+          <Reveal key={i} delay={i * 120} className="testi-card">
+            <p className="testi-quote">"{it.texto}"</p>
+            <div className="testi-author">
+              <span className="testi-avatar" style={{ background: it.color }}>{it.ini}</span>
+              <div>
+                <div className="testi-name">{it.nombre}</div>
+                <div className="testi-role">{it.rol}</div>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function CountdownNavidad() {
   const [t2, setT2] = useState({});
   useEffect(() => {
@@ -326,6 +354,8 @@ export default function Home() {
           </div>
         </aside>
       </div>
+
+      <Testimonios />
 
       {/* CTA de cierre cinematográfico */}
       <section className="cta-final">

@@ -519,6 +519,20 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .fb-comment .fb-composer { margin-top: 0.6rem; margin-bottom: 0.3rem; }
 .fb-comment .fb-comment { margin-top: 0.8rem; }
 
+/* ═══ TESTIMONIOS ═══ */
+.testi { max-width: 1080px; margin: 0 auto; padding: 4rem 1.5rem 1rem; text-align: center; }
+.testi-title { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.testi-sub { font-size: 1.1rem; color: var(--ink-soft); margin: 0.6rem auto 2.6rem; }
+.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+@media (max-width: 800px) { .testi-grid { grid-template-columns: 1fr; } .testi { padding-top: 3rem; } }
+.testi-card { background: var(--surface); border-radius: var(--r); padding: 1.8rem; text-align: left; box-shadow: var(--sh); border: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 1.2rem; transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease); }
+.testi-card:hover { transform: translateY(-5px); box-shadow: var(--sh-lg); }
+.testi-quote { font-size: 1.02rem; line-height: 1.6; color: var(--ink); font-style: italic; flex: 1; }
+.testi-author { display: flex; align-items: center; gap: 0.8rem; }
+.testi-avatar { width: 46px; height: 46px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
+.testi-name { font-weight: 700; color: var(--ink); font-size: 0.95rem; }
+.testi-role { font-size: 0.82rem; color: var(--ink-soft); margin-top: 0.1rem; }
+
 /* ═══ CTA FINAL CINEMATOGRÁFICO ═══ */
 .cta-final {
   position: relative; overflow: hidden;
