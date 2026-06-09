@@ -220,8 +220,8 @@ function PostCard({ n, t }) {
           : <div className="post-avatar-placeholder">🎁</div>
         }
         <div className="post-meta">
-          <div className="post-name">🎄 {n.nombre}</div>
-          <div className="post-location">📍 {n.provincia}, {n.region} · {n.edad} años</div>
+          <div className="post-name">{n.nombre}</div>
+          <div className="post-location">{n.provincia}, {n.region} · {n.edad} años</div>
         </div>
         <span className={`post-badge ${tienePadrino ? 'con' : 'sin'}`}>
           {tienePadrino ? '✓ Apadrinado' : 'Busca padrino'}
@@ -274,20 +274,20 @@ function PostCard({ n, t }) {
         <p style={{fontSize:'1.08rem', lineHeight:1.7, color:'var(--ink)'}}>"{n.carta_texto}"</p>
         {n.carta_foto && (
           <>
-            <p style={{color:'var(--ink-faint)', fontSize:'0.78rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:'1.2rem 0 0.5rem'}}>✍️ Carta escrita a mano</p>
+            <p style={{color:'var(--ink-faint)', fontSize:'0.78rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:'1.2rem 0 0.5rem'}}>Carta escrita a mano</p>
             <img src={cld(n.carta_foto, 'w_700,q_auto,f_auto,c_limit')} alt="Carta a mano"
               style={{width:'100%', borderRadius:14}} />
           </>
         )}
         {n.video_url && (
           <>
-            <p style={{color:'var(--ink-faint)', fontSize:'0.78rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:'1.2rem 0 0.5rem'}}>🎬 Video del niño</p>
+            <p style={{color:'var(--ink-faint)', fontSize:'0.78rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:'1.2rem 0 0.5rem'}}>Video del niño</p>
             <video src={n.video_url} controls playsInline preload="metadata"
               style={{width:'100%', borderRadius:14, background:'#000', maxHeight:'50vh'}} />
           </>
         )}
         <p style={{color:'var(--ink-faint)', fontSize:'0.85rem', marginTop:'1rem'}}>
-          📍 {n.provincia}, {n.region} · {n.edad} años
+          {n.provincia}, {n.region} · {n.edad} años
         </p>
       </Modal>
 
@@ -414,7 +414,7 @@ export default function Home() {
         {/* SIDEBAR */}
         <aside className="sidebar">
           <div className="sidebar-card">
-            <h3>📊 Resumen</h3>
+            <h3>Resumen</h3>
             {[
               ['Total cartas', ninos.length],
               ['Apadrinados', ninos.filter(n=>n.tiene_padrino).length],
@@ -426,11 +426,11 @@ export default function Home() {
                 <span className="sidebar-stat-val">{v}</span>
               </div>
             ))}
-            <Link to="/registrar" className="sidebar-cta">🎄 Registrar niño</Link>
+            <Link to="/registrar" className="sidebar-cta">Registrar niño</Link>
           </div>
 
           <div className="sidebar-card">
-            <h3>📍 Por Región</h3>
+            <h3>Por Región</h3>
             <div>
               {REGIONES_SIDEBAR.map(r => (
                 <span key={r} className={`region-tag ${region===r?'active':''}`}
@@ -445,11 +445,11 @@ export default function Home() {
           </div>
 
           <div className="sidebar-card">
-            <h3>❤️ ¿Quieres ayudar?</h3>
+            <h3>¿Quieres ayudar?</h3>
             <p style={{color:'#888', fontSize:'0.83rem', marginBottom:'0.8rem', lineHeight:1.6}}>
               Sé el padrino de un niño. Coordina directamente con la familia y haz realidad su Navidad.
             </p>
-            <Link to="/mi-nino" className="sidebar-cta" style={{background:'linear-gradient(135deg,#8B0000,#c0392b)', color:'white'}}>
+            <Link to="/mi-nino" className="sidebar-cta" style={{background:'var(--gray-bg)', color:'var(--red)'}}>
               Ver mi niño apadrinado
             </Link>
           </div>

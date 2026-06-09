@@ -5,19 +5,16 @@ import { API, cld } from '../config';
 import { LangContext } from '../App';
 import VideoThread from '../VideoThread';
 import Comments from '../Comments';
-import { useAuth } from '../AuthContext';
+import PadrinoForm from '../PadrinoForm';
 import { HeartIcon, ShareIcon, WhatsAppIcon } from '../Icons';
 
 export default function FamilyDetail() {
   const { id } = useParams();
   const { t } = useContext(LangContext);
-  const { user } = useAuth();
   const [nino, setNino] = useState(null);
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
-  const [padrinoForm, setPadrinoForm] = useState({ nombre: '', email: '', pais: '' });
   const [success, setSuccess] = useState(false);
-  const [enviando, setEnviando] = useState(false);
   const [tab, setTab] = useState('mensajes'); // 'mensajes' | 'videos'
 
   useEffect(() => {
@@ -30,17 +27,6 @@ export default function FamilyDetail() {
     if (liked) return;
     const res = await axios.post(`${API}/api/ninos/${id}/like`);
     setLikes(res.data.likes); setLiked(true);
-  };
-
-  const handlePadrino = async e => {
-    e.preventDefault();
-    setEnviando(true);
-    // Si está logueado, su email de cuenta es el oficial (para vincular en "Mi niño")
-    const email = user?.email || padrinoForm.email;
-    const nombre = padrinoForm.nombre || user?.displayName || '';
-    await axios.post(API+'/api/padrinos', { ...padrinoForm, nombre, email, nino_id: parseInt(id) });
-    setEnviando(false); setSuccess(true);
-    setNino(prev => ({ ...prev, tiene_padrino: true }));
   };
 
   if (!nino) return <p className="loading">🎄 Cargando...</p>;
@@ -108,23 +94,7 @@ export default function FamilyDetail() {
         {!nino.tiene_padrino && !success && (
           <div className="godfather-form">
             <h4>{t.godfather_title}</h4>
-            <form onSubmit={handlePadrino}>
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.8rem', marginBottom:'0.8rem'}}>
-                <div className="form-group" style={{marginBottom:0}}>
-                  <label>{t.godfather_name}</label>
-                  <input value={padrinoForm.nombre} onChange={e=>setPadrinoForm({...padrinoForm,nombre:e.target.value})} required />
-                </div>
-                <div className="form-group" style={{marginBottom:0}}>
-                  <label>{t.godfather_country}</label>
-                  <input value={padrinoForm.pais} onChange={e=>setPadrinoForm({...padrinoForm,pais:e.target.value})} placeholder="Perú, España..." />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>{t.godfather_email}</label>
-                <input type="email" value={padrinoForm.email} onChange={e=>setPadrinoForm({...padrinoForm,email:e.target.value})} required />
-              </div>
-              <button className="submit-btn" disabled={enviando}>{enviando ? '⏳...' : t.godfather_btn}</button>
-            </form>
+            <PadrinoForm ninoId={id} ninoNombre={nino.nombre} onSuccess={()=>setSuccess(true)} />
           </div>
         )}
         {success && <div className="success-msg" style={{margin:'0 1.8rem 1.4rem'}}>🎄 {t.godfather_success}</div>}

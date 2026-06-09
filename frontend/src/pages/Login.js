@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 
 export default function Login() {
   const { registrar, entrar, entrarGoogle } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const destino = searchParams.get('next') || '/';  // volver a donde estabas
   const [modo, setModo] = useState('entrar'); // 'entrar' | 'registrar'
   const [rol, setRol] = useState('padrino');
   const [form, setForm] = useState({ nombre: '', email: '', password: '' });
@@ -32,7 +34,7 @@ export default function Login() {
       } else {
         await entrar(form.email, form.password);
       }
-      navigate('/');
+      navigate(destino);
     } catch (err) {
       setError(traducirError(err.code));
     }
@@ -43,7 +45,7 @@ export default function Login() {
     setError(''); setCargando(true);
     try {
       await entrarGoogle(rol);
-      navigate('/');
+      navigate(destino);
     } catch (err) {
       setError('No se pudo entrar con Google. Inténtalo de nuevo.');
     }
