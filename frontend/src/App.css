@@ -237,16 +237,16 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 /* Escena animada (SVG) dentro de un círculo cálido y flotante */
 .how-anim {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 84px; height: 84px; border-radius: 24px; margin-bottom: 1.2rem;
+  width: 118px; height: 118px; border-radius: 32px; margin-bottom: 1.6rem;
   background: linear-gradient(135deg, #fde3e7, #fff1f2);
   animation: iconFloat 3.6s ease-in-out infinite;
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
-  box-shadow: 0 8px 22px rgba(225,29,72,0.12);
+  box-shadow: 0 10px 30px rgba(225,29,72,0.14);
 }
 .how-card:nth-child(2) .how-anim { animation-delay: -1.2s; background: linear-gradient(135deg,#dbeafe,#eff6ff); box-shadow: 0 8px 22px rgba(59,130,246,0.14); }
-.how-card:nth-child(3) .how-anim { animation-delay: -2.4s; background: linear-gradient(135deg,#fef3c7,#fffbeb); box-shadow: 0 8px 22px rgba(245,158,11,0.16); }
+.how-card:nth-child(3) .how-anim { animation-delay: -2.4s; background: linear-gradient(135deg,#fde3e7,#fff1f2); box-shadow: 0 10px 30px rgba(225,29,72,0.14); }
 .how-card:hover .how-anim { transform: scale(1.12) translateY(-2px); }
-.stepanim { width: 60px; height: 60px; display: block; overflow: visible; }
+.stepanim { width: 88px; height: 88px; display: block; overflow: visible; }
 @keyframes iconFloat {
   0%,100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-8px) rotate(3deg); }

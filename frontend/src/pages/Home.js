@@ -83,28 +83,28 @@ function StepAnim({ type }) {
     <svg className="stepanim" viewBox="0 0 120 120" aria-hidden="true">
       <defs>
         <linearGradient id="boxG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff7ed"/><stop offset="100%" stopColor="#fde68a"/>
+          <stop offset="0%" stopColor="#fb7185"/><stop offset="100%" stopColor="#e11d48"/>
         </linearGradient>
         <linearGradient id="bowG" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#fbbf24"/><stop offset="100%" stopColor="#f59e0b"/>
+          <stop offset="0%" stopColor="#f43f5e"/><stop offset="100%" stopColor="#be123c"/>
         </linearGradient>
         <filter id="giftSh" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#f59e0b" floodOpacity="0.30"/>
+          <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#e11d48" floodOpacity="0.30"/>
         </filter>
       </defs>
       <g filter="url(#giftSh)">
-        <rect x="34" y="58" width="52" height="42" rx="8" fill="url(#boxG)" stroke="#fcd34d" strokeWidth="1.5"/>
+        <rect x="34" y="58" width="52" height="42" rx="8" fill="url(#boxG)" stroke="#fb7185" strokeWidth="1.5"/>
         <rect x="55" y="58" width="10" height="42" fill="url(#bowG)"/>
       </g>
       <g className="lid">
         <rect x="30" y="48" width="60" height="16" rx="6" fill="url(#bowG)"/>
-        <rect x="55" y="48" width="10" height="16" fill="#ea9b08"/>
-        <path d="M60 48 C45 28 28 42 52 48 M60 48 C75 28 92 42 68 48" fill="none" stroke="#f59e0b" strokeWidth="5" strokeLinecap="round"/>
-        <circle cx="60" cy="46" r="4" fill="#fbbf24"/>
+        <rect x="55" y="48" width="10" height="16" fill="#9f1239"/>
+        <path d="M60 48 C45 28 28 42 52 48 M60 48 C75 28 92 42 68 48" fill="none" stroke="#e11d48" strokeWidth="5" strokeLinecap="round"/>
+        <circle cx="60" cy="46" r="4" fill="#fb7185"/>
       </g>
       <g className="sparkles">
         <path className="sp s1" d="M30 40 l1.6 4 l4 1.6 l-4 1.6 l-1.6 4 l-1.6 -4 l-4 -1.6 l4 -1.6 Z" fill="#fbbf24"/>
-        <path className="sp s2" d="M92 46 l1.3 3.2 l3.2 1.3 l-3.2 1.3 l-1.3 3.2 l-1.3 -3.2 l-3.2 -1.3 l3.2 -1.3 Z" fill="#f59e0b"/>
+        <path className="sp s2" d="M92 46 l1.3 3.2 l3.2 1.3 l-3.2 1.3 l-1.3 3.2 l-1.3 -3.2 l-3.2 -1.3 l3.2 -1.3 Z" fill="#fb7185"/>
         <path className="sp s3" d="M60 24 l1.8 4.4 l4.4 1.8 l-4.4 1.8 l-1.8 4.4 l-1.8 -4.4 l-4.4 -1.8 l4.4 -1.8 Z" fill="#fbbf24"/>
       </g>
     </svg>
