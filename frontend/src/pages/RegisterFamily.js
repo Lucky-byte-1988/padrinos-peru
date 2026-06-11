@@ -6,21 +6,35 @@ import { useAuth } from '../AuthContext';
 
 const REGIONES = ['Amazonas','Áncash','Apurímac','Arequipa','Ayacucho','Cajamarca','Callao','Cusco','Huancavelica','Huánuco','Ica','Junín','La Libertad','Lambayeque','Lima','Loreto','Madre de Dios','Moquegua','Pasco','Piura','Puno','San Martín','Tacna','Tumbes','Ucayali'];
 
-function FileUpload({ label, name, accept, capture, preview, onChange, icon }) {
+const CameraGlyph = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+    <circle cx="12" cy="13" r="3.5"/>
+  </svg>
+);
+const VideoGlyph = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="6" width="13" height="12" rx="2.5"/>
+    <path d="m16 10 5-3v10l-5-3Z"/>
+  </svg>
+);
+
+function FileUpload({ label, name, accept, capture, preview, onChange }) {
+  const esVideo = accept.startsWith('video');
   return (
     <div className="form-group">
-      <label>{icon} {label}</label>
+      <label>{label}</label>
       <label className="file-upload-box">
         {preview ? (
-          accept.startsWith('video') ? (
+          esVideo ? (
             <video src={preview} controls className="file-preview-video" />
           ) : (
-            <img src={preview} alt="preview" className="file-preview-img" />
+            <img src={preview} alt="Vista previa" className="file-preview-img" />
           )
         ) : (
           <div className="file-upload-placeholder">
-            <span className="file-upload-icon">{accept.startsWith('video') ? '🎥' : '📷'}</span>
-            <span className="file-upload-text">Toca para {accept.startsWith('video') ? 'grabar o subir video' : 'tomar foto o elegir imagen'}</span>
+            <span className="file-upload-icon">{esVideo ? <VideoGlyph /> : <CameraGlyph />}</span>
+            <span className="file-upload-text">Toca para {esVideo ? 'grabar o subir un video' : 'tomar una foto o elegir una imagen'}</span>
             <span className="file-upload-hint">Desde cámara o galería</span>
           </div>
         )}
@@ -73,11 +87,14 @@ export default function RegisterFamily() {
 
   if (success) return (
     <div className="form-page" style={{textAlign:'center'}}>
-      <div style={{fontSize:'5rem', marginBottom:'1rem'}}>🎅</div>
-      <div className="success-msg">{t.reg_success}</div>
-      <br />
-      <a href="/" className="btn-gold" style={{display:'inline-block', marginTop:'1rem', padding:'0.9rem 2rem', borderRadius:'30px', fontWeight:'bold', textDecoration:'none', background:'linear-gradient(135deg,#FFD700,#FFA500)', color:'#8B0000'}}>
-        Ver otras cartas
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{margin:'1.5rem auto 1rem', display:'block'}} aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="m8.5 12.5 2.5 2.5 5-6"/>
+      </svg>
+      <h2 style={{marginBottom:'0.6rem'}}>Carta publicada</h2>
+      <p className="form-desc" style={{marginBottom:'2rem'}}>{t.reg_success}</p>
+      <a href="/" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
+        Ver las cartas
       </a>
     </div>
   );
@@ -112,7 +129,7 @@ export default function RegisterFamily() {
         </div>
 
         <div className="form-group">
-          <label>✉️ {t.field_carta}</label>
+          <label>{t.field_carta}</label>
           <textarea
             name="carta_texto"
             value={form.carta_texto}
@@ -129,7 +146,6 @@ export default function RegisterFamily() {
           capture="environment"
           preview={previews.carta_foto}
           onChange={handleFile('carta_foto')}
-          icon="📝"
         />
 
         <FileUpload
@@ -139,7 +155,6 @@ export default function RegisterFamily() {
           capture="environment"
           preview={previews.foto_familia}
           onChange={handleFile('foto_familia')}
-          icon="👨‍👩‍👧"
         />
 
         <FileUpload
@@ -149,16 +164,16 @@ export default function RegisterFamily() {
           capture="camcorder"
           preview={previews.video}
           onChange={handleFile('video')}
-          icon="🎥"
         />
 
         <div className="form-group">
-          <label>📱 {t.field_whatsapp}</label>
-          <input name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="9XXXXXXXX" />
+          <label>{t.field_whatsapp}</label>
+          <input name="whatsapp" type="tel" inputMode="numeric" value={form.whatsapp} onChange={handleChange} placeholder="9XXXXXXXX" />
+          <p style={{fontSize:'0.8rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>Solo lo usamos para avisarte cuando alguien apadrine al niño.</p>
         </div>
 
         <button type="submit" className="submit-btn" disabled={loading}>
-          {loading ? '⏳ Enviando...' : t.reg_btn}
+          {loading ? 'Enviando…' : t.reg_btn}
         </button>
       </form>
     </div>

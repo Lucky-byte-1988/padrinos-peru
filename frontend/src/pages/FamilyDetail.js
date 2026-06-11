@@ -29,7 +29,7 @@ export default function FamilyDetail() {
     setLikes(res.data.likes); setLiked(true);
   };
 
-  if (!nino) return <p className="loading">🎄 Cargando...</p>;
+  if (!nino) return <p className="loading">Cargando…</p>;
 
   const videoEmbed = nino.video_url
     ? nino.video_url.replace('watch?v=','embed/').replace('youtu.be/','youtube.com/embed/')

@@ -19,7 +19,10 @@ function AdminGuard({ children }) {
   if (!user) {
     return (
       <div className="form-page" style={{textAlign:'center'}}>
-        <div style={{fontSize:'3rem'}}>🔒</div>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" strokeWidth="1.6" strokeLinecap="round" style={{margin:'0 auto 0.8rem', display:'block'}} aria-hidden="true">
+          <rect x="5" y="11" width="14" height="9" rx="2.5"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
         <h2>Área privada</h2>
         <p className="form-desc">Este panel es solo para administradores. Inicia sesión.</p>
         <Link to="/login" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.9rem 2rem'}}>Iniciar sesión</Link>
@@ -29,7 +32,10 @@ function AdminGuard({ children }) {
   if (!isAdmin) {
     return (
       <div className="form-page" style={{textAlign:'center'}}>
-        <div style={{fontSize:'3rem'}}>⛔</div>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" strokeWidth="1.6" strokeLinecap="round" style={{margin:'0 auto 0.8rem', display:'block'}} aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M5 19 19 5"/>
+        </svg>
         <h2>Acceso restringido</h2>
         <p className="form-desc">Tu cuenta ({user.email}) no tiene permisos de administrador.</p>
         <Link to="/" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.9rem 2rem'}}>Volver al inicio</Link>

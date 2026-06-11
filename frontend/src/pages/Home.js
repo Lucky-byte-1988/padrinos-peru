@@ -413,7 +413,7 @@ export default function Home() {
             </div>
           </div>
 
-          {loading ? <p className="loading">🎄 Cargando cartas...</p>
+          {loading ? <p className="loading">Cargando cartas...</p>
             : filtrados.length === 0 ? <p className="loading" style={{color:'#555'}}>Sin resultados.</p>
             : filtrados.map((n, i) => <Reveal key={n.id} delay={Math.min(i, 5) * 90}><PostCard n={n} t={t} /></Reveal>)
           }

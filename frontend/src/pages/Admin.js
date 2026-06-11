@@ -72,7 +72,7 @@ export default function Admin() {
     cargar();
   };
 
-  if (!data) return <p className="loading">🎄 Cargando panel...</p>;
+  if (!data) return <p className="loading">Cargando panel…</p>;
 
   const filtrados = data.ninos.filter(n =>
     n.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -85,28 +85,28 @@ export default function Admin() {
       <h1>{t.admin_title}</h1>
 
       <div className="stats">
-        <div className="stat-card"><h3>{data.total_ninos}</h3><p>🎄 {t.admin_total}</p></div>
-        <div className="stat-card"><h3>{data.total_padrinos}</h3><p>❤️ {t.admin_padrinos}</p></div>
-        <div className="stat-card"><h3 style={{color:'#e74c3c'}}>{data.sin_padrino}</h3><p>⏳ {t.admin_sin_padrino}</p></div>
+        <div className="stat-card"><h3>{data.total_ninos}</h3><p>{t.admin_total}</p></div>
+        <div className="stat-card"><h3>{data.total_padrinos}</h3><p>{t.admin_padrinos}</p></div>
+        <div className="stat-card"><h3 style={{color:'#e74c3c'}}>{data.sin_padrino}</h3><p>{t.admin_sin_padrino}</p></div>
         <div className="stat-card">
           <h3 style={{color:'#2ecc71'}}>{data.total_ninos > 0 ? Math.round((data.total_padrinos / data.total_ninos) * 100) : 0}%</h3>
-          <p>📊 Cobertura</p>
+          <p>Cobertura</p>
         </div>
       </div>
 
       {/* TABS */}
       <div className="admin-tabs">
         <button className={`admin-tab ${tab === 'ninos' ? 'active' : ''}`} onClick={() => setTab('ninos')}>
-          🎄 Niños ({data.total_ninos})
+          Niños ({data.total_ninos})
         </button>
         <button className={`admin-tab ${tab === 'padrinos' ? 'active' : ''}`} onClick={() => setTab('padrinos')}>
-          ❤️ Padrinos ({data.total_padrinos})
+          Padrinos ({data.total_padrinos})
         </button>
         <button className={`admin-tab ${tab === 'mensajes' ? 'active' : ''}`} onClick={() => setTab('mensajes')}>
-          💌 Mensajes ({mensajes.length})
+          Mensajes ({mensajes.length})
         </button>
         <button className={`admin-tab ${tab === 'historial' ? 'active' : ''}`} onClick={() => setTab('historial')}>
-          📋 Historial ({historial.length})
+          Historial ({historial.length})
         </button>
         <button className={`admin-tab ${tab === 'admins' ? 'active' : ''}`} onClick={() => setTab('admins')}>
           🔑 Administradores
@@ -132,7 +132,7 @@ export default function Admin() {
                 {key:'fecha',label:'Fecha registro'},
               ],
               'ninos_registrados'
-            )}>📊 Exportar a Excel</button>
+            )}>Exportar a Excel</button>
           </div>
           <div style={{overflowX:'auto'}}>
             <table className="admin-table">
@@ -179,7 +179,7 @@ export default function Admin() {
                         </Link>
                         <button onClick={() => eliminarNino(n)}
                           style={{background:'#fef2f2', color:'#b91c1c', border:'1px solid #fecaca', borderRadius:'8px', padding:'0.3rem 0.6rem', fontSize:'0.78rem', fontWeight:600, cursor:'pointer'}}>
-                          🗑 Eliminar
+                          Eliminar
                         </button>
                       </div>
                     </td>
@@ -217,7 +217,7 @@ export default function Admin() {
                   <td>
                     <button onClick={() => eliminarPadrino(p)}
                       style={{background:'#fef2f2', color:'#b91c1c', border:'1px solid #fecaca', borderRadius:'8px', padding:'0.3rem 0.6rem', fontSize:'0.78rem', fontWeight:600, cursor:'pointer'}}>
-                      🗑 Eliminar
+                      Eliminar
                     </button>
                   </td>
                 </tr>
@@ -230,7 +230,7 @@ export default function Admin() {
       {tab === 'mensajes' && (
         <>
           <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', marginBottom:'1rem'}}>
-            💌 Mensajes privados enviados a las familias (no aparecen en el muro público).
+            Mensajes privados enviados a las familias (no aparecen en el muro público).
           </p>
           <div style={{overflowX:'auto'}}>
             <table className="admin-table">
@@ -264,7 +264,7 @@ export default function Admin() {
         <>
           <div style={{display:'flex', gap:'0.6rem', marginBottom:'1rem', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap'}}>
             <p style={{color:'var(--ink-soft)', fontSize:'0.9rem', margin:0}}>
-              📋 Trazabilidad: registro permanente de los niños eliminados (regalo entregado u otro motivo).
+              Trazabilidad: registro permanente de los niños eliminados (regalo entregado u otro motivo).
             </p>
             <button className="btn-export" onClick={() => exportarCSV(
               historial,
@@ -276,7 +276,7 @@ export default function Admin() {
                 {key:'fecha_eliminacion',label:'Eliminado'},
               ],
               'historial_ninos_ayudados'
-            )}>📊 Exportar a Excel</button>
+            )}>Exportar a Excel</button>
           </div>
           <div style={{overflowX:'auto'}}>
             <table className="admin-table">
@@ -352,7 +352,7 @@ export default function Admin() {
                     <td>
                       <button onClick={() => quitarAdmin(a)}
                         style={{background:'#fef2f2', color:'#b91c1c', border:'1px solid #fecaca', borderRadius:'8px', padding:'0.3rem 0.6rem', fontSize:'0.78rem', fontWeight:600, cursor:'pointer'}}>
-                        🗑 Quitar
+                        Quitar
                       </button>
                     </td>
                   </tr>

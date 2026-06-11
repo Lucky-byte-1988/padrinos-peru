@@ -171,7 +171,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
               Cancelar
             </button>
             <button type="submit" className="vthread-send" disabled={enviando}>
-              {enviando ? '⏳ Publicando...' : '🚀 Publicar video'}
+              {enviando ? 'Publicando...' : '🚀 Publicar video'}
             </button>
           </div>
         </form>
