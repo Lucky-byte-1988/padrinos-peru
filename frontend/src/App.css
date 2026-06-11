@@ -1,8 +1,6 @@
 /* ═══════════════════════════════════════════
    CartasANoel.pe — Premium Design System
    ═══════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -371,7 +369,7 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .post-badge.sin { background: #fdeeec; color: var(--red); }
 .post-badge.con { background: #ecfdf3; color: var(--green); }
 .post-img-wrap { overflow: hidden; position: relative; }
-.post-img { width: 100%; max-height: 560px; object-fit: cover; display: block; transition: transform 0.7s var(--ease); }
+.post-img { width: 100%; max-height: 560px; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: var(--gray-bg); transition: transform 0.7s var(--ease); }
 .post:hover .post-img { transform: scale(1.03); }
 .post-carta { margin: 1.4rem 1.6rem; padding: 0; font-size: 1.12rem; color: var(--ink); line-height: 1.65; font-weight: 400; letter-spacing: -0.01em; }
 .post-actions { display: flex; align-items: center; gap: 0.3rem; padding: 0.5rem 1.2rem 1.1rem; }

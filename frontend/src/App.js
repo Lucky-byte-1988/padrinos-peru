@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
-import RegisterFamily from './pages/RegisterFamily';
-import FamilyDetail from './pages/FamilyDetail';
-import Admin from './pages/Admin';
-import PadrinoPanel from './pages/PadrinoPanel';
-import Nosotros from './pages/Nosotros';
-import Login from './pages/Login';
 import { AuthProvider, useAuth } from './AuthContext';
 import { translations } from './i18n';
 import './App.css';
+
+// Carga diferida: estas páginas solo se descargan cuando el usuario las visita
+const RegisterFamily = lazy(() => import('./pages/RegisterFamily'));
+const FamilyDetail = lazy(() => import('./pages/FamilyDetail'));
+const Admin = lazy(() => import('./pages/Admin'));
+const PadrinoPanel = lazy(() => import('./pages/PadrinoPanel'));
+const Nosotros = lazy(() => import('./pages/Nosotros'));
+const Login = lazy(() => import('./pages/Login'));
 
 function AdminGuard({ children }) {
   const { user, loading, isAdmin } = useAuth();
@@ -84,15 +86,17 @@ function App() {
       <LangContext.Provider value={{ lang, setLang, t }}>
         <Router>
           <Nav />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/registrar" element={<RegisterFamily />} />
-            <Route path="/carta/:id" element={<FamilyDetail />} />
-            <Route path="/admin" element={<AdminGuard><Admin /></AdminGuard>} />
-            <Route path="/mi-nino" element={<PadrinoPanel />} />
-            <Route path="/nosotros" element={<Nosotros />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
+          <Suspense fallback={<p className="loading">Cargando…</p>}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/registrar" element={<RegisterFamily />} />
+              <Route path="/carta/:id" element={<FamilyDetail />} />
+              <Route path="/admin" element={<AdminGuard><Admin /></AdminGuard>} />
+              <Route path="/mi-nino" element={<PadrinoPanel />} />
+              <Route path="/nosotros" element={<Nosotros />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          </Suspense>
           <footer className="footer">{t.footer}</footer>
         </Router>
       </LangContext.Provider>
