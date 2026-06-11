@@ -184,7 +184,7 @@ function CountdownNavidad() {
   }, []);
   return (
     <div className="countdown">
-      <p className="countdown-label">⏳ Faltan para Navidad</p>
+      <p className="countdown-label">Faltan para Navidad</p>
       <div className="countdown-boxes">
         {[['dias','Días'],['horas','Hrs'],['minutos','Min'],['segundos','Seg']].map(([k,l]) => (
           <div className="countdown-box" key={k}>

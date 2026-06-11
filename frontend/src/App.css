@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════
    CartasANoel.pe — Premium Design System
    ═══════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -33,7 +33,7 @@
 html { scroll-behavior: smooth; }
 html, body { overflow-x: hidden; max-width: 100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Helvetica Neue', Arial, sans-serif;
   background: var(--bg);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
@@ -73,9 +73,16 @@ img, video, iframe { max-width: 100%; }
 /* Titulares con la fuente del sistema: en Mac/iPhone renderiza San Francisco (Apple real) */
 .hero h1, .how-title, .cta-title, .auth-title, .nav-brand,
 .section-title, .panel-hero h1, .admin-page h1, .form-page h2, .testi-title {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', sans-serif;
   font-weight: 700;
 }
+
+/* Microinteracción global de presión (Apple HIG: feedback <100ms, escala sutil) */
+button:active, a.btn-gold:active, a.cta-btn-white:active, a.sidebar-cta:active, a.btn-outline:active {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
+}
+button, a { touch-action: manipulation; }
 
 /* Accesibilidad: anillos de foco visibles para navegación por teclado (WCAG) */
 a:focus-visible, button:focus-visible, input:focus-visible,
@@ -85,36 +92,38 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
   border-radius: 6px;
 }
 
-/* ═══ NAVBAR ═══ */
+/* ═══ NAVBAR — barra Apple: fina, translúcida, hairline inferior ═══ */
 .navbar {
-  background: rgba(255,253,250,0.62);
-  backdrop-filter: saturate(180%) blur(30px);
-  -webkit-backdrop-filter: saturate(180%) blur(30px);
-  border: 1px solid rgba(255,255,255,0.55);
-  box-shadow: 0 8px 32px rgba(40,30,20,0.08);
-  padding: 0.75rem 1.5rem;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  box-shadow: none;
+  padding: 0.65rem 0;
   display: flex; justify-content: space-between; align-items: center;
-  position: sticky; top: 12px; z-index: 100;
-  margin: 12px auto 0; max-width: 1180px; width: calc(100% - 24px);
-  border-radius: 980px;
+  position: sticky; top: 0; z-index: 100;
+  margin: 0; max-width: 100%; width: 100%;
+  border-radius: 0;
 }
+.navbar > * { }
 .nav-brand {
-  color: var(--ink); font-size: 1.25rem; font-weight: 800; text-decoration: none;
-  letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.45rem;
+  color: var(--ink); font-size: 1.15rem; font-weight: 600; text-decoration: none;
+  letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.45rem;
+  margin-left: max(1.5rem, calc((100% - 1100px) / 2));
 }
 .brand-mark {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; border-radius: 9px;
-  background: var(--red); color: #fff; font-size: 0.95rem;
-  box-shadow: var(--sh-red);
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--red); color: #fff; font-size: 0.9rem;
 }
-.brand-dot { color: var(--red); font-weight: 700; }
-.nav-links { display: flex; gap: 0.15rem; align-items: center; }
+.brand-dot { color: var(--red); font-weight: 600; }
+.nav-links { display: flex; gap: 0.1rem; align-items: center; margin-right: max(1.5rem, calc((100% - 1100px) / 2)); }
 .nav-links a {
-  color: var(--ink-soft); text-decoration: none; font-size: 0.88rem; font-weight: 500;
-  padding: 0.5rem 1rem; border-radius: 980px; transition: all 0.3s var(--ease);
+  color: var(--ink-soft); text-decoration: none; font-size: 0.85rem; font-weight: 400;
+  padding: 0.5rem 0.9rem; border-radius: 980px; transition: color 0.2s var(--ease);
 }
-.nav-links a:hover { color: var(--ink); background: rgba(20,17,15,0.05); }
+.nav-links a:hover { color: var(--ink); background: none; }
 .lang-btn {
   background: var(--ink); color: #fff; border: none;
   padding: 0.5rem 1.1rem; border-radius: 980px; cursor: pointer; font-size: 0.82rem; font-weight: 600;
@@ -125,7 +134,9 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 /* ═══ HERO ═══ */
 .hero {
   position: relative; overflow: hidden;
-  padding: 8rem 1.5rem 6rem; text-align: center;
+  min-height: calc(100dvh - 56px);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 5rem 1.5rem 4rem; text-align: center;
   background: #ffffff;
 }
 .hero-snow { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
@@ -607,17 +618,14 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 /* ═══ CTA FINAL CINEMATOGRÁFICO ═══ */
 .cta-final {
   position: relative; overflow: hidden;
-  margin: 4rem auto 1rem; border-radius: 40px;
-  background:
-    radial-gradient(ellipse 60% 80% at 12% 15%, rgba(225,29,72,0.16), transparent 60%),
-    radial-gradient(ellipse 50% 70% at 88% 85%, rgba(245,158,11,0.18), transparent 60%),
-    radial-gradient(ellipse 45% 60% at 90% 10%, rgba(244,63,94,0.12), transparent 60%),
-    linear-gradient(180deg, #fff 0%, var(--bg-warm) 100%);
-  border: 1px solid var(--line);
-  padding: 5.5rem 2rem; text-align: center; color: var(--ink);
+  margin: 5rem auto 2rem; border-radius: 28px;
+  background: var(--gray-bg);
+  border: none;
+  padding: 6rem 2rem; text-align: center; color: var(--ink);
   max-width: 1080px; width: calc(100% - 3rem);
-  box-shadow: var(--sh);
+  box-shadow: none;
 }
+.cta-orb { display: none; }
 .cta-orb { position: absolute; border-radius: 50%; filter: blur(70px); pointer-events: none; opacity: 0.5; }
 .cta-orb-1 { width: 360px; height: 360px; top: -130px; left: -70px; background: radial-gradient(circle, rgba(225,29,72,0.42), transparent 70%); animation: floatSlow 18s ease-in-out infinite; }
 .cta-orb-2 { width: 320px; height: 320px; bottom: -130px; right: -50px; background: radial-gradient(circle, rgba(245,158,11,0.4), transparent 70%); animation: floatSlow 21s ease-in-out infinite reverse; }
@@ -682,21 +690,21 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 /* ═══ VENTANA EMERGENTE (MODAL) ═══ */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 1500;
-  background: rgba(20,17,15,0.45); backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.40); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: center; padding: 1rem;
   animation: fadeIn 0.2s var(--ease);
 }
 .modal-card {
-  background: var(--surface); border-radius: 26px; width: 100%;
+  background: var(--surface); border-radius: 20px; width: 100%;
   max-height: 88vh; display: flex; flex-direction: column;
-  box-shadow: var(--sh-lg); animation: scaleIn 0.28s var(--ease); overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.18); animation: scaleIn 0.26s var(--ease); overflow: hidden;
+  border: none;
 }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--line-soft);
 }
-.modal-title { font-size: 1.1rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.modal-title { font-size: 1.05rem; font-weight: 600; color: var(--ink); letter-spacing: -0.015em; }
 .modal-close {
   width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
   background: var(--bg-warm); color: var(--ink-soft); font-size: 1rem; transition: all 0.2s;
@@ -815,7 +823,8 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .story-cta:hover { transform: scale(1.03); box-shadow: 0 10px 28px rgba(0,0,0,0.3); }
 
 /* ═══ FOOTER ═══ */
-.footer { background: var(--ink); color: rgba(255,255,255,0.55); text-align: center; padding: 2.5rem; font-size: 0.88rem; }
+/* Footer estilo Apple: claro, discreto, hairline superior */
+.footer { background: var(--gray-bg); color: var(--ink-faint); text-align: center; padding: 2.8rem 1.5rem; font-size: 0.8rem; border-top: 1px solid rgba(0,0,0,0.06); letter-spacing: -0.005em; }
 
 .loading { text-align: center; padding: 4rem; color: var(--ink-faint); font-size: 1rem; }
 
