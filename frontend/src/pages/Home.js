@@ -382,7 +382,13 @@ export default function Home() {
 
       <HowItWorks />
 
-      <div className="social-layout" id="feed">
+      {/* Zona de feed estilo página de Mac: gris luminoso, título grande a la izquierda */}
+      <section className="feed-zone" id="feed">
+      <div className="feed-head">
+        <Reveal><h2 className="feed-title">Conoce a los niños.</h2></Reveal>
+      </div>
+
+      <div className="social-layout">
         {/* FEED */}
         <div>
           {/* Stories — al tocar se abren como historias de Instagram */}
@@ -404,7 +410,7 @@ export default function Home() {
 
           {/* Filtros */}
           <div className="filtros">
-            <input className="filtro-buscar" placeholder="🔍 Buscar niño o provincia..."
+            <input className="filtro-buscar" placeholder="Buscar niño o provincia…"
               value={busqueda} onChange={e => setBusqueda(e.target.value)} />
             <div className="filtro-tabs">
               {[['todos','Todos'],['sin','Sin padrino'],['con','Con padrino']].map(([v,l]) => (
@@ -463,6 +469,7 @@ export default function Home() {
           </div>
         </aside>
       </div>
+      </section>
 
       <Testimonios />
 

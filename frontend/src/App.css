@@ -363,13 +363,26 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .story-add { width: 70px; height: 70px; border-radius: 50%; background: var(--bg-warm); border: 2px dashed var(--line); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 300; color: var(--ink-soft); flex-shrink: 0; transition: all 0.3s var(--ease); }
 .story:hover .story-add { border-color: var(--red); color: var(--red); border-style: solid; }
 
-/* ═══ FILTROS ═══ */
+/* ═══ ZONA DE FEED ESTILO PÁGINA DE MAC: gris luminoso, tarjetas blancas ═══ */
+.feed-zone { background: var(--gray-bg); }
+.feed-zone .post { border: none; box-shadow: var(--sh-sm); }
+.feed-zone .stories-bar, .feed-zone .sidebar-card { box-shadow: var(--sh-sm); }
+.feed-zone .filtro-buscar, .feed-zone .filtro-tabs { background: #e8e8ed; }
+.feed-head { max-width: 1180px; margin: 0 auto; padding: 5rem 1.5rem 2rem; }
+.feed-title {
+  font-size: clamp(2.2rem, 5.5vw, 3.5rem); font-weight: 700; color: var(--ink);
+  letter-spacing: -0.025em; line-height: 1.05; text-align: left;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+}
+
+/* ═══ FILTROS — píldoras estilo apple.com/mac (activo = negro) ═══ */
 .filtros { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 1.8rem; align-items: center; }
-.filtro-buscar { flex: 1; min-width: 220px; padding: 0.8rem 1.2rem; background: var(--gray-bg); border: 1px solid transparent; border-radius: 12px; color: var(--ink); font-size: 1rem; font-family: inherit; transition: all 0.25s var(--ease); }
+.filtro-buscar { flex: 1; min-width: 220px; padding: 0.8rem 1.3rem; background: var(--gray-bg); border: 1px solid transparent; border-radius: 980px; color: var(--ink); font-size: 1rem; font-family: inherit; transition: all 0.25s var(--ease); }
 .filtro-buscar:focus { outline: none; border-color: var(--red); background: var(--surface); box-shadow: 0 0 0 4px rgba(225,29,72,0.12); }
-.filtro-tabs { display: flex; gap: 0.25rem; background: var(--gray-bg); padding: 0.3rem; border-radius: 12px; border: none; }
-.filtro-tab { padding: 0.55rem 1.1rem; border-radius: 9px; border: none; background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 0.9rem; font-weight: 500; font-family: inherit; transition: all 0.25s var(--ease); }
-.filtro-tab.active { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.filtro-tabs { display: flex; gap: 0.2rem; background: var(--gray-bg); padding: 0.32rem; border-radius: 980px; border: none; }
+.filtro-tab { padding: 0.6rem 1.25rem; border-radius: 980px; border: none; background: transparent; color: var(--ink); cursor: pointer; font-size: 0.95rem; font-weight: 400; font-family: inherit; transition: all 0.25s var(--ease); letter-spacing: -0.01em; }
+.filtro-tab:hover { color: var(--ink); }
+.filtro-tab.active { background: var(--ink); color: #fff; font-weight: 500; }
 
 /* ═══ POST CARD — foto protagonista, sin bordes ═══ */
 .post { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); margin-bottom: 2rem; overflow: hidden; box-shadow: var(--sh-sm); transition: all 0.4s var(--ease); animation: fadeUp 0.5s var(--ease) both; }
