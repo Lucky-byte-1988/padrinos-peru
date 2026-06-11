@@ -466,6 +466,36 @@ export default function Home() {
 
       <Testimonios />
 
+      {/* Vitrina oscura estilo Apple TV: carteles cinematográficos de los niños */}
+      {ninos.length > 0 && (
+        <section className="tvband">
+          <Reveal>
+            <div className="tvband-head">
+              <h2 className="tvband-title">Historias que esperan un final feliz.</h2>
+              <a href="#feed" className="tvband-link">Ver todas &rsaquo;</a>
+            </div>
+          </Reveal>
+          <div className="tv-row" role="list">
+            {ninos.slice(0, 10).map((n, i) => (
+              <Link to={`/carta/${n.id}`} className="tv-card" key={n.id} role="listitem" style={{animationDelay: `${i * 60}ms`}}>
+                <img
+                  src={n.foto_familia
+                    ? cld(n.foto_familia, 'w_700,h_440,q_auto,f_auto,c_fill,g_auto')
+                    : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=700'}
+                  alt={`${n.nombre}, ${n.region}`} loading="lazy" width="700" height="440"
+                />
+                <div className="tv-card-shade" />
+                <div className="tv-card-info">
+                  <span className="tv-card-name">{n.nombre}, {n.edad} años</span>
+                  <span className="tv-card-loc">{n.provincia} · {n.region}</span>
+                </div>
+                {!n.tiene_padrino && <span className="tv-card-tag">Busca padrino</span>}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* CTA de cierre cinematográfico */}
       <section className="cta-final">
         <div className="cta-orb cta-orb-1" />
