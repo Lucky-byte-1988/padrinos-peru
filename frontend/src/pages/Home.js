@@ -346,29 +346,37 @@ export default function Home() {
   return (
     <>
       <div className="hero">
-        <div className="hero-snow" />
-        <div className="hero-orb orb-1" />
-        <div className="hero-orb orb-2" />
-        <div className="hero-orb orb-3" />
-        <span className="hero-eyebrow"><span className="dot" /> {t.hero_eyebrow}</span>
+        <span className="hero-eyebrow">{t.hero_eyebrow}</span>
         <h1>{t.hero_tagline}<br /><span className="accent">{t.hero_title}</span></h1>
         <p className="hero-sub">{t.hero_sub}</p>
-        <CountdownNavidad />
         <div className="hero-btns">
           <a href="#feed" className="btn-gold">{t.hero_btn}</a>
-          <Link to="/registrar" className="btn-outline">{t.hero_btn2}</Link>
+          <Link to="/registrar" className="btn-outline">{t.hero_btn2} &rsaquo;</Link>
         </div>
+        <Reveal className="hero-visual">
+          <img
+            src={ninos[0]?.foto_familia
+              ? cld(ninos[0].foto_familia, 'w_1600,h_1000,q_auto,f_auto,c_fill,g_auto')
+              : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=1600'}
+            alt={ninos[0] ? `${ninos[0].nombre}, ${ninos[0].region}` : 'Niños de los Andes peruanos'}
+            width="1600" height="1000" fetchpriority="high"
+          />
+          <div className="hero-visual-caption">
+            {ninos[0] ? `${ninos[0].provincia}, ${ninos[0].region} · Perú` : 'Andes peruanos'}
+          </div>
+        </Reveal>
+        <CountdownNavidad />
       </div>
 
       {!loading && (
         <div className="stats-bar">
-          <div className="stat-item"><span className="stat-num">{ninos.length}</span><span className="stat-label">🎄 Cartas</span></div>
+          <div className="stat-item"><span className="stat-num">{ninos.length}</span><span className="stat-label">Cartas</span></div>
           <div className="stat-divider"/>
-          <div className="stat-item"><span className="stat-num">{ninos.filter(n=>n.tiene_padrino).length}</span><span className="stat-label">❤️ Apadrinados</span></div>
+          <div className="stat-item"><span className="stat-num">{ninos.filter(n=>n.tiene_padrino).length}</span><span className="stat-label">Apadrinados</span></div>
           <div className="stat-divider"/>
-          <div className="stat-item"><span className="stat-num" style={{color: sinPadrino > 0 ? '#e74c3c' : '#2ecc71'}}>{sinPadrino}</span><span className="stat-label">⏳ Esperando</span></div>
+          <div className="stat-item"><span className="stat-num">{sinPadrino}</span><span className="stat-label">Esperando padrino</span></div>
           <div className="stat-divider"/>
-          <div className="stat-item"><span className="stat-num">{regiones}</span><span className="stat-label">📍 Regiones</span></div>
+          <div className="stat-item"><span className="stat-num">{regiones}</span><span className="stat-label">Regiones</span></div>
         </div>
       )}
 
