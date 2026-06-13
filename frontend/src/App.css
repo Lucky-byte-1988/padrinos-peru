@@ -223,7 +223,19 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .countdown-box:hover { transform: scale(1.03); }
 .countdown-num {
   display: block; font-size: 2.6rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums;
-  color: var(--ink);
+  color: var(--ink); overflow: hidden; height: 2.6rem;
+}
+.countdown-flip {
+  display: inline-block;
+  animation: flipDigit 0.5s var(--ease);
+}
+@keyframes flipDigit {
+  0% { transform: translateY(-90%); opacity: 0; }
+  55% { transform: translateY(8%); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .countdown-flip { animation: none; }
 }
 .countdown-unit { display: block; font-size: 0.7rem; color: var(--ink-faint); margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
 

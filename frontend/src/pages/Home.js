@@ -188,7 +188,9 @@ function CountdownNavidad() {
       <div className="countdown-boxes">
         {[['dias','Días'],['horas','Hrs'],['minutos','Min'],['segundos','Seg']].map(([k,l]) => (
           <div className="countdown-box" key={k}>
-            <span className="countdown-num">{String(t2[k]??0).padStart(2,'0')}</span>
+            <span className="countdown-num">
+              <span className="countdown-flip" key={t2[k]}>{String(t2[k]??0).padStart(2,'0')}</span>
+            </span>
             <span className="countdown-unit">{l}</span>
           </div>
         ))}
