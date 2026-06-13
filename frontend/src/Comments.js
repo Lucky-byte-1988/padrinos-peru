@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { API } from './config';
 import { HeartIcon } from './Icons';
+import { useAuth } from './AuthContext';
 
 const AVATAR_COLORS = ['#1877f2','#e0245e','#15803d','#7c3aed','#d97706','#0891b2','#db2777'];
 const colorFor = (name) => AVATAR_COLORS[(name || '?').charCodeAt(0) % AVATAR_COLORS.length];
@@ -56,23 +57,30 @@ function CommentNode({ c, replies, allReplies, onReply, depth = 0 }) {
 }
 
 function ReplyComposer({ onSend, placeholder, compact }) {
+  const { user } = useAuth();
+  // Si hay sesión, el nombre de la cuenta es el autor (no se vuelve a pedir).
+  const nombreCuenta = user ? (user.displayName || user.email.split('@')[0]) : '';
   const saved = localStorage.getItem('visitorName') || '';
-  const [autor, setAutor] = useState(saved);
+  const [autor, setAutor] = useState(nombreCuenta || saved);
   const [texto, setTexto] = useState('');
   const [sending, setSending] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!texto.trim() || !autor.trim()) return;
+    const nombre = user ? nombreCuenta : autor.trim();
+    if (!texto.trim() || !nombre) return;
     setSending(true);
-    localStorage.setItem('visitorName', autor.trim());
-    await onSend(texto.trim(), autor.trim());
+    if (!user) localStorage.setItem('visitorName', nombre);
+    await onSend(texto.trim(), nombre);
     setTexto(''); setSending(false);
   };
 
+  // Solo pedimos el nombre si NO hay sesión y aún no lo guardamos antes.
+  const pedirNombre = !user && !saved;
+
   return (
     <form className={`igc-composer ${compact ? 'compact' : ''}`} onSubmit={submit}>
-      {!saved && (
+      {pedirNombre && (
         <input className="igc-name" placeholder="Tu nombre" value={autor}
           onChange={e => setAutor(e.target.value)} required />
       )}
