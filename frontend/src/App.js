@@ -12,6 +12,7 @@ const Admin = lazy(() => import('./pages/Admin'));
 const PadrinoPanel = lazy(() => import('./pages/PadrinoPanel'));
 const Nosotros = lazy(() => import('./pages/Nosotros'));
 const Login = lazy(() => import('./pages/Login'));
+const Laberinto = lazy(() => import('./pages/Laberinto'));
 
 function AdminGuard({ children }) {
   const { user, loading, isAdmin } = useAuth();
@@ -101,6 +102,7 @@ function App() {
               <Route path="/mi-nino" element={<PadrinoPanel />} />
               <Route path="/nosotros" element={<Nosotros />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/laberinto" element={<Laberinto />} />
             </Routes>
           </Suspense>
           <footer className="footer">{t.footer}</footer>
