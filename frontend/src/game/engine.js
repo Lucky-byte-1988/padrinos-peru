@@ -7,7 +7,7 @@
 
 import {
   generarLaberinto, abrirBucles, callejones, celdasLibres,
-  campoDistancias, hayVision, alcanceRayo, repartir, crearRng,
+  campoDistancias, hayVision, alcanceRayo, repartir, crearRng, DIRS,
 } from './maze';
 
 export const LLAVES_TOTALES = 10;
@@ -52,7 +52,6 @@ const TRAMPAS = [
   { id: 'eco', texto: 'Era un cebo. Un eco la arrastró hasta cerca de ti.' },
 ];
 
-const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 

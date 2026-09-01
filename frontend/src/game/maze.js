@@ -6,7 +6,8 @@
 export const PARED = 1;
 export const SUELO = 0;
 
-const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+/** Las cuatro direcciones ortogonales, en orden reloj desde arriba. */
+export const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
 /** Generador pseudoaleatorio con semilla (mulberry32): partidas reproducibles. */
 export function crearRng(semilla) {
