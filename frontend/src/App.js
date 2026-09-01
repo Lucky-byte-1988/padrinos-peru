@@ -75,6 +75,13 @@ function Nav() {
         <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
         <Link to="/mi-nino">{lang === 'es' ? 'Mi niño' : 'My child'}</Link>
         {isAdmin && <Link to="/admin">{t.nav_admin}</Link>}
+        <Link to="/laberinto" className="nav-jugar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="8" cy="8" r="4.2" />
+            <path d="M11 11l8 8M16 16l2.4-2.4M19 19l2-2" />
+          </svg>
+          {lang === 'es' ? 'Jugar' : 'Play'}
+        </Link>
         <button className="lang-btn" onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>
           {lang === 'es' ? 'EN' : 'ES'}
         </button>
