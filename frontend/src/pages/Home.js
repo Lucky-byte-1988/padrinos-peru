@@ -379,8 +379,10 @@ export default function Home() {
         <div className="stats-bar">
           <div className="stat-item"><span className="stat-num">{ninos.length}</span><span className="stat-label">Cartas</span></div>
           <div className="stat-divider"/>
-          <div className="stat-item"><span className="stat-num">{ninos.filter(n=>n.tiene_padrino).length}</span><span className="stat-label">Apadrinados</span></div>
-          <div className="stat-divider"/>
+          {ninos.some(n => n.tiene_padrino) && <>
+            <div className="stat-item"><span className="stat-num">{ninos.filter(n=>n.tiene_padrino).length}</span><span className="stat-label">Apadrinados</span></div>
+            <div className="stat-divider"/>
+          </>}
           <div className="stat-item"><span className="stat-num">{sinPadrino}</span><span className="stat-label">Esperando padrino</span></div>
           <div className="stat-divider"/>
           <div className="stat-item"><span className="stat-num">{regiones}</span><span className="stat-label">Regiones</span></div>
