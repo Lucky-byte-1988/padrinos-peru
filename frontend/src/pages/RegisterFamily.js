@@ -108,6 +108,7 @@ export default function RegisterFamily() {
       <h2>{t.reg_title}</h2>
       <p className="form-desc">{t.reg_desc}</p>
       <form onSubmit={handleSubmit}>
+        <h3 className="form-sec"><span>1</span>El niño</h3>
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem'}}>
           <div className="form-group">
             <label>{t.field_nombre}</label>
@@ -132,6 +133,7 @@ export default function RegisterFamily() {
           </div>
         </div>
 
+        <h3 className="form-sec"><span>2</span>Su carta</h3>
         <div className="form-group">
           <label>{t.field_carta}</label>
           <textarea
@@ -152,6 +154,7 @@ export default function RegisterFamily() {
           onChange={handleFile('carta_foto')}
         />
 
+        <h3 className="form-sec"><span>3</span>La familia</h3>
         <FileUpload
           label="Foto de la familia"
           name="foto_familia"

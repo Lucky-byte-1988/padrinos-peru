@@ -72,8 +72,8 @@ function Nav() {
       <div className="nav-links">
         <Link to="/">{t.nav_home}</Link>
         <Link to="/registrar">{t.nav_registro}</Link>
-        <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
         <Link to="/mi-nino">{lang === 'es' ? 'Mi niño' : 'My child'}</Link>
+        <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
         {isAdmin && <Link to="/admin">{t.nav_admin}</Link>}
         <button className="lang-btn" onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>
           {lang === 'es' ? 'EN' : 'ES'}

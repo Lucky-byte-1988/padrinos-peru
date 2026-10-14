@@ -389,6 +389,36 @@ export default function Home() {
 
       <HowItWorks />
 
+      {/* Vitrina oscura estilo Apple TV: carteles cinematográficos de los niños */}
+      {ninos.length > 0 && (
+        <section className="tvband">
+          <Reveal>
+            <div className="tvband-head">
+              <h2 className="tvband-title">Historias que esperan un final feliz.</h2>
+              <a href="#feed" className="tvband-link">Ver todas &rsaquo;</a>
+            </div>
+          </Reveal>
+          <div className="tv-row" role="list">
+            {ninos.slice(0, 10).map((n, i) => (
+              <Link to={`/carta/${n.id}`} className="tv-card" key={n.id} role="listitem" style={{animationDelay: `${i * 60}ms`}}>
+                <img
+                  src={n.foto_familia
+                    ? cld(n.foto_familia, 'w_700,h_440,q_auto,f_auto,c_fill,g_auto')
+                    : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=700'}
+                  alt={`${n.nombre}, ${n.region}`} loading="lazy" width="700" height="440"
+                />
+                <div className="tv-card-shade" />
+                <div className="tv-card-info">
+                  <span className="tv-card-name">{n.nombre}, {n.edad} años</span>
+                  <span className="tv-card-loc">{n.provincia} · {n.region}</span>
+                </div>
+                {!n.tiene_padrino && <span className="tv-card-tag">Busca padrino</span>}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Zona de feed estilo página de Mac: gris luminoso, título grande a la izquierda */}
       <section className="feed-zone" id="feed">
       <div className="feed-head">
@@ -419,6 +449,10 @@ export default function Home() {
           <div className="filtros">
             <input className="filtro-buscar" placeholder="Buscar niño o provincia…"
               value={busqueda} onChange={e => setBusqueda(e.target.value)} />
+            <select className="filtro-region" value={region} onChange={e => setRegion(e.target.value)} aria-label="Región">
+              <option value="Todas">Todas las regiones</option>
+              {[...new Set([...REGIONES_SIDEBAR, ...ninos.map(n => n.region).filter(Boolean), ...(region !== 'Todas' ? [region] : [])])].map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
             <div className="filtro-tabs">
               {[['todos','Todos'],['sin','Sin padrino'],['con','Con padrino']].map(([v,l]) => (
                 <button key={v} className={`filtro-tab ${filtro===v?'active':''}`} onClick={() => setFiltro(v)}>{l}</button>
@@ -448,19 +482,16 @@ export default function Home() {
         {/* SIDEBAR */}
         <aside className="sidebar">
           <div className="sidebar-card">
-            <h3>Resumen</h3>
-            {[
-              ['Total cartas', ninos.length],
-              ['Apadrinados', ninos.filter(n=>n.tiene_padrino).length],
-              ['Necesitan padrino', sinPadrino],
-              ['Regiones', regiones],
-            ].map(([l,v]) => (
-              <div className="sidebar-stat" key={l}>
-                <span className="sidebar-stat-label">{l}</span>
-                <span className="sidebar-stat-val">{v}</span>
-              </div>
-            ))}
-            <Link to="/registrar" className="sidebar-cta">Registrar niño</Link>
+            <h3>¿Quieres ayudar?</h3>
+            <p style={{color:'var(--ink-soft)', fontSize:'0.83rem', marginBottom:'0.8rem', lineHeight:1.6}}>
+              Elige un niño que busca padrino y coordina directamente con su familia.
+            </p>
+            <button type="button" className="sidebar-cta" onClick={() => { setFiltro('sin'); setRegion('Todas'); setBusqueda(''); }}>
+              Ver quién busca padrino ({sinPadrino})
+            </button>
+            <Link to="/registrar" className="sidebar-cta" style={{background:'var(--gray-bg)', color:'var(--red)', marginTop:'0.5rem'}}>
+              Registrar un niño
+            </Link>
           </div>
 
           <div className="sidebar-card">
@@ -475,50 +506,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="sidebar-card">
-            <h3>¿Quieres ayudar?</h3>
-            <p style={{color:'var(--ink-soft)', fontSize:'0.83rem', marginBottom:'0.8rem', lineHeight:1.6}}>
-              Sé el padrino de un niño. Coordina directamente con la familia y haz realidad su Navidad.
-            </p>
-            <Link to="/mi-nino" className="sidebar-cta" style={{background:'var(--gray-bg)', color:'var(--red)'}}>
-              Ver mi niño apadrinado
-            </Link>
-          </div>
         </aside>
       </div>
       </section>
 
       <Testimonios />
-
-      {/* Vitrina oscura estilo Apple TV: carteles cinematográficos de los niños */}
-      {ninos.length > 0 && (
-        <section className="tvband">
-          <Reveal>
-            <div className="tvband-head">
-              <h2 className="tvband-title">Historias que esperan un final feliz.</h2>
-              <a href="#feed" className="tvband-link">Ver todas &rsaquo;</a>
-            </div>
-          </Reveal>
-          <div className="tv-row" role="list">
-            {ninos.slice(0, 10).map((n, i) => (
-              <Link to={`/carta/${n.id}`} className="tv-card" key={n.id} role="listitem" style={{animationDelay: `${i * 60}ms`}}>
-                <img
-                  src={n.foto_familia
-                    ? cld(n.foto_familia, 'w_700,h_440,q_auto,f_auto,c_fill,g_auto')
-                    : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=700'}
-                  alt={`${n.nombre}, ${n.region}`} loading="lazy" width="700" height="440"
-                />
-                <div className="tv-card-shade" />
-                <div className="tv-card-info">
-                  <span className="tv-card-name">{n.nombre}, {n.edad} años</span>
-                  <span className="tv-card-loc">{n.provincia} · {n.region}</span>
-                </div>
-                {!n.tiene_padrino && <span className="tv-card-tag">Busca padrino</span>}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* CTA de cierre cinematográfico */}
       <section className="cta-final">
