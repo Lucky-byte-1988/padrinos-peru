@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { API, cld } from '../config';
 import { LangContext } from '../App';
@@ -327,6 +327,17 @@ export default function Home() {
   const [storyIdx, setStoryIdx] = useState(null);
   const [region, setRegion] = useState('Todas');
   const [filtro, setFiltro] = useState('todos');
+
+  // Desde el buscador: /?region=Cusco o /?f=sin abren el feed ya filtrado
+  const location = useLocation();
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    if (!q.has('region') && !q.has('f')) return;
+    setRegion(q.get('region') || 'Todas');
+    setFiltro(['sin', 'con'].includes(q.get('f')) ? q.get('f') : 'todos');
+    setBusqueda('');
+    setTimeout(() => document.getElementById('feed')?.scrollIntoView({ behavior: 'smooth' }), 120);
+  }, [location.search]);
 
   useEffect(() => {
     axios.get(API+'/api/ninos')

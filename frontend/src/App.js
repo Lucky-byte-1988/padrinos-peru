@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react
 import Home from './pages/Home';
 import { AuthProvider, useAuth } from './AuthContext';
 import { translations } from './i18n';
+import Buscador from './Buscador';
 import './App.css';
 
 // Carga diferida: estas páginas solo se descargan cuando el usuario las visita
@@ -92,6 +93,7 @@ function App() {
       <LangContext.Provider value={{ lang, setLang, t }}>
         <Router>
           <Nav />
+          <Buscador />
           <Suspense fallback={<p className="loading">Cargando…</p>}>
             <Routes>
               <Route path="/" element={<Home />} />
