@@ -22,8 +22,8 @@ function CommentNode({ c, replies, allReplies, onReply, depth = 0 }) {
 
   const handleLike = async () => {
     if (liked) return;
-    const r = await axios.post(`${API}/api/comentarios/${c.id}/like`);
-    setLikes(r.data.likes); setLiked(true);
+    setLiked(true); setLikes(l => l + 1);
+    axios.post(`${API}/api/comentarios/${c.id}/like`).then(r => setLikes(r.data.likes)).catch(() => {});
   };
 
   return (
@@ -64,15 +64,21 @@ function ReplyComposer({ onSend, placeholder, compact }) {
   const [autor, setAutor] = useState(nombreCuenta || saved);
   const [texto, setTexto] = useState('');
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
   const submit = async (e) => {
     e.preventDefault();
     const nombre = user ? nombreCuenta : autor.trim();
     if (!texto.trim() || !nombre) return;
-    setSending(true);
+    setSending(true); setError('');
     if (!user) localStorage.setItem('visitorName', nombre);
-    await onSend(texto.trim(), nombre);
-    setTexto(''); setSending(false);
+    try {
+      await onSend(texto.trim(), nombre);
+      setTexto('');
+    } catch (err) {
+      setError('No se pudo publicar. Inténtalo de nuevo.');
+    }
+    setSending(false);
   };
 
   // Solo pedimos el nombre si NO hay sesión y aún no lo guardamos antes.
@@ -91,6 +97,7 @@ function ReplyComposer({ onSend, placeholder, compact }) {
           {sending ? '···' : 'Publicar'}
         </button>
       </div>
+      {error && <p className="igc-error" role="alert">{error}</p>}
     </form>
   );
 }
@@ -98,7 +105,7 @@ function ReplyComposer({ onSend, placeholder, compact }) {
 export default function Comments({ ninoId }) {
   const [comments, setComments] = useState([]);
   const load = useCallback(() => {
-    axios.get(`${API}/api/ninos/${ninoId}/comentarios`).then(r => setComments(r.data));
+    axios.get(`${API}/api/ninos/${ninoId}/comentarios`).then(r => setComments(r.data)).catch(() => {});
   }, [ninoId]);
   useEffect(() => { load(); }, [load]);
 

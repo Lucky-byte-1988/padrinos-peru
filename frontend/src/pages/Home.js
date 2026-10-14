@@ -9,6 +9,7 @@ import Modal from '../Modal';
 import Comments from '../Comments';
 import PadrinoForm from '../PadrinoForm';
 import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, WhatsAppIcon, GiftIcon } from '../Icons';
+import Foto from '../Foto';
 
 function StepAnim({ type }) {
   if (type === 'carta') {
@@ -205,25 +206,21 @@ function PostCard({ n, t }) {
   const [modal, setModal] = useState(null); // 'carta' | 'comentarios' | 'padrino' | null
   const [tienePadrino, setTienePadrino] = useState(n.tiene_padrino);
 
-  const handleLike = async () => {
+  const handleLike = () => {
     if (liked) return;
-    const res = await axios.post(`${API}/api/ninos/${n.id}/like`);
-    setLikes(res.data.likes);
-    setLiked(true);
+    setLiked(true); setLikes(l => l + 1);
+    axios.post(`${API}/api/ninos/${n.id}/like`).then(r => setLikes(r.data.likes)).catch(() => {});
   };
 
   return (
     <div className="post">
       {/* Header */}
       <div className="post-header">
-        {n.foto_familia
-          ? <img className="post-avatar" src={cld(n.foto_familia, 'w_120,h_120,q_auto,f_auto,c_fill,g_face')} alt={n.nombre}
-              onError={e => { e.target.style.display='none'; }} />
-          : <div className="post-avatar-placeholder">🎁</div>
-        }
+        <Foto className="post-avatar" src={cld(n.foto_familia, 'w_120,h_120,q_auto,f_auto,c_fill,g_face')} alt={n.nombre}
+          fallback={<div className="post-avatar-placeholder">🎁</div>} />
         <div className="post-meta">
           <div className="post-name">{n.nombre}</div>
-          <div className="post-location">{n.provincia}, {n.region} · {n.edad} años</div>
+          <div className="post-location">{[n.provincia, n.region].filter(Boolean).join(', ')}{n.edad ? ` · ${n.edad} años` : ''}</div>
         </div>
         <span className={`post-badge ${tienePadrino ? 'con' : 'sin'}`}>
           {tienePadrino ? '✓ Apadrinado' : 'Busca padrino'}
@@ -231,11 +228,7 @@ function PostCard({ n, t }) {
       </div>
 
       {/* Imagen */}
-      {n.foto_familia && (
-        <img className="post-img" src={cld(n.foto_familia)} alt={n.nombre}
-          loading="lazy"
-          onError={e => { e.target.style.display='none'; }} />
-      )}
+      <Foto className="post-img" src={cld(n.foto_familia)} alt={n.nombre} loading="lazy" />
 
       {/* Preview carta */}
       {n.carta_texto && (
@@ -327,6 +320,7 @@ export default function Home() {
   const [storyIdx, setStoryIdx] = useState(null);
   const [region, setRegion] = useState('Todas');
   const [filtro, setFiltro] = useState('todos');
+  const [error, setError] = useState(false);
 
   // Desde el buscador: /?region=Cusco o /?f=sin abren el feed ya filtrado
   const location = useLocation();
@@ -342,7 +336,7 @@ export default function Home() {
   useEffect(() => {
     axios.get(API+'/api/ninos')
       .then(r => { setNinos(r.data); setLoading(false); })
-      .catch(() => setLoading(false));
+      .catch(() => { setError(true); setLoading(false); });
   }, []);
 
   const filtrados = ninos.filter(n => {
@@ -372,7 +366,7 @@ export default function Home() {
               ? cld(ninos[0].foto_familia, 'w_1600,h_1000,q_auto,f_auto,c_fill,g_auto')
               : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=1600'}
             alt={ninos[0] ? `${ninos[0].nombre}, ${ninos[0].region}` : 'Niños de los Andes peruanos'}
-            width="1600" height="1000" fetchpriority="high"
+            width="1600" height="1000" fetchPriority="high"
           />
           <div className="hero-visual-caption">
             {ninos[0] ? `${ninos[0].provincia}, ${ninos[0].region} · Perú` : 'Andes peruanos'}
@@ -414,7 +408,7 @@ export default function Home() {
               <button type="button" className="story" key={n.id} onClick={() => setStoryIdx(i)}>
                 <div className="story-ring">
                   <img src={cld(n.foto_familia, 'w_140,h_140,q_auto,f_auto,c_fill,g_face') || 'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'}
-                    alt={n.nombre} onError={e => { e.target.src='https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'; }} />
+                    alt={n.nombre} onError={e => { e.target.onerror = null; e.target.src='https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'; }} />
                 </div>
                 <span className="story-name">{n.nombre}</span>
               </button>
@@ -432,8 +426,21 @@ export default function Home() {
             </div>
           </div>
 
-          {loading ? <p className="loading">Cargando cartas...</p>
-            : filtrados.length === 0 ? <p className="loading" style={{color:'#555'}}>Sin resultados.</p>
+          {region !== 'Todas' && (
+            <div className="filtro-activo">
+              <span>{region}</span>
+              <button type="button" onClick={() => setRegion('Todas')} aria-label="Quitar filtro de región">✕</button>
+            </div>
+          )}
+
+          {loading ? <p className="loading">Cargando cartas…</p>
+            : error ? <p className="feed-vacio">No se pudieron cargar las cartas. Revisa tu conexión y vuelve a abrir la página.</p>
+            : filtrados.length === 0 ? (
+              <div className="feed-vacio">
+                <p>No hay cartas con ese filtro.</p>
+                <button type="button" onClick={() => { setBusqueda(''); setRegion('Todas'); setFiltro('todos'); }}>Ver todas</button>
+              </div>
+            )
             : filtrados.map((n, i) => <Reveal key={n.id} delay={Math.min(i, 5) * 90}><PostCard n={n} t={t} /></Reveal>)
           }
         </div>
@@ -460,20 +467,17 @@ export default function Home() {
             <h3>Por Región</h3>
             <div>
               {REGIONES_SIDEBAR.map(r => (
-                <span key={r} className={`region-tag ${region===r?'active':''}`}
-                  onClick={() => setRegion(region===r?'Todas':r)}>
+                <button type="button" key={r} className={`region-tag ${region===r?'active':''}`}
+                  aria-pressed={region===r} onClick={() => setRegion(region===r?'Todas':r)}>
                   {r}
-                </span>
+                </button>
               ))}
-              {region !== 'Todas' && (
-                <span className="region-tag" onClick={() => setRegion('Todas')} style={{color:'#e74c3c'}}>✕ Limpiar</span>
-              )}
             </div>
           </div>
 
           <div className="sidebar-card">
             <h3>¿Quieres ayudar?</h3>
-            <p style={{color:'#888', fontSize:'0.83rem', marginBottom:'0.8rem', lineHeight:1.6}}>
+            <p style={{color:'var(--ink-soft)', fontSize:'0.83rem', marginBottom:'0.8rem', lineHeight:1.6}}>
               Sé el padrino de un niño. Coordina directamente con la familia y haz realidad su Navidad.
             </p>
             <Link to="/mi-nino" className="sidebar-cta" style={{background:'var(--gray-bg)', color:'var(--red)'}}>

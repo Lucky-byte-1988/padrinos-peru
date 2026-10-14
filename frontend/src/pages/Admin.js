@@ -3,11 +3,9 @@ import axios from 'axios';
 import { API } from '../config';
 import { Link } from 'react-router-dom';
 import { LangContext } from '../App';
-import { useAuth } from '../AuthContext';
 
 export default function Admin() {
   const { t } = useContext(LangContext);
-  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [historial, setHistorial] = useState([]);
   const [mensajes, setMensajes] = useState([]);
@@ -17,7 +15,7 @@ export default function Admin() {
   const [tab, setTab] = useState('ninos');
 
   const cargar = () => {
-    axios.get(API+'/api/admin').then(r => setData(r.data));
+    axios.get(API+'/api/admin').then(r => setData(r.data)).catch(() => setData({ error: true }));
     axios.get(API+'/api/historial').then(r => setHistorial(r.data)).catch(()=>{});
     axios.get(API+'/api/mensajes-privados').then(r => setMensajes(r.data)).catch(()=>{});
     axios.get(API+'/api/admins').then(r => setAdmins(r.data)).catch(()=>{});
@@ -27,14 +25,16 @@ export default function Admin() {
   const agregarAdmin = async (e) => {
     e.preventDefault();
     if (!nuevoAdmin.trim()) return;
-    const r = await axios.post(`${API}/api/admins`, { email: nuevoAdmin.trim(), by: user?.email });
-    setNuevoAdmin('');
-    cargar();
-    alert(r.data.mensaje || 'Listo');
+    try {
+      const r = await axios.post(`${API}/api/admins`, { email: nuevoAdmin.trim() });
+      setNuevoAdmin('');
+      cargar();
+      alert(r.data.mensaje || 'Listo');
+    } catch (err) { alert(err.response?.data?.error || 'No se pudo agregar.'); }
   };
   const quitarAdmin = async (a) => {
     if (!window.confirm(`¿Quitar como administrador a ${a.email}?`)) return;
-    await axios.delete(`${API}/api/admins/${a.id}?by=${encodeURIComponent(user?.email)}`);
+    await axios.delete(`${API}/api/admins/${a.id}`).catch(err => alert(err.response?.data?.error || 'No se pudo quitar.'));
     cargar();
   };
 
@@ -58,7 +58,7 @@ export default function Admin() {
 
   const eliminarPadrino = async (p) => {
     if (!window.confirm(`¿Eliminar al padrino "${p.nombre}" (${p.email})?\nEl niño que apadrinaba volverá a "busca padrino".`)) return;
-    await axios.delete(`${API}/api/padrinos/${p.id}`);
+    await axios.delete(`${API}/api/padrinos/${p.id}`).catch(err => alert(err.response?.data?.error || 'No se pudo eliminar.'));
     cargar();
   };
 
@@ -68,11 +68,12 @@ export default function Admin() {
       'Regalo entregado'
     );
     if (motivo === null) return; // canceló
-    await axios.delete(`${API}/api/ninos/${n.id}`, { data: { motivo } });
+    await axios.delete(`${API}/api/ninos/${n.id}`, { data: { motivo } }).catch(err => alert(err.response?.data?.error || 'No se pudo eliminar.'));
     cargar();
   };
 
   if (!data) return <p className="loading">Cargando panel…</p>;
+  if (data.error) return <p className="loading">No se pudo cargar el panel. Vuelve a iniciar sesión e inténtalo de nuevo.</p>;
 
   const filtrados = data.ninos.filter(n =>
     n.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -82,14 +83,14 @@ export default function Admin() {
 
   return (
     <div className="admin-page">
-      <h1>{t.admin_title}</h1>
+      <h1>Panel admin</h1>
 
       <div className="stats">
         <div className="stat-card"><h3>{data.total_ninos}</h3><p>{t.admin_total}</p></div>
         <div className="stat-card"><h3>{data.total_padrinos}</h3><p>{t.admin_padrinos}</p></div>
-        <div className="stat-card"><h3 style={{color:'#e74c3c'}}>{data.sin_padrino}</h3><p>{t.admin_sin_padrino}</p></div>
+        <div className="stat-card"><h3 style={{color:'var(--red)'}}>{data.sin_padrino}</h3><p>{t.admin_sin_padrino}</p></div>
         <div className="stat-card">
-          <h3 style={{color:'#2ecc71'}}>{data.total_ninos > 0 ? Math.round((data.total_padrinos / data.total_ninos) * 100) : 0}%</h3>
+          <h3 style={{color:'var(--green)'}}>{data.total_ninos > 0 ? Math.round((data.total_padrinos / data.total_ninos) * 100) : 0}%</h3>
           <p>Cobertura</p>
         </div>
       </div>
@@ -153,7 +154,7 @@ export default function Admin() {
                 {filtrados.map(n => (
                   <tr key={n.id}>
                     <td>{n.id}</td>
-                    <td style={{color:'#FFD700', fontWeight:'bold'}}>{n.nombre}</td>
+                    <td style={{fontWeight:600}}>{n.nombre}</td>
                     <td>{n.edad}</td>
                     <td>{n.provincia}</td>
                     <td>{n.region}</td>
@@ -209,7 +210,7 @@ export default function Admin() {
               {data.padrinos?.map(p => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
-                  <td style={{color:'#FFD700', fontWeight:'bold'}}>{p.nombre}</td>
+                  <td style={{fontWeight:600}}>{p.nombre}</td>
                   <td>{p.email}</td>
                   <td>{p.pais || '—'}</td>
                   <td>{p.nino_nombre || '—'}</td>

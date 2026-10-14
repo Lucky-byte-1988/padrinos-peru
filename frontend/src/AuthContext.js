@@ -9,6 +9,16 @@ import { API } from './config';
 import { esSuperAdmin } from './adminConfig';
 
 const AuthContext = createContext();
+
+// Cada llamada al servidor lleva el token de la sesión: así el servidor sabe quién es
+// de verdad (no basta con decir un correo) y protege el panel admin y los datos privados.
+axios.interceptors.request.use(async (config) => {
+  const u = auth.currentUser;
+  if (u && config.url && config.url.startsWith(API)) {
+    try { config.headers.Authorization = `Bearer ${await u.getIdToken()}`; } catch (e) { /* sin token */ }
+  }
+  return config;
+});
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
@@ -23,7 +33,7 @@ export function AuthProvider({ children }) {
       if (u?.email) {
         if (esSuperAdmin(u.email)) { setIsAdmin(true); return; }
         // Consultar al servidor si este correo es administrador
-        axios.get(`${API}/api/es-admin?email=${encodeURIComponent(u.email)}`)
+        axios.get(`${API}/api/es-admin`)
           .then(r => setIsAdmin(!!r.data.es_admin)).catch(() => setIsAdmin(false));
       } else {
         setIsAdmin(false);

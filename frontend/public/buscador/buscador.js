@@ -49,7 +49,9 @@ function spPintar(){const el=$('#spot'),box=$('#spRes');if(!box)return;const q=S
  if(SP.hint&&!SP.cat&&!q.trim()){const rec=spRecGet(),sug=(window.SPOT_SUG||['Reg 81.1','Cuenta especial por consumo','CIC sin herederos','Anexo 3']).filter(x=>!rec.some(r=>spN(r)===spN(x))).slice(0,4);
   const fila=(t,L,icn)=>L.length?`<div class="sp-sh">${t}</div><div class="sp-rec">${L.map(x=>`<button class="sp-rq" data-spq="${spEsc(x)}">${ic(icn)}<span>${spEsc(x)}</span></button>`).join('')}</div>`:'';
   const yo=decodeURIComponent(location.pathname.split('/').pop()),pg=window.SPOT_SOLO?[]:AN_PG.filter(x=>x[0]!==yo);
-  h=fila('Recientes',rec,'clock')+fila('Sugerencias',sug,'search')+(pg.length?`<div class="sp-sh">Páginas</div><div class="sp-rec">${pg.map(([f,tt,i])=>`<button class="sp-rq pag" data-sppag="${spEsc(f)}">${ic(i)}<span>${spEsc(tt)}</span></button>`).join('')}</div>`:'')+(CATS.length?`<div class="sp-kfila">${CATS.map((c,n)=>`<button data-spcat="${c.k}" title="${spEsc(c.t)}"><kbd>Ctrl ${n+1}</kbd>${spEsc(c.t)}</button>`).join('')}</div>`:'')}
+  const G=(window.SPOT_GUIA&&window.SPOT_GUIA())||[];SP.ng=G.length;
+  const gh=G.length?`<div class="sp-sh">¿Qué quieres hacer?</div><div class="sp-guia">${G.map((x,n)=>{SP.items.push(x);return `<button class="sp-g ${x.prin?'prin':''} ${n===SP.i?'on':''}" data-spi="${n}" style="animation-delay:${n*35}ms"><span class="sp-gi">${ic(x.ic||'grid')}</span><span class="sp-gt"><b>${spEsc(x.t)}</b>${x.s?`<span>${spEsc(x.s)}</span>`:''}</span></button>`}).join('')}</div>`:'';
+  h=gh+fila('Recientes',rec,'clock')+fila('Sugerencias',sug,'search')+(pg.length?`<div class="sp-sh">Páginas</div><div class="sp-rec">${pg.map(([f,tt,i])=>`<button class="sp-rq pag" data-sppag="${spEsc(f)}">${ic(i)}<span>${spEsc(tt)}</span></button>`).join('')}</div>`:'')+(CATS.length?`<div class="sp-kfila">${CATS.map((c,n)=>`<button data-spcat="${c.k}" title="${spEsc(c.t)}"><kbd>Ctrl ${n+1}</kbd>${spEsc(c.t)}</button>`).join('')}</div>`:'')}
  else if(SP.cat){const D=spCatData(SP.cat);const nq=spN(q).trim();const fil=x=>(!SP.f||x.grp===SP.f)&&(!nq||spN(x.t+' '+(x.sub||'')).includes(nq));
   h=D.chips.length?`<div class="sp-chips">${D.chips.map(c=>`<button class="sp-chip ${SP.f===c?'on':''}" data-spf="${spEsc(c)}">${spEsc(c)}</button>`).join('')}</div>`:'';
   const secs=(nq||SP.f)?[['Resultados',D.all.filter(fil).slice(0,20)]]:D.secs.filter(s=>s[1].length);
@@ -66,7 +68,7 @@ function spPintar(){const el=$('#spot'),box=$('#spRes');if(!box)return;const q=S
  const on=$('[data-spi].on',box);if(on)on.scrollIntoView({block:'nearest'})}
 function spCat(k){SP.cat=SP.cat===k?null:k;SP.f='';SP.q='';SP.i=0;SP.hint=!SP.cat;const inp=$('#spIn');inp.value='';spPintar();inp.focus()}
 function spIr(i){const x=SP.items[i];if(!x)return;spTic('clic');window.__spIr=1;setTimeout(()=>{window.__spIr=0},700);if(SP.q.trim())spRecAdd(SP.q);const r=$(`#spRes [data-spi="${i}"]`);if(r){r.classList.remove('sp-press');void r.offsetWidth;r.classList.add('sp-press')}const o=x.k==='resp'?x.orig:x;setTimeout(()=>{spCerrar();setTimeout(()=>{try{o.go()}catch(e){console.error(e)}},200)},170)}
-const spTemaGet=()=>{try{return localStorage.getItem('spTema2')||'oscuro'}catch(e){return 'oscuro'}};function spTemaPon(t){try{localStorage.setItem('spTema2',t)}catch(e){}const el=$('#spot');if(!el)return;el.classList.toggle('claro',t==='claro');const b=$('#spTema');if(b){b.innerHTML=ic(t==='claro'?'moon':'sun');const tp=b.nextElementSibling;if(tp)tp.textContent=t==='claro'?'Búsqueda oscura':'Búsqueda clara'}}
+const spTemaGet=()=>'oscuro';function spTemaPon(t){try{localStorage.setItem('spTema2',t)}catch(e){}const el=$('#spot');if(!el)return;el.classList.toggle('claro',t==='claro');const b=$('#spTema');if(b){b.innerHTML=ic(t==='claro'?'moon':'sun');const tp=b.nextElementSibling;if(tp)tp.textContent=t==='claro'?'Búsqueda oscura':'Búsqueda clara'}}
 /* Sonido (Web Audio, sin archivos). Toque redondo: seno con un armónico suave, ataque 3 ms, caída exponencial corta,
    paso bajo a 3 kHz (sin energía en la zona áspera de 2-4 kHz), volumen bajo. Suena recién tras el primer clic o tecla. */
 const SON={gota:{t:'Gota',f:880,h:2,ha:.12,d:.06,lp:2600,gl:.94},cristal:{t:'Cristal',f:1000,h:2.76,ha:.07,d:.08,lp:3000,gl:1},madera:{t:'Madera',f:800,h:2.4,ha:.16,d:.05,lp:2000,gl:.97}};
@@ -120,11 +122,11 @@ function spAbrir(){let el=$('#spot');if(el&&el.classList.contains('on')&&!el.cla
   spSonPinta();$('#spSon').onclick=()=>{const k=SON_ORD[(SON_ORD.indexOf(spSonV())+1)%SON_ORD.length];spSonSet(k);spSonPinta();spACget();if(k!=='off')setTimeout(()=>spTic('abrir',k),30);$('#spIn').focus()};$('#spTema').onclick=()=>{spTemaPon(spTemaGet()==='claro'?'oscuro':'claro');$('#spIn').focus()};
   $('#spX').onclick=()=>{if(SP.q){SP.q='';$('#spIn').value=''}else{SP.cat=null;SP.f=''}SP.i=0;SP.hint=!SP.cat;spPintar();$('#spIn').focus()};
   const inp=$('#spIn');inp.oninput=()=>{SP.q=inp.value;SP.i=0;SP.hint=!SP.q&&!SP.cat;spPintar()};
-  inp.onkeydown=e=>{const n=SP.items.length;const grid=!!SP.cat;
+  inp.onkeydown=e=>{const n=SP.items.length;const guia=SP.hint&&!SP.cat&&!SP.q.trim()&&SP.ng;const grid=!!SP.cat||!!guia;const fil=guia?(window.innerWidth<560?2:3):5;
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(SP.q){SP.q='';inp.value='';SP.hint=!SP.cat;spPintar()}else if(SP.cat){SP.cat=null;SP.f='';SP.hint=true;spPintar()}else spCerrar();return}
    if(e.key==='Backspace'&&!inp.value&&SP.cat){e.preventDefault();SP.cat=null;SP.f='';SP.hint=true;spPintar();return}
    if(!n)return;const mv=d=>{e.preventDefault();SP.i=(SP.i+d+n)%n;spPintar()};
-   if(e.key==='ArrowDown')mv(grid?Math.min(5,n-SP.i-1)||1:1);else if(e.key==='ArrowUp')mv(grid?-Math.min(5,SP.i)||-1:-1);else if(grid&&e.key==='ArrowRight'&&!inp.value)mv(1);else if(grid&&e.key==='ArrowLeft'&&!inp.value)mv(-1);else if(e.key==='Enter'){e.preventDefault();spIr(SP.i)}}}
+   if(e.key==='ArrowDown')mv(grid?Math.min(fil,n-SP.i-1)||1:1);else if(e.key==='ArrowUp')mv(grid?-Math.min(fil,SP.i)||-1:-1);else if(grid&&e.key==='ArrowRight'&&!inp.value)mv(1);else if(grid&&e.key==='ArrowLeft'&&!inp.value)mv(-1);else if(e.key==='Enter'){e.preventDefault();spIr(SP.i)}}}
  SP.cat=SP.cat&&!SP.q?SP.cat:null;SP.f='';SP.i=0;SP.hint=!SP.cat;
  window.__spT=Date.now();el.classList.remove('out','open','orbe');void el.offsetWidth;el.classList.add('on');$$('.sp-box,.sp-cat',el).forEach(b=>{b.style.animation='none';void b.offsetWidth;b.style.animation=''});
  const inp=$('#spIn');inp.value=SP.q;SP.hint=!SP.q&&!SP.cat;spPintar();inp.focus();inp.select();setTimeout(()=>inp.focus(),30)}

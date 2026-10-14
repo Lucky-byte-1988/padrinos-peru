@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { API } from './config';
 
-function VideoCard({ v, onLike }) {
+function VideoCard({ v }) {
   const ref = useRef(null);
   const [likes, setLikes] = useState(v.likes || 0);
   const [liked, setLiked] = useState(false);
@@ -10,8 +10,8 @@ function VideoCard({ v, onLike }) {
 
   const handleLike = async () => {
     if (liked) return;
-    const res = await axios.post(`${API}/api/videos/${v.id}/like`);
-    setLikes(res.data.likes); setLiked(true);
+    setLiked(true); setLikes(l => l + 1);
+    axios.post(`${API}/api/videos/${v.id}/like`).then(r => setLikes(r.data.likes)).catch(() => {});
   };
 
   // src puede ser archivo subido o link de youtube
@@ -63,10 +63,11 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
   const [preview, setPreview] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  const cargar = () => {
-    axios.get(`${API}/api/ninos/${ninoId}/videos`).then(r => setVideos(r.data));
-  };
-  useEffect(() => { cargar(); }, [ninoId]);
+  const [error, setError] = useState('');
+  const cargar = useCallback(() => {
+    axios.get(`${API}/api/ninos/${ninoId}/videos`).then(r => setVideos(r.data)).catch(() => {});
+  }, [ninoId]);
+  useEffect(() => { cargar(); }, [cargar]);
 
   const handleFile = e => {
     const f = e.target.files[0];
@@ -77,21 +78,25 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
 
   const enviar = async e => {
     e.preventDefault();
-    if (!file) { alert('Graba o elige un video primero 🎥'); return; }
-    setEnviando(true);
+    if (!file) { setError('Graba o elige un video primero.'); return; }
+    setEnviando(true); setError('');
     const fd = new FormData();
     fd.append('autor', form.autor);
     fd.append('pais', form.pais);
     fd.append('texto', form.texto);
     fd.append('de', form.de);
     fd.append('video', file);
-    await axios.post(`${API}/api/ninos/${ninoId}/videos`, fd, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    try {
+      await axios.post(`${API}/api/ninos/${ninoId}/videos`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setForm({ autor: '', pais: '', texto: '', de: 'padrino' });
+      setFile(null); setPreview(null); setShowForm(false);
+      cargar();
+    } catch (err) {
+      setError(err.response?.data?.error || 'No se pudo publicar el video. Revisa tu conexión e inténtalo de nuevo.');
+    }
     setEnviando(false);
-    setForm({ autor: '', pais: '', texto: '', de: 'padrino' });
-    setFile(null); setPreview(null); setShowForm(false);
-    cargar();
   };
 
   return (
@@ -166,6 +171,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
           <input placeholder="Escribe un mensaje (opcional)" value={form.texto}
             onChange={e => setForm({...form, texto: e.target.value})} />
 
+          {error && <div className="auth-error" role="alert">{error}</div>}
           <div className="vthread-form-btns">
             <button type="button" className="vthread-cancel" onClick={() => { setShowForm(false); setFile(null); setPreview(null); }}>
               Cancelar

@@ -78,8 +78,8 @@ function Nav() {
         <button className="lang-btn" onClick={() => setLang(lang === 'es' ? 'en' : 'es')}>
           {lang === 'es' ? 'EN' : 'ES'}
         </button>
-        <SessionButton />
       </div>
+      <SessionButton />
     </nav>
   );
 }
@@ -105,7 +105,7 @@ function App() {
               <Route path="/login" element={<Login />} />
             </Routes>
           </Suspense>
-          <footer className="footer">{t.footer}</footer>
+          <footer className="footer">{t.footer.replace('2024', new Date().getFullYear())}</footer>
         </Router>
       </LangContext.Provider>
     </AuthProvider>
