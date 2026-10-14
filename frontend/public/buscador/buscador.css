@@ -394,32 +394,32 @@ body.sp-foco .sp-orb::before,body.sp-foco .sp-orb::after,body.sp-foco .sp-orb *{
 body.sp-foco .sp-lens{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.sp-lens{animation:none}}
 
-/* ═══ CartasANoel: vidrio claro, fino y transparente, con un toque rosado de la página ═══ */
-.spot{background:rgba(255,240,242,.18);z-index:300}
+/* ═══ CartasANoel: vidrio blanco, fino y transparente, sin rojo ═══ */
+.spot{background:rgba(250,250,252,.28);z-index:300}
 .spot.open.guia .sp-box{width:760px}
 .sp-g{min-width:0}
 .sp-gt b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sp-glass,.spot.claro .sp-glass{
-  background:linear-gradient(180deg,rgba(255,250,251,.62),rgba(255,236,240,.56));
-  backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(250,250,252,.66));
+  backdrop-filter:blur(40px) saturate(60%);-webkit-backdrop-filter:blur(40px) saturate(60%);
   border:1px solid rgba(255,255,255,.75);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 .5px rgba(225,29,72,.10),0 18px 50px rgba(225,29,72,.10),0 2px 10px rgba(0,0,0,.04);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 .5px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.08),0 2px 10px rgba(0,0,0,.04);
   color:#1d1d1f;text-shadow:none}
 .sp-cw:has(#spTema){display:none}
-.spot.claro .sp-row.on,.spot.claro .sp-t.on,.spot.claro .sp-t:hover{background:rgba(225,29,72,.07);box-shadow:none}
+.spot.claro .sp-row.on,.spot.claro .sp-t.on,.spot.claro .sp-t:hover{background:rgba(0,0,0,.05);box-shadow:none}
 .spot.claro .sp-rq,.spot.claro .sp-kfila button{background:rgba(255,255,255,.6)}
 .spot.claro .sp-rq:hover,.spot.claro .sp-rq:focus-visible{background:#fff}
 .spot.claro .sp-sh{color:#86868b}
-.spot.claro .sp-lead svg,.spot.claro .sp-cat svg{color:#e11d48}
+.spot.claro .sp-lead svg,.spot.claro .sp-cat svg{color:#3a3a3c}
 
 /* Guía de accesos directos */
 .sp-guia{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:2px 2px 6px}
 .sp-g{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.8);
   background:rgba(255,255,255,.5);color:inherit;font:inherit;text-align:left;cursor:pointer;
   transition:background .18s,transform .18s,box-shadow .18s;animation:spGuiaIn .32s cubic-bezier(.2,.8,.2,1) both}
-.sp-g:hover,.sp-g.on{background:rgba(255,255,255,.88);box-shadow:0 4px 16px rgba(225,29,72,.10)}
+.sp-g:hover,.sp-g.on{background:rgba(255,255,255,.88);box-shadow:0 4px 16px rgba(0,0,0,.07)}
 .sp-g:active{transform:scale(.97)}
-.sp-gi{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#fdeeec;color:#e11d48}
+.sp-gi{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:rgba(0,0,0,.045);color:#3a3a3c}
 .sp-gi svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .sp-gt{display:flex;flex-direction:column;min-width:0}
 .sp-gt b{font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:#1d1d1f}
