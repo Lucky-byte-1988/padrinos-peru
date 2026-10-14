@@ -71,6 +71,16 @@ def requiere_admin(f):
         return f(*a, **k)
     return w
 
+@app.errorhandler(Exception)
+def error_servidor(e):
+    # Cualquier falla devuelve un mensaje claro (y queda en el registro del servidor)
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return jsonify({'error': 'No encontrado' if e.code == 404 else e.description}), e.code
+    app.logger.exception(e)
+    db.session.rollback()
+    return jsonify({'error': f'Error del servidor: {type(e).__name__}. Inténtalo de nuevo.'}), 500
+
 def faltan(data, *campos):
     # Devuelve un error 400 si falta algún campo obligatorio
     falta = [c for c in campos if not str((data or {}).get(c) or '').strip()]
