@@ -394,37 +394,36 @@ body.sp-foco .sp-orb::before,body.sp-foco .sp-orb::after,body.sp-foco .sp-orb *{
 body.sp-foco .sp-lens{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.sp-lens{animation:none}}
 
-/* ═══ CartasANoel: vidrio rojizo y transparente, en los colores de la página ═══ */
-.spot{background:rgba(120,10,30,.08);z-index:300}
+/* ═══ CartasANoel: vidrio claro, fino y transparente, con un toque rosado de la página ═══ */
+.spot{background:rgba(255,240,242,.18);z-index:300}
 .spot.open.guia .sp-box{width:760px}
 .sp-g{min-width:0}
 .sp-gt b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sp-glass,.spot.claro .sp-glass{
-  background:linear-gradient(180deg,rgba(225,29,72,.56),rgba(159,18,57,.64));
-  backdrop-filter:blur(40px) saturate(160%);-webkit-backdrop-filter:blur(40px) saturate(160%);
-  border:1px solid rgba(255,220,225,.32);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 0 .5px rgba(120,10,30,.25),0 24px 70px rgba(120,10,30,.28);
-  color:#fff;text-shadow:0 1px 2px rgba(80,0,20,.25)}
+  background:linear-gradient(180deg,rgba(255,250,251,.62),rgba(255,236,240,.56));
+  backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid rgba(255,255,255,.75);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 0 0 .5px rgba(225,29,72,.10),0 18px 50px rgba(225,29,72,.10),0 2px 10px rgba(0,0,0,.04);
+  color:#1d1d1f;text-shadow:none}
 .sp-cw:has(#spTema){display:none}
-.sp-row.on,.sp-t.on,.sp-t:hover{background:rgba(255,255,255,.18);box-shadow:none}
-.sp-rq,.sp-kfila button{background:rgba(255,255,255,.14)}
-.sp-rq:hover,.sp-rq:focus-visible{background:rgba(255,255,255,.24)}
-.sp-sh{color:rgba(255,255,255,.78)}
+.spot.claro .sp-row.on,.spot.claro .sp-t.on,.spot.claro .sp-t:hover{background:rgba(225,29,72,.07);box-shadow:none}
+.spot.claro .sp-rq,.spot.claro .sp-kfila button{background:rgba(255,255,255,.6)}
+.spot.claro .sp-rq:hover,.spot.claro .sp-rq:focus-visible{background:#fff}
+.spot.claro .sp-sh{color:#86868b}
+.spot.claro .sp-lead svg,.spot.claro .sp-cat svg{color:#e11d48}
 
 /* Guía de accesos directos */
 .sp-guia{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:2px 2px 6px}
-.sp-g{display:flex;align-items:center;gap:12px;min-height:66px;padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.1);color:inherit;font:inherit;text-align:left;cursor:pointer;
-  transition:background .18s,transform .18s,border-color .18s;animation:spGuiaIn .32s cubic-bezier(.2,.8,.2,1) both}
-.sp-g:hover,.sp-g.on{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.34)}
+.sp-g{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.8);
+  background:rgba(255,255,255,.5);color:inherit;font:inherit;text-align:left;cursor:pointer;
+  transition:background .18s,transform .18s,box-shadow .18s;animation:spGuiaIn .32s cubic-bezier(.2,.8,.2,1) both}
+.sp-g:hover,.sp-g.on{background:rgba(255,255,255,.88);box-shadow:0 4px 16px rgba(225,29,72,.10)}
 .sp-g:active{transform:scale(.97)}
-.sp-g.prin{background:rgba(255,255,255,.18)}
-.sp-g.prin:hover,.sp-g.prin.on{background:rgba(255,255,255,.3)}
-.sp-gi{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#fff;color:#e11d48;box-shadow:0 2px 8px rgba(120,10,30,.25)}
-.sp-gi svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sp-gi{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#fdeeec;color:#e11d48}
+.sp-gi svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .sp-gt{display:flex;flex-direction:column;min-width:0}
-.sp-gt b{font-size:15px;font-weight:600;letter-spacing:-.01em}
-.sp-gt span{font-size:12.5px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-gt b{font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:#1d1d1f}
+.sp-gt span{font-size:12.5px;color:#6e6e73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @keyframes spGuiaIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 @media (max-width:560px){.sp-guia{grid-template-columns:repeat(2,minmax(0,1fr))}.spot.open.guia .sp-cats{display:none}.sp-g{min-height:60px;padding:10px 11px;gap:10px}.sp-gi{width:34px;height:34px}}
 @media (prefers-reduced-motion:reduce){.sp-g{animation:none}}
