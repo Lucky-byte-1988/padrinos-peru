@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { API } from './config';
+import { mensajeError } from './achicarFoto';
 
 function VideoCard({ v }) {
   const ref = useRef(null);
@@ -94,7 +95,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
       setFile(null); setPreview(null); setShowForm(false);
       cargar();
     } catch (err) {
-      setError(err.response?.data?.error || 'No se pudo publicar el video. Revisa tu conexión e inténtalo de nuevo.');
+      setError(mensajeError(err, 'publicar el video'));
     }
     setEnviando(false);
   };

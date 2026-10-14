@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
+import achicarFoto, { mensajeError } from '../achicarFoto';
 import axios from 'axios';
 import { API } from '../config';
 import { LangContext } from '../App';
@@ -73,8 +74,8 @@ export default function RegisterFamily() {
     setLoading(true); setError('');
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
-    if (files.carta_foto) formData.append('carta_foto', files.carta_foto);
-    if (files.foto_familia) formData.append('foto_familia', files.foto_familia);
+    if (files.carta_foto) formData.append('carta_foto', await achicarFoto(files.carta_foto));
+    if (files.foto_familia) formData.append('foto_familia', await achicarFoto(files.foto_familia));
     if (files.video) formData.append('video', files.video);
     try {
       await axios.post(API+'/api/ninos', formData, {
@@ -83,7 +84,7 @@ export default function RegisterFamily() {
       setSuccess(true);
       window.scrollTo(0, 0);
     } catch (err) {
-      setError(err.response?.data?.error || 'No se pudo enviar la carta. Revisa tu conexión e inténtalo de nuevo.');
+      setError(mensajeError(err, 'enviar la carta'));
     }
     setLoading(false);
   };
