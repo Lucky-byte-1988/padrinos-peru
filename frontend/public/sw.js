@@ -1,5 +1,5 @@
 // Service Worker de CartasANoel.pe — instalable + offline, SIEMPRE con la última versión
-const CACHE = 'cartasanoel-v3';
+const CACHE = 'cartasanoel-v4';
 const APP_SHELL = ['/', '/index.html', '/manifest.json', '/logo192.png', '/logo512.png'];
 
 self.addEventListener('install', (e) => {
@@ -33,6 +33,20 @@ self.addEventListener('fetch', (e) => {
           return res;
         })
         .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Archivos sin hash (buscador, manifest, íconos): RED PRIMERO, así un cambio se ve al instante
+  if (!url.pathname.startsWith('/static/')) {
+    e.respondWith(
+      fetch(request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
