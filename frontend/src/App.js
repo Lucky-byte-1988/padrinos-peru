@@ -1,6 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
+import Noel from './pages/Noel';
 import { AuthProvider, useAuth } from './AuthContext';
 import { translations } from './i18n';
 import Buscador from './Buscador';
@@ -13,6 +14,12 @@ const Admin = lazy(() => import('./pages/Admin'));
 const PadrinoPanel = lazy(() => import('./pages/PadrinoPanel'));
 const Nosotros = lazy(() => import('./pages/Nosotros'));
 const Login = lazy(() => import('./pages/Login'));
+
+// La raíz abre la página en blanco con Papá Noel; con filtros (?f=, ?region=) muestra las cartas
+function Raiz() {
+  const { search } = useLocation();
+  return search ? <Home /> : <Noel />;
+}
 
 function AdminGuard({ children }) {
   const { user, loading, isAdmin } = useAuth();
@@ -70,7 +77,7 @@ function Nav() {
     <nav className="navbar">
       <Link to="/" className="nav-brand"><span className="brand-mark">✉</span> {t.title}<span className="brand-dot">.pe</span></Link>
       <div className="nav-links">
-        <Link to="/">{t.nav_home}</Link>
+        <Link to="/cartas">{t.nav_home}</Link>
         <Link to="/registrar">{t.nav_registro}</Link>
         <Link to="/mi-nino">{lang === 'es' ? 'Mi niño' : 'My child'}</Link>
         <Link to="/nosotros">{lang === 'es' ? 'Nosotros' : 'About'}</Link>
@@ -96,7 +103,8 @@ function App() {
           <Buscador />
           <Suspense fallback={<p className="loading">Cargando…</p>}>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Raiz />} />
+              <Route path="/cartas" element={<Home />} />
               <Route path="/registrar" element={<RegisterFamily />} />
               <Route path="/carta/:id" element={<FamilyDetail />} />
               <Route path="/admin" element={<AdminGuard><Admin /></AdminGuard>} />

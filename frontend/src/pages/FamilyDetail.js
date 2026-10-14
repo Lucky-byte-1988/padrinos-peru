@@ -43,7 +43,7 @@ export default function FamilyDetail() {
 
   return (
     <div className="detail-wrapper">
-      <Link to="/" className="detail-back">‹ Cartas</Link>
+      <Link to="/cartas" className="detail-back">‹ Cartas</Link>
 
       <div className="detail-post">
         {/* Header */}
