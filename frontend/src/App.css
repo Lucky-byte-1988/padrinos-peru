@@ -1018,3 +1018,14 @@ button.sidebar-cta { width: 100%; border: none; font-family: inherit; cursor: po
 .form-sec { display: flex; align-items: center; gap: 0.6rem; font-size: 1.05rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 2rem 0 1rem; padding-top: 1.4rem; border-top: 1px solid rgba(0,0,0,0.06); }
 .form-sec:first-child { margin-top: 1.4rem; padding-top: 0; border-top: none; }
 .form-sec span { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--gray-bg); color: var(--red); font-size: 0.85rem; font-weight: 700; }
+
+/* Portada más compacta: los niños aparecen antes */
+.hero { padding-top: 5rem; padding-bottom: 3.5rem; }
+.hero-visual { width: min(1000px, 100%); margin: 2.8rem auto 2.4rem; }
+.hero-visual img { aspect-ratio: 21 / 9; }
+.countdown { margin-top: 1.5rem; }
+@media (max-width: 700px) {
+  .hero { padding-top: 3.2rem; padding-bottom: 2.5rem; }
+  .hero-visual { margin: 2rem auto 1.6rem; border-radius: 20px; }
+  .hero-visual img { aspect-ratio: 16 / 10; }
+}
