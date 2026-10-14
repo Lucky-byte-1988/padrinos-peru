@@ -1005,3 +1005,16 @@ button.region-tag { font-family: inherit; }
   .navbar > .nav-links { margin-right: 0; }
 }
 .session-login { text-decoration: none; padding: 0.45rem 1.1rem; }
+
+/* ═══ ORDEN: pie de página siempre abajo, filtros juntos, registro por pasos ═══ */
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+#root > * { width: 100%; }
+#root > .footer { margin-top: auto; }
+.how + .tvband { margin-top: 0; }
+button.sidebar-cta { width: 100%; border: none; font-family: inherit; cursor: pointer; }
+.filtro-region { display: none; padding: 0.8rem 1.1rem; border: 1px solid transparent; border-radius: 980px; background: #e8e8ed; color: var(--ink); font: inherit; font-size: 0.95rem; }
+.filtro-region:focus { outline: none; border-color: var(--red); background: var(--surface); }
+@media (max-width: 920px) { .filtro-region { display: block; flex: 1; min-width: 0; } }
+.form-sec { display: flex; align-items: center; gap: 0.6rem; font-size: 1.05rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 2rem 0 1rem; padding-top: 1.4rem; border-top: 1px solid rgba(0,0,0,0.06); }
+.form-sec:first-child { margin-top: 1.4rem; padding-top: 0; border-top: none; }
+.form-sec span { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--gray-bg); color: var(--red); font-size: 0.85rem; font-weight: 700; }
