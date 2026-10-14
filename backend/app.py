@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, g
+from functools import wraps
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -27,6 +28,53 @@ def enviar_whatsapp(mensaje):
 
 app = Flask(__name__)
 CORS(app)
+
+# Sesión verificada: el navegador manda el token de Firebase y aquí se comprueba con Google.
+# Así nadie puede hacerse pasar por otro correo ni por administrador.
+FIREBASE_PROJECT = os.environ.get('FIREBASE_PROJECT_ID', 'cartasanoel-3cbeb')
+try:
+    from google.oauth2 import id_token as _gid
+    from google.auth.transport import requests as _greq
+    _GREQ = _greq.Request()
+except Exception:
+    _gid = None
+
+def correo_sesion():
+    h = request.headers.get('Authorization', '')
+    if not h.startswith('Bearer ') or not _gid:
+        return None
+    try:
+        info = _gid.verify_firebase_token(h[7:], _GREQ, audience=FIREBASE_PROJECT)
+        return (info.get('email') or '').lower().strip() or None
+    except Exception:
+        return None
+
+def requiere_sesion(f):
+    @wraps(f)
+    def w(*a, **k):
+        email = correo_sesion()
+        if not email:
+            return jsonify({'error': 'Inicia sesión'}), 401
+        g.email = email
+        return f(*a, **k)
+    return w
+
+def requiere_admin(f):
+    @wraps(f)
+    def w(*a, **k):
+        email = correo_sesion()
+        if not email:
+            return jsonify({'error': 'Inicia sesión'}), 401
+        if not es_admin(email):
+            return jsonify({'error': 'No autorizado'}), 403
+        g.email = email
+        return f(*a, **k)
+    return w
+
+def faltan(data, *campos):
+    # Devuelve un error 400 si falta algún campo obligatorio
+    falta = [c for c in campos if not str((data or {}).get(c) or '').strip()]
+    return (jsonify({'error': 'Faltan datos: ' + ', '.join(falta)}), 400) if falta else None
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///navidad.db')
 if DATABASE_URL.startswith('postgres://'):
@@ -165,38 +213,43 @@ def registrar_nino():
         foto_familia_url = save_file(request.files.get('foto_familia'), 'familia')
         video_url = save_file(request.files.get('video'), 'video')
     else:
-        data = request.json
+        data = request.get_json(silent=True) or {}
         carta_foto_url = data.get('carta_foto', '')
         foto_familia_url = data.get('foto_familia', '')
         video_url = data.get('video_url', '')
 
+    err = faltan(data, 'nombre', 'carta_texto')
+    if err:
+        return err
+    try:
+        edad = int(data.get('edad')) if data.get('edad') else None
+    except (TypeError, ValueError):
+        edad = None
     nino = Nino(
-        nombre=data['nombre'], edad=data.get('edad') or None,
+        nombre=data['nombre'].strip(), edad=edad,
         provincia=data.get('provincia', ''), region=data.get('region', ''),
         carta_texto=data.get('carta_texto', ''), carta_foto=carta_foto_url,
         foto_familia=foto_familia_url, video_url=video_url,
         whatsapp=data.get('whatsapp', ''),
-        owner_email=(data.get('owner_email') or '').lower().strip()
+        owner_email=correo_sesion() or ''
     )
     db.session.add(nino)
     db.session.commit()
     return jsonify({'mensaje': 'Carta enviada', 'id': nino.id}), 201
 
 @app.route('/api/mis-ninos', methods=['GET'])
+@requiere_sesion
 def mis_ninos():
-    # Niños registrados por una familia (su email)
-    email = (request.args.get('email') or '').lower().strip()
-    if not email:
-        return jsonify([])
+    # Niños registrados por una familia (el correo de su sesión)
+    email = g.email
     ninos = Nino.query.filter_by(owner_email=email).order_by(Nino.fecha.desc()).all()
     return jsonify([_nino_dict(n) for n in ninos])
 
 @app.route('/api/mis-apadrinados', methods=['GET'])
+@requiere_sesion
 def mis_apadrinados():
-    # Niños que un padrino (su email) ha apadrinado
-    email = (request.args.get('email') or '').lower().strip()
-    if not email:
-        return jsonify([])
+    # Niños que un padrino (el correo de su sesión) ha apadrinado
+    email = g.email
     padrinos = Padrino.query.filter(db.func.lower(Padrino.email) == email).all()
     ids = [p.nino_id for p in padrinos if p.nino_id]
     ninos = Nino.query.filter(Nino.id.in_(ids)).all() if ids else []
@@ -225,9 +278,13 @@ def like_comentario(cid):
 
 @app.route('/api/ninos/<int:id>/comentarios', methods=['POST'])
 def add_comentario(id):
-    data = request.json
-    c = Comentario(nino_id=id, autor=data['autor'], pais=data.get('pais',''),
-                   texto=data['texto'], parent_id=data.get('parent_id'))
+    Nino.query.get_or_404(id)
+    data = request.get_json(silent=True) or {}
+    err = faltan(data, 'autor', 'texto')
+    if err:
+        return err
+    c = Comentario(nino_id=id, autor=data['autor'].strip()[:100], pais=data.get('pais',''),
+                   texto=data['texto'].strip(), parent_id=data.get('parent_id'))
     db.session.add(c)
     db.session.commit()
     return jsonify({'mensaje': 'Comentario agregado', 'id': c.id}), 201
@@ -243,12 +300,16 @@ def get_videos(id):
 
 @app.route('/api/ninos/<int:id>/videos', methods=['POST'])
 def add_video(id):
+    nino = Nino.query.get_or_404(id)
     if request.content_type and 'multipart' in request.content_type:
         data = request.form
         video_url = save_file(request.files.get('video'), 'respuesta')
     else:
-        data = request.json
+        data = request.get_json(silent=True) or {}
         video_url = data.get('video_url', '')
+    err = faltan(data, 'autor')
+    if err:
+        return err
     if not video_url:
         return jsonify({'error': 'Falta el video'}), 400
     v = VideoMensaje(
@@ -258,7 +319,6 @@ def add_video(id):
     db.session.add(v)
     db.session.commit()
     # Notificar al admin de la nueva interacción
-    nino = Nino.query.get(id)
     quien = 'El padrino' if v.de == 'padrino' else 'El niño'
     enviar_whatsapp(f"🎥 {quien} {v.autor} respondió con un video en la conversación de *{nino.nombre}*")
     return jsonify({'mensaje': 'Video publicado', 'id': v.id}), 201
@@ -271,15 +331,22 @@ def like_video(vid):
     return jsonify({'likes': v.likes})
 
 @app.route('/api/padrinos', methods=['POST'])
+@requiere_sesion
 def registrar_padrino():
-    data = request.json
-    padrino = Padrino(nombre=data['nombre'], email=data['email'],
-                      pais=data.get('pais',''), nino_id=data.get('nino_id'))
+    data = request.get_json(silent=True) or {}
+    err = faltan(data, 'nombre')
+    if err:
+        return err
     nino = None
     if data.get('nino_id'):
         nino = Nino.query.get(data['nino_id'])
-        if nino:
-            nino.tiene_padrino = True
+        if not nino:
+            return jsonify({'error': 'Ese niño ya no está en la página'}), 404
+        if nino.tiene_padrino:
+            return jsonify({'error': f'{nino.nombre} ya tiene padrino'}), 409
+        nino.tiene_padrino = True
+    padrino = Padrino(nombre=data['nombre'].strip(), email=g.email,
+                      pais=data.get('pais',''), nino_id=nino.id if nino else None)
     db.session.add(padrino)
     db.session.commit()
     if nino:
@@ -292,6 +359,7 @@ def registrar_padrino():
     return jsonify({'mensaje': 'Padrino registrado', 'id': padrino.id}), 201
 
 @app.route('/api/ninos/<int:id>', methods=['DELETE'])
+@requiere_admin
 def borrar_nino(id):
     n = Nino.query.get_or_404(id)
     data = request.get_json(silent=True) or {}
@@ -317,7 +385,10 @@ def borrar_nino(id):
 @app.route('/api/ninos/<int:id>/mensaje-privado', methods=['POST'])
 def enviar_mensaje_privado(id):
     nino = Nino.query.get_or_404(id)
-    data = request.json
+    data = request.get_json(silent=True) or {}
+    err = faltan(data, 'autor', 'texto')
+    if err:
+        return err
     m = MensajePrivado(nino_id=id, autor=data['autor'],
                        email=data.get('email', ''), texto=data['texto'])
     db.session.add(m)
@@ -330,6 +401,7 @@ def enviar_mensaje_privado(id):
     return jsonify({'mensaje': 'Mensaje privado enviado'}), 201
 
 @app.route('/api/mensajes-privados', methods=['GET'])
+@requiere_admin
 def get_mensajes_privados():
     msgs = MensajePrivado.query.order_by(MensajePrivado.fecha.desc()).all()
     return jsonify([{
@@ -340,6 +412,7 @@ def get_mensajes_privados():
     } for m in msgs])
 
 @app.route('/api/historial', methods=['GET'])
+@requiere_admin
 def get_historial():
     items = Historial.query.order_by(Historial.fecha_eliminacion.desc()).all()
     return jsonify([{
@@ -352,6 +425,7 @@ def get_historial():
     } for h in items])
 
 @app.route('/api/admins', methods=['GET'])
+@requiere_admin
 def listar_admins():
     admins = Admin.query.order_by(Admin.fecha.asc()).all()
     return jsonify({
@@ -360,10 +434,9 @@ def listar_admins():
     })
 
 @app.route('/api/admins', methods=['POST'])
+@requiere_admin
 def agregar_admin():
-    data = request.json or {}
-    if not es_admin(data.get('by')):
-        return jsonify({'error': 'No autorizado'}), 403
+    data = request.get_json(silent=True) or {}
     email = (data.get('email') or '').lower().strip()
     if not email or '@' not in email:
         return jsonify({'error': 'Correo no válido'}), 400
@@ -374,10 +447,8 @@ def agregar_admin():
     return jsonify({'mensaje': 'Administrador agregado'}), 201
 
 @app.route('/api/admins/<int:aid>', methods=['DELETE'])
+@requiere_admin
 def quitar_admin(aid):
-    by = request.args.get('by') or (request.get_json(silent=True) or {}).get('by')
-    if not es_admin(by):
-        return jsonify({'error': 'No autorizado'}), 403
     a = Admin.query.get_or_404(aid)
     if a.email.lower() == SUPER_ADMIN:
         return jsonify({'error': 'No se puede quitar al dueño'}), 400
@@ -387,10 +458,11 @@ def quitar_admin(aid):
 
 @app.route('/api/es-admin', methods=['GET'])
 def check_admin():
-    email = request.args.get('email', '')
+    email = correo_sesion()
     return jsonify({'es_admin': es_admin(email)})
 
 @app.route('/api/padrinos/<int:pid>', methods=['DELETE'])
+@requiere_admin
 def borrar_padrino(pid):
     p = Padrino.query.get_or_404(pid)
     # Si tenía un niño asignado, lo libera (vuelve a "busca padrino")
@@ -403,15 +475,16 @@ def borrar_padrino(pid):
     return jsonify({'mensaje': 'Padrino eliminado'})
 
 @app.route('/api/padrino-panel', methods=['GET'])
+@requiere_sesion
 def padrino_panel():
-    email = request.args.get('email', '')
-    padrino = Padrino.query.filter_by(email=email).first()
+    padrino = Padrino.query.filter(db.func.lower(Padrino.email) == g.email).first()
     if not padrino or not padrino.nino_id:
         return jsonify({'error': 'No encontrado'}), 404
     n = Nino.query.get(padrino.nino_id)
     return jsonify(_nino_dict(n)) if n else (jsonify({'error': 'No encontrado'}), 404)
 
 @app.route('/api/admin', methods=['GET'])
+@requiere_admin
 def admin():
     ninos = Nino.query.order_by(Nino.fecha.desc()).all()
     padrinos = Padrino.query.all()
@@ -420,7 +493,7 @@ def admin():
         'sin_padrino': Nino.query.filter_by(tiene_padrino=False).count(),
         'ninos': [_nino_dict(n) for n in ninos],
         'padrinos': [{'id':p.id,'nombre':p.nombre,'email':p.email,'pais':p.pais,
-            'nino_nombre': Nino.query.get(p.nino_id).nombre if p.nino_id else None,
+            'nino_nombre': (Nino.query.get(p.nino_id).nombre if p.nino_id and Nino.query.get(p.nino_id) else None),
             'fecha': p.fecha.strftime('%Y-%m-%d')} for p in padrinos]
     })
 
@@ -430,7 +503,6 @@ def _nino_dict(n):
         'carta_texto':n.carta_texto,'carta_foto':n.carta_foto,'foto_familia':n.foto_familia,
         'video_url':n.video_url,'whatsapp':n.whatsapp,'tiene_padrino':n.tiene_padrino,
         'likes': n.likes or 0,
-        'owner_email': n.owner_email or '',
         'num_comentarios': len(n.comentarios),
         'fecha':n.fecha.strftime('%Y-%m-%d')
     }
@@ -480,4 +552,3 @@ with app.app_context():
 if __name__ == '__main__':
     app.run(debug=True, port=5003)
 
-# prueba de persistencia de base de datos

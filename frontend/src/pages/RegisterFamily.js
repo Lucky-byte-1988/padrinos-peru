@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { API } from '../config';
 import { LangContext } from '../App';
-import { useAuth } from '../AuthContext';
 
 const REGIONES = ['Amazonas','Áncash','Apurímac','Arequipa','Ayacucho','Cajamarca','Callao','Cusco','Huancavelica','Huánuco','Ica','Junín','La Libertad','Lambayeque','Lima','Loreto','Madre de Dios','Moquegua','Pasco','Piura','Puno','San Martín','Tacna','Tumbes','Ucayali'];
 
@@ -52,12 +52,12 @@ function FileUpload({ label, name, accept, capture, preview, onChange }) {
 
 export default function RegisterFamily() {
   const { t } = useContext(LangContext);
-  const { user } = useAuth();
   const [form, setForm] = useState({ nombre: '', edad: '', provincia: '', region: '', carta_texto: '', whatsapp: '' });
   const [files, setFiles] = useState({ carta_foto: null, foto_familia: null, video: null });
   const [previews, setPreviews] = useState({ carta_foto: null, foto_familia: null, video: null });
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -70,19 +70,22 @@ export default function RegisterFamily() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setLoading(true);
+    setLoading(true); setError('');
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
-    if (user?.email) formData.append('owner_email', user.email);
     if (files.carta_foto) formData.append('carta_foto', files.carta_foto);
     if (files.foto_familia) formData.append('foto_familia', files.foto_familia);
     if (files.video) formData.append('video', files.video);
-    await axios.post(API+'/api/ninos', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    try {
+      await axios.post(API+'/api/ninos', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setSuccess(true);
+      window.scrollTo(0, 0);
+    } catch (err) {
+      setError(err.response?.data?.error || 'No se pudo enviar la carta. Revisa tu conexión e inténtalo de nuevo.');
+    }
     setLoading(false);
-    setSuccess(true);
-    window.scrollTo(0, 0);
   };
 
   if (success) return (
@@ -93,9 +96,9 @@ export default function RegisterFamily() {
       </svg>
       <h2 style={{marginBottom:'0.6rem'}}>Carta publicada</h2>
       <p className="form-desc" style={{marginBottom:'2rem'}}>{t.reg_success}</p>
-      <a href="/" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
+      <Link to="/" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
         Ver las cartas
-      </a>
+      </Link>
     </div>
   );
 
@@ -169,9 +172,10 @@ export default function RegisterFamily() {
         <div className="form-group">
           <label>{t.field_whatsapp}</label>
           <input name="whatsapp" type="tel" inputMode="numeric" value={form.whatsapp} onChange={handleChange} placeholder="9XXXXXXXX" />
-          <p style={{fontSize:'0.8rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>Solo lo usamos para avisarte cuando alguien apadrine al niño.</p>
+          <p style={{fontSize:'0.8rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>En la carta aparece un botón de WhatsApp para que el padrino coordine contigo.</p>
         </div>
 
+        {error && <div className="auth-error" role="alert">{error}</div>}
         <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? 'Enviando…' : t.reg_btn}
         </button>

@@ -7,17 +7,23 @@ import { useAuth } from './AuthContext';
 export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
   const { user } = useAuth();
   const location = useLocation();
-  const [form, setForm] = useState({ nombre: '', pais: '' });
+  const [form, setForm] = useState({ nombre: user?.displayName || '', pais: '' });
   const [enviando, setEnviando] = useState(false);
   const [ok, setOk] = useState(false);
+  const [error, setError] = useState('');
 
   const submit = async (e) => {
     e.preventDefault();
-    setEnviando(true);
-    const nombre = form.nombre || user?.displayName || '';
-    await axios.post(`${API}/api/padrinos`, { ...form, nombre, email: user.email, nino_id: parseInt(ninoId) });
-    setEnviando(false); setOk(true);
-    if (onSuccess) onSuccess();
+    setEnviando(true); setError('');
+    const nombre = form.nombre.trim() || user?.displayName || '';
+    try {
+      await axios.post(`${API}/api/padrinos`, { ...form, nombre, nino_id: parseInt(ninoId) });
+      setOk(true);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      setError(err.response?.data?.error || 'No se pudo registrar. Inténtalo de nuevo.');
+    }
+    setEnviando(false);
   };
 
   if (ok) return (
@@ -60,6 +66,7 @@ export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
       <label style={{display:'block', fontSize:'0.8rem', color:'var(--ink-soft)', margin:'0 0 0.35rem 0.2rem'}}>Tu correo (de tu cuenta)</label>
       <input className="auth-input" type="email" value={user.email} disabled readOnly
         style={{background:'var(--gray-bg)', color:'var(--ink-soft)'}} />
+      {error && <div className="auth-error" role="alert">{error}</div>}
       <button className="auth-submit" disabled={enviando}>
         {enviando ? 'Enviando…' : 'Quiero ser su padrino'}
       </button>

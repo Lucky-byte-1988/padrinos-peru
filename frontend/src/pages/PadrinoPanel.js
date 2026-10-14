@@ -29,10 +29,9 @@ export default function PadrinoPanel() {
 
   useEffect(() => {
     if (!user) { setCargando(false); return; }
-    const email = encodeURIComponent(user.email);
     Promise.all([
-      axios.get(`${API}/api/mis-apadrinados?email=${email}`).then(r => setApadrinados(r.data)).catch(()=>{}),
-      axios.get(`${API}/api/mis-ninos?email=${email}`).then(r => setMisNinos(r.data)).catch(()=>{}),
+      axios.get(`${API}/api/mis-apadrinados`).then(r => setApadrinados(r.data)).catch(()=>{}),
+      axios.get(`${API}/api/mis-ninos`).then(r => setMisNinos(r.data)).catch(()=>{}),
     ]).finally(() => setCargando(false));
   }, [user]);
 
