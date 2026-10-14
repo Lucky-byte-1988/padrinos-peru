@@ -10,10 +10,10 @@ const HUES = [8, 28, 150, 198, 222, 262, 330, 40, 172, 12];
 
 const AYUDA = [
   ['¿Qué es CartasANoel?', 'Una plataforma que conecta a niños de provincias del Perú con personas de todo el mundo. Los niños comparten su carta a Papá Noel y tú puedes ser su padrino navideño.', 'que es plataforma quienes somos nosotros', '/nosotros'],
-  ['¿Cómo apadrino a un niño?', 'Abre la carta de un niño que busca padrino y pulsa «Quiero ser su padrino». Necesitas iniciar sesión; tu correo se usa automáticamente.', 'padrino apadrinar ayudar regalar como apadrino', '/?f=sin'],
-  ['¿Se maneja dinero?', 'No. El padrino coordina directamente con la familia del niño. Solo somos el puente de conexión.', 'dinero pago donacion plata cobro transferencia', null],
-  ['¿Qué datos del niño se publican?', 'Solo el primer nombre, la edad, la provincia, la carta y lo que la familia decide compartir.', 'privacidad datos seguridad foto apellido', null],
-  ['¿Cómo registro a un niño?', 'Pulsa «Registrar niño», escribe su carta y sube la foto de la carta, la de la familia y, si quieres, un video.', 'registrar carta familia nueva escribir', '/registrar'],
+  ['¿Cómo apadrino a un niño?', 'Abre la carta de un niño que busca padrino y elige «Padrino» o «Madrina». Necesitas iniciar sesión. El equipo coordina con la familia, sin mostrar teléfonos.', 'padrino madrina apadrinar ayudar regalar como apadrino', '/?f=sin'],
+  ['¿Se maneja dinero?', 'No. Nadie paga a la plataforma. El equipo hace de puente con la familia y no se publican teléfonos.', 'dinero pago donacion plata cobro transferencia whatsapp telefono', null],
+  ['¿Qué datos del niño se publican?', 'Solo el primer nombre, la edad, la provincia y la carta, después de que un administrador la apruebe. No se publican apellidos, teléfono ni foto familiar.', 'privacidad datos seguridad foto apellido whatsapp revision', null],
+  ['¿Cómo registro a un niño?', 'Pulsa «Registrar niño» y escribe su carta. La foto familiar es opcional y no se publica. La carta queda en revisión hasta que un administrador la apruebe.', 'registrar carta familia nueva escribir revision', '/registrar'],
   ['¿Dónde operan?', 'En todas las regiones del Perú, con prioridad para las provincias más alejadas: Cusco, Puno, Huancavelica, Ayacucho, Cajamarca y más.', 'donde regiones provincias operan lugares', '/'],
   ['¿Dónde veo a mi niño apadrinado?', 'En «Mi niño», con tu sesión iniciada, ves a los niños que apadrinaste o las cartas que registraste.', 'mi nino apadrinado panel seguimiento', '/mi-nino'],
 ];
@@ -26,7 +26,7 @@ function items(go) {
    ['Mi niño', 'Tus apadrinados o tus cartas', 'user', '/mi-nino'], ['Nosotros', 'Qué es y cómo funciona', 'book', '/nosotros']]
     .forEach(([t, s, ic, h]) => out.push({ g: 'Ir a', t, s, ic, go: () => go(h) }));
   NINOS.forEach(n => {
-    const est = n.tiene_padrino ? 'Apadrinado' : 'Busca padrino';
+    const est = !n.tiene_padrino ? 'Busca padrino' : (n.rol_padrino === 'madrina' ? 'Su madrina' : 'Su padrino');
     out.push({ g: 'Niños', t: n.nombre, s: `${n.edad} años · ${n.provincia || ''}, ${n.region || ''}`, ic: 'user', c: est, kl: est, tl: n.region,
       d: n.carta_texto || '', x: `${n.provincia || ''} ${est}`, gl: 'Leer su carta', av: [String(n.nombre || '?')[0], HUES[n.id % HUES.length]],
       go: () => go(`/carta/${n.id}`) });

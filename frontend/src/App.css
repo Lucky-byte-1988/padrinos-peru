@@ -149,8 +149,11 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 }
 .hero-visual-caption {
   position: absolute; left: 1.4rem; bottom: 1.2rem;
-  color: rgba(255,255,255,0.92); font-size: 0.82rem; font-weight: 500;
-  letter-spacing: 0.01em; text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  color: var(--ink); font-size: 0.82rem; font-weight: 600;
+  letter-spacing: 0.01em;
+  background: rgba(255,255,255,0.9);
+  border-radius: 980px;
+  padding: 0.28rem 0.75rem;
 }
 .hero-snow { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .hero-snow::before, .hero-snow::after {
@@ -596,7 +599,7 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
 .igc-send:disabled { opacity: 0.4; cursor: default; }
 
 /* En la hoja deslizante, los comentarios ocupan toda la altura */
-.modal-sheet .modal-body { padding: 0 1.1rem 0.6rem; display: flex; }
+.modal-sheet .modal-body { padding: 0 1.1rem 1rem; display: flex; flex-direction: column; align-items: stretch; }
 
 /* ═══ COMENTARIOS ESTILO FACEBOOK (legacy) ═══ */
 .fb-comments { margin: 0 1.8rem 2rem; padding-top: 0.8rem; }
@@ -1022,10 +1025,97 @@ button.sidebar-cta { width: 100%; border: none; font-family: inherit; cursor: po
 /* Portada más compacta: los niños aparecen antes */
 .hero { padding-top: 5rem; padding-bottom: 3.5rem; }
 .hero-visual { width: min(1000px, 100%); margin: 2.8rem auto 2.4rem; }
-.hero-visual img { aspect-ratio: 21 / 9; }
+.hero-visual img, .hero-visual .carta-portada { aspect-ratio: 21 / 9; }
 .countdown { margin-top: 1.5rem; }
 @media (max-width: 700px) {
   .hero { padding-top: 3.2rem; padding-bottom: 2.5rem; }
   .hero-visual { margin: 2rem auto 1.6rem; border-radius: 20px; }
-  .hero-visual img { aspect-ratio: 16 / 10; }
+  .hero-visual img, .hero-visual .carta-portada { aspect-ratio: 16 / 10; }
 }
+
+.story-initial {
+  width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, #fff, #f5f5f7);
+  color: var(--red); font-weight: 700; font-size: 1.2rem;
+}
+.story-fallback { background: radial-gradient(90% 70% at 50% 20%, #3a3a3c 0%, #1d1d1f 72%); }
+.carta-portada {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(120% 90% at 0% 0%, #fff 0%, #f5f5f7 70%);
+  padding: 1.6rem;
+}
+.carta-portada-papel {
+  width: min(460px, 88%); background: #fff; border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+  padding: 1.35rem 1.45rem 1.6rem; position: relative; text-align: left;
+}
+.carta-portada-papel::after {
+  content: ""; position: absolute; right: 16px; bottom: 14px;
+  width: 16px; height: 16px; border-radius: 50%; background: var(--red);
+}
+.carta-portada-nombre { display: block; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.45rem; color: var(--ink); }
+.carta-portada-papel p {
+  margin: 0; color: var(--ink-soft); font-size: 0.98rem; line-height: 1.55;
+  display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tv-letter {
+  position: absolute; inset: 0; padding: 1.15rem 1.2rem 4.4rem;
+  background: radial-gradient(120% 80% at 0% 0%, #3a3a3c, #1d1d1f 62%);
+  color: rgba(255,255,255,0.88); font-size: 0.98rem; line-height: 1.45;
+}
+.tv-letter p {
+  margin: 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tv-card-tag.con { background: rgba(255,255,255,0.16); }
+.field-hint { font-size: 0.8rem; color: var(--ink-faint); margin-top: 0.4rem; line-height: 1.45; }
+.priv-note {
+  background: var(--gray-bg); border-radius: 14px; padding: 0.85rem 1rem;
+  color: var(--ink-soft); font-size: 0.88rem; line-height: 1.5; margin: 0 0 1rem;
+}
+.badge-wait {
+  background: var(--gray-bg); color: var(--ink); padding: 0.3rem 0.75rem;
+  border-radius: 980px; font-size: 0.76rem; font-weight: 600;
+}
+.contacto-familia {
+  background: var(--gray-bg); border-radius: var(--r); padding: 1.15rem 1.15rem 1.2rem;
+}
+.contacto-familia h4 { font-size: 1.05rem; letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+.contacto-familia p { color: var(--ink-soft); font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.8rem; }
+.contacto-familia textarea {
+  width: 100%; border: none; border-radius: 14px; padding: 0.8rem 0.9rem;
+  font-family: inherit; font-size: 0.95rem; resize: vertical; background: #fff; color: var(--ink);
+}
+.contacto-familia textarea:focus { outline: 2px solid rgba(225,29,72,0.25); }
+.contacto-login { display: inline-block; text-decoration: none; padding: 0.8rem 1.3rem; }
+.mod-lead { color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; margin-bottom: 1.4rem; max-width: 680px; }
+.mod-h { font-size: 1.15rem; letter-spacing: -0.02em; margin: 1.4rem 0 0.7rem; }
+.mod-empty { color: var(--ink-faint); background: var(--surface); border-radius: 16px; padding: 1rem 1.1rem; box-shadow: var(--sh-sm); }
+.mod-card {
+  background: var(--surface); border-radius: 20px; padding: 1.15rem 1.2rem 1.2rem;
+  box-shadow: var(--sh-sm); margin-bottom: 0.9rem;
+}
+.mod-card-rech { background: var(--gray-bg); box-shadow: none; }
+.mod-head { display: flex; justify-content: space-between; gap: 0.8rem; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.55rem; }
+.mod-head strong { margin-right: 0.45rem; }
+.mod-head span, .mod-publico, .mod-privado, .mod-card figcaption {
+  color: var(--ink-soft); font-size: 0.84rem;
+}
+.mod-publico { margin-bottom: 0.7rem; }
+.mod-carta { font-size: 1.02rem; line-height: 1.6; margin: 0.4rem 0 0.8rem; }
+.mod-card figure { margin: 0.6rem 0; }
+.mod-card figcaption { margin-bottom: 0.35rem; }
+.mod-card img, .mod-card video {
+  width: min(420px, 100%); border-radius: 14px; background: #000; max-height: 280px; object-fit: cover;
+}
+.mod-privada img { max-height: 180px; filter: saturate(0.85); }
+.mod-actions { display: flex; gap: 0.55rem; align-items: center; flex-wrap: wrap; margin-top: 0.85rem; }
+.mod-actions a { color: var(--red); font-weight: 600; font-size: 0.86rem; text-decoration: none; }
+.btn-aprobar, .btn-rechazar {
+  border-radius: 980px; padding: 0.55rem 0.95rem; font-weight: 650; font-size: 0.86rem;
+  font-family: inherit; cursor: pointer;
+}
+.btn-aprobar { background: #1d1d1f; color: #fff; border: none; }
+.btn-aprobar:hover { background: #000; }
+.btn-rechazar { background: #fff; color: var(--red); border: 1px solid #fecdd3; }
+.btn-rechazar:hover { background: #fff1f2; }

@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { API } from './config';
+import { LangContext } from './i18n';
 import { useAuth } from './AuthContext';
 
 export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
+  const { t } = useContext(LangContext);
   const { user } = useAuth();
   const location = useLocation();
+  const [rol, setRol] = useState('padrino');
   const [form, setForm] = useState({ nombre: user?.displayName || '', pais: '' });
   const [enviando, setEnviando] = useState(false);
   const [ok, setOk] = useState(false);
@@ -17,9 +20,9 @@ export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
     setEnviando(true); setError('');
     const nombre = form.nombre.trim() || user?.displayName || '';
     try {
-      await axios.post(`${API}/api/padrinos`, { ...form, nombre, nino_id: parseInt(ninoId) });
+      await axios.post(`${API}/api/padrinos`, { ...form, nombre, rol, nino_id: parseInt(ninoId) });
       setOk(true);
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess(rol);
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo registrar. Inténtalo de nuevo.');
     }
@@ -28,7 +31,7 @@ export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
 
   if (ok) return (
     <div className="success-msg" style={{margin:0}}>
-      🎄 ¡Gracias! Ahora eres el padrino de {ninoNombre}. Nos pondremos en contacto contigo.
+      🎄 {rol === 'madrina' ? t.godfather_success_madrina : t.godfather_success_padrino}
     </div>
   );
 
@@ -53,9 +56,18 @@ export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
 
   return (
     <form onSubmit={submit}>
-      <p style={{color:'var(--ink-soft)', fontSize:'0.92rem', marginBottom:'1.1rem'}}>
-        Conviértete en el padrino de <strong>{ninoNombre}</strong> y coordina para hacer realidad su Navidad.
+      <p style={{color:'var(--ink-soft)', fontSize:'0.92rem', marginBottom:'1rem'}}>
+        {t.godfather_intro}
       </p>
+      <p style={{fontSize:'0.8rem', color:'var(--ink-faint)', margin:'0 0 0.4rem 0.15rem', fontWeight:600}}>{t.godfather_choose}</p>
+      <div className="auth-rol" role="group" aria-label={t.godfather_choose}>
+        <button type="button" className={`auth-rol-btn ${rol === 'padrino' ? 'active' : ''}`} onClick={() => setRol('padrino')}>
+          {t.godfather_padrino}
+        </button>
+        <button type="button" className={`auth-rol-btn ${rol === 'madrina' ? 'active' : ''}`} onClick={() => setRol('madrina')}>
+          {t.godfather_madrina}
+        </button>
+      </div>
       <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.7rem', marginBottom:'0.7rem'}}>
         <input className="auth-input" placeholder="Tu nombre" required style={{marginBottom:0}}
           value={form.nombre} onChange={e=>setForm({...form, nombre:e.target.value})} />
@@ -68,7 +80,7 @@ export default function PadrinoForm({ ninoId, ninoNombre, onSuccess }) {
         style={{background:'var(--gray-bg)', color:'var(--ink-soft)'}} />
       {error && <div className="auth-error" role="alert">{error}</div>}
       <button className="auth-submit" disabled={enviando}>
-        {enviando ? 'Enviando…' : 'Quiero ser su padrino'}
+        {enviando ? 'Enviando…' : (rol === 'madrina' ? t.godfather_btn_madrina : t.godfather_btn_padrino)}
       </button>
     </form>
   );

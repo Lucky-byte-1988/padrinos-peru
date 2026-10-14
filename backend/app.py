@@ -111,6 +111,9 @@ class Nino(db.Model):
     tiene_padrino = db.Column(db.Boolean, default=False)
     likes = db.Column(db.Integer, default=0)
     owner_email = db.Column(db.String(120))   # email de la familia que lo registró
+    # pendiente: no se muestra. aprobado: público. rechazado: oculto, con motivo.
+    estado = db.Column(db.String(20), default='pendiente')
+    motivo_rechazo = db.Column(db.String(300))
     comentarios = db.relationship('Comentario', backref='nino', lazy=True)
 
 class Padrino(db.Model):
@@ -118,6 +121,7 @@ class Padrino(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     pais = db.Column(db.String(100))
+    rol = db.Column(db.String(20), default='padrino')  # 'padrino' o 'madrina'
     nino_id = db.Column(db.Integer, db.ForeignKey('nino.id'), nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -140,6 +144,8 @@ class VideoMensaje(db.Model):
     video_url = db.Column(db.String(300), nullable=False)
     texto = db.Column(db.String(300))
     likes = db.Column(db.Integer, default=0)
+    estado = db.Column(db.String(20), default='pendiente')
+    motivo_rechazo = db.Column(db.String(300))
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
 SUPER_ADMIN = 'rimapaivan@gmail.com'  # dueño, siempre admin, no se puede quitar
@@ -204,16 +210,34 @@ def save_file(file, prefix):
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
+    # La foto familiar nunca es un archivo público: solo la familia dueña o un admin.
+    if filename.startswith('familia_'):
+        email = correo_sesion()
+        if not email:
+            return jsonify({'error': 'No autorizado'}), 401
+        if not es_admin(email):
+            propio = Nino.query.filter(
+                db.func.lower(Nino.owner_email) == email,
+                Nino.foto_familia.contains(filename)
+            ).first()
+            if not propio:
+                return jsonify({'error': 'No autorizado'}), 403
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/api/ninos', methods=['GET'])
 def get_ninos():
-    ninos = Nino.query.order_by(Nino.fecha.desc()).all()
-    return jsonify([_nino_dict(n) for n in ninos])
+    # Solo cartas aprobadas. Pendientes y rechazadas no existen para el público.
+    ninos = Nino.query.filter(Nino.estado == 'aprobado').order_by(Nino.fecha.desc()).all()
+    roles = _roles_por_nino([n.id for n in ninos])
+    return jsonify([_nino_publico(n, roles.get(n.id)) for n in ninos])
 
 @app.route('/api/ninos/<int:id>', methods=['GET'])
 def get_nino(id):
-    return jsonify(_nino_dict(Nino.query.get_or_404(id)))
+    n = Nino.query.get_or_404(id)
+    if n.estado != 'aprobado' and not _puede_ver_reserva(n):
+        return jsonify({'error': 'No encontrado'}), 404
+    # Aunque la vea la familia o un admin, esta ruta no entrega teléfono ni foto familiar.
+    return jsonify(_nino_publico(n))
 
 @app.route('/api/ninos', methods=['POST'])
 def registrar_nino():
@@ -241,19 +265,24 @@ def registrar_nino():
         carta_texto=data.get('carta_texto', ''), carta_foto=carta_foto_url,
         foto_familia=foto_familia_url, video_url=video_url,
         whatsapp=data.get('whatsapp', ''),
-        owner_email=correo_sesion() or ''
+        owner_email=correo_sesion() or '',
+        estado='pendiente',
     )
     db.session.add(nino)
     db.session.commit()
-    return jsonify({'mensaje': 'Carta enviada', 'id': nino.id}), 201
+    enviar_whatsapp(
+        f"📩 Nueva carta en revisión: *{nino.nombre}* ({nino.provincia or 'sin provincia'}). "
+        f"Entra al panel admin para aprobarla o rechazarla."
+    )
+    return jsonify({'mensaje': 'Carta enviada a revisión', 'id': nino.id, 'estado': 'pendiente'}), 201
 
 @app.route('/api/mis-ninos', methods=['GET'])
 @requiere_sesion
 def mis_ninos():
     # Niños registrados por una familia (el correo de su sesión)
     email = g.email
-    ninos = Nino.query.filter_by(owner_email=email).order_by(Nino.fecha.desc()).all()
-    return jsonify([_nino_dict(n) for n in ninos])
+    ninos = Nino.query.filter(db.func.lower(Nino.owner_email) == email).order_by(Nino.fecha.desc()).all()
+    return jsonify([_nino_privado(n) for n in ninos])
 
 @app.route('/api/mis-apadrinados', methods=['GET'])
 @requiere_sesion
@@ -261,19 +290,32 @@ def mis_apadrinados():
     # Niños que un padrino (el correo de su sesión) ha apadrinado
     email = g.email
     padrinos = Padrino.query.filter(db.func.lower(Padrino.email) == email).all()
-    ids = [p.nino_id for p in padrinos if p.nino_id]
-    ninos = Nino.query.filter(Nino.id.in_(ids)).all() if ids else []
-    return jsonify([_nino_dict(n) for n in ninos])
+    por_nino = {}
+    for p in padrinos:
+        if p.nino_id and p.nino_id not in por_nino:
+            por_nino[p.nino_id] = p.rol if p.rol in ('padrino', 'madrina') else 'padrino'
+    ninos = Nino.query.filter(Nino.id.in_(list(por_nino))).all() if por_nino else []
+    out = []
+    for n in ninos:
+        d = _nino_publico(n, por_nino.get(n.id))
+        d['mi_rol'] = por_nino.get(n.id)
+        out.append(d)
+    return jsonify(out)
 
 @app.route('/api/ninos/<int:id>/like', methods=['POST'])
 def like_nino(id):
     nino = Nino.query.get_or_404(id)
+    if nino.estado != 'aprobado':
+        return jsonify({'error': 'No encontrado'}), 404
     nino.likes = (nino.likes or 0) + 1
     db.session.commit()
     return jsonify({'likes': nino.likes})
 
 @app.route('/api/ninos/<int:id>/comentarios', methods=['GET'])
 def get_comentarios(id):
+    nino = Nino.query.get_or_404(id)
+    if nino.estado != 'aprobado' and not _puede_ver_reserva(nino):
+        return jsonify({'error': 'No encontrado'}), 404
     coms = Comentario.query.filter_by(nino_id=id).order_by(Comentario.fecha.asc()).all()
     return jsonify([{'id':c.id,'parent_id':c.parent_id,'autor':c.autor,'pais':c.pais,
                      'texto':c.texto,'likes': c.likes or 0,
@@ -288,7 +330,9 @@ def like_comentario(cid):
 
 @app.route('/api/ninos/<int:id>/comentarios', methods=['POST'])
 def add_comentario(id):
-    Nino.query.get_or_404(id)
+    nino = Nino.query.get_or_404(id)
+    if nino.estado != 'aprobado':
+        return jsonify({'error': 'No encontrado'}), 404
     data = request.get_json(silent=True) or {}
     err = faltan(data, 'autor', 'texto')
     if err:
@@ -301,16 +345,17 @@ def add_comentario(id):
 
 @app.route('/api/ninos/<int:id>/videos', methods=['GET'])
 def get_videos(id):
-    vids = VideoMensaje.query.filter_by(nino_id=id).order_by(VideoMensaje.fecha.asc()).all()
-    return jsonify([{
-        'id': v.id, 'autor': v.autor, 'de': v.de, 'pais': v.pais,
-        'video_url': v.video_url, 'texto': v.texto, 'likes': v.likes or 0,
-        'fecha': v.fecha.strftime('%d/%m/%Y %H:%M')
-    } for v in vids])
+    nino = Nino.query.get_or_404(id)
+    if nino.estado != 'aprobado' and not _puede_ver_reserva(nino):
+        return jsonify({'error': 'No encontrado'}), 404
+    vids = VideoMensaje.query.filter_by(nino_id=id, estado='aprobado').order_by(VideoMensaje.fecha.asc()).all()
+    return jsonify([_video_publico(v) for v in vids])
 
 @app.route('/api/ninos/<int:id>/videos', methods=['POST'])
 def add_video(id):
     nino = Nino.query.get_or_404(id)
+    if nino.estado != 'aprobado':
+        return jsonify({'error': 'Esta carta todavía no está publicada'}), 404
     if request.content_type and 'multipart' in request.content_type:
         data = request.form
         video_url = save_file(request.files.get('video'), 'respuesta')
@@ -324,18 +369,21 @@ def add_video(id):
         return jsonify({'error': 'Falta el video'}), 400
     v = VideoMensaje(
         nino_id=id, autor=data['autor'], de=data.get('de', 'padrino'),
-        pais=data.get('pais', ''), video_url=video_url, texto=data.get('texto', '')
+        pais=data.get('pais', ''), video_url=video_url, texto=data.get('texto', ''),
+        estado='pendiente',
     )
     db.session.add(v)
     db.session.commit()
-    # Notificar al admin de la nueva interacción
     quien = 'El padrino' if v.de == 'padrino' else 'El niño'
-    enviar_whatsapp(f"🎥 {quien} {v.autor} respondió con un video en la conversación de *{nino.nombre}*")
-    return jsonify({'mensaje': 'Video publicado', 'id': v.id}), 201
+    enviar_whatsapp(f"🎥 {quien} {v.autor} envió un video para revisión en la carta de *{nino.nombre}*")
+    return jsonify({'mensaje': 'Video enviado a revisión', 'id': v.id, 'estado': 'pendiente'}), 201
 
 @app.route('/api/videos/<int:vid>/like', methods=['POST'])
 def like_video(vid):
     v = VideoMensaje.query.get_or_404(vid)
+    nino = Nino.query.get(v.nino_id)
+    if v.estado != 'aprobado' or not nino or nino.estado != 'aprobado':
+        return jsonify({'error': 'No encontrado'}), 404
     v.likes = (v.likes or 0) + 1
     db.session.commit()
     return jsonify({'likes': v.likes})
@@ -347,21 +395,26 @@ def registrar_padrino():
     err = faltan(data, 'nombre')
     if err:
         return err
+    rol = (data.get('rol') or 'padrino').strip().lower()
+    if rol not in ('padrino', 'madrina'):
+        return jsonify({'error': 'Elige Padrino o Madrina'}), 400
     nino = None
     if data.get('nino_id'):
         nino = Nino.query.get(data['nino_id'])
-        if not nino:
-            return jsonify({'error': 'Ese niño ya no está en la página'}), 404
+        if not nino or nino.estado != 'aprobado':
+            return jsonify({'error': 'Esa carta todavía no está publicada'}), 404
         if nino.tiene_padrino:
-            return jsonify({'error': f'{nino.nombre} ya tiene padrino'}), 409
+            actual = _roles_por_nino([nino.id]).get(nino.id) or 'padrino'
+            return jsonify({'error': f'{primer_nombre(nino.nombre)} ya tiene {actual}'}), 409
         nino.tiene_padrino = True
-    padrino = Padrino(nombre=data['nombre'].strip(), email=g.email,
+    padrino = Padrino(nombre=data['nombre'].strip(), email=g.email, rol=rol,
                       pais=data.get('pais',''), nino_id=nino.id if nino else None)
     db.session.add(padrino)
     db.session.commit()
     if nino:
+        figura = 'Nueva Madrina' if rol == 'madrina' else 'Nuevo Padrino'
         enviar_whatsapp(
-            f"🎄 *Nuevo Padrino!*\n👤 {padrino.nombre}\n📧 {padrino.email}\n"
+            f"🎄 *{figura}!*\n👤 {padrino.nombre}\n📧 {padrino.email}\n"
             f"🌍 {padrino.pais or 'N/A'}\n🎁 Niño: *{nino.nombre}*\n"
             f"📍 {nino.provincia}, {nino.region}\n"
             f"❤️ Total padrinos: {Padrino.query.count()}"
@@ -393,22 +446,27 @@ def borrar_nino(id):
     return jsonify({'mensaje': 'Niño eliminado y registrado en el historial'})
 
 @app.route('/api/ninos/<int:id>/mensaje-privado', methods=['POST'])
+@requiere_sesion
 def enviar_mensaje_privado(id):
+    # El padrino no ve el teléfono. El mensaje llega al equipo y el equipo habla con la familia.
     nino = Nino.query.get_or_404(id)
+    if nino.estado != 'aprobado':
+        return jsonify({'error': 'Esta carta todavía no está publicada'}), 404
     data = request.get_json(silent=True) or {}
     err = faltan(data, 'autor', 'texto')
     if err:
         return err
-    m = MensajePrivado(nino_id=id, autor=data['autor'],
-                       email=data.get('email', ''), texto=data['texto'])
+    m = MensajePrivado(nino_id=id, autor=data['autor'].strip()[:100],
+                       email=g.email, texto=data['texto'].strip())
     db.session.add(m)
     db.session.commit()
     enviar_whatsapp(
-        f"💌 *Mensaje privado para {nino.nombre}*\n"
-        f"De: {m.autor} ({m.email or 'sin email'})\n\n"
-        f"\"{m.texto}\""
+        f"💌 *Mensaje para la familia de {nino.nombre}*\n"
+        f"De: {m.autor} ({m.email})\n\n"
+        f"\"{m.texto}\"\n\n"
+        f"WhatsApp familiar (solo tú lo ves): {nino.whatsapp or 'no dejó número'}"
     )
-    return jsonify({'mensaje': 'Mensaje privado enviado'}), 201
+    return jsonify({'mensaje': 'Mensaje enviado al equipo'}), 201
 
 @app.route('/api/mensajes-privados', methods=['GET'])
 @requiere_admin
@@ -491,67 +549,221 @@ def padrino_panel():
     if not padrino or not padrino.nino_id:
         return jsonify({'error': 'No encontrado'}), 404
     n = Nino.query.get(padrino.nino_id)
-    return jsonify(_nino_dict(n)) if n else (jsonify({'error': 'No encontrado'}), 404)
+    if not n:
+        return jsonify({'error': 'No encontrado'}), 404
+    rol = padrino.rol if padrino.rol in ('padrino', 'madrina') else 'padrino'
+    d = _nino_publico(n, rol)
+    d['mi_rol'] = rol
+    return jsonify(d)
 
 @app.route('/api/admin', methods=['GET'])
 @requiere_admin
 def admin():
     ninos = Nino.query.order_by(Nino.fecha.desc()).all()
-    padrinos = Padrino.query.all()
+    padrinos = Padrino.query.order_by(Padrino.fecha.desc()).all()
+    roles = _roles_por_nino([n.id for n in ninos])
     return jsonify({
         'total_ninos': len(ninos), 'total_padrinos': len(padrinos),
-        'sin_padrino': Nino.query.filter_by(tiene_padrino=False).count(),
-        'ninos': [_nino_dict(n) for n in ninos],
+        'sin_padrino': Nino.query.filter_by(estado='aprobado', tiene_padrino=False).count(),
+        'en_revision': (Nino.query.filter_by(estado='pendiente').count()
+                        + VideoMensaje.query.filter_by(estado='pendiente').count()),
+        'ninos': [_nino_privado(n, roles.get(n.id)) for n in ninos],
         'padrinos': [{'id':p.id,'nombre':p.nombre,'email':p.email,'pais':p.pais,
+            'rol': p.rol if p.rol in ('padrino', 'madrina') else 'padrino',
             'nino_nombre': (Nino.query.get(p.nino_id).nombre if p.nino_id and Nino.query.get(p.nino_id) else None),
             'fecha': p.fecha.strftime('%Y-%m-%d')} for p in padrinos]
     })
 
-def _nino_dict(n):
+def _aplicar_moderar(obj):
+    data = request.get_json(silent=True) or {}
+    accion = (data.get('accion') or '').strip().lower()
+    if accion == 'aprobar':
+        obj.estado = 'aprobado'
+        obj.motivo_rechazo = None
+        return None
+    if accion == 'rechazar':
+        motivo = (data.get('motivo') or '').strip()
+        if not motivo:
+            return jsonify({'error': 'Escribe el motivo del rechazo'}), 400
+        obj.estado = 'rechazado'
+        obj.motivo_rechazo = motivo[:300]
+        return None
+    return jsonify({'error': 'Acción no válida'}), 400
+
+@app.route('/api/ninos/<int:id>/moderar', methods=['POST'])
+@requiere_admin
+def moderar_nino(id):
+    n = Nino.query.get_or_404(id)
+    err = _aplicar_moderar(n)
+    if err:
+        return err
+    db.session.commit()
+    return jsonify({'mensaje': 'Listo', 'estado': n.estado})
+
+@app.route('/api/videos/<int:vid>/moderar', methods=['POST'])
+@requiere_admin
+def moderar_video(vid):
+    v = VideoMensaje.query.get_or_404(vid)
+    err = _aplicar_moderar(v)
+    if err:
+        return err
+    db.session.commit()
+    return jsonify({'mensaje': 'Listo', 'estado': v.estado})
+
+@app.route('/api/moderacion', methods=['GET'])
+@requiere_admin
+def moderacion():
+    cartas = Nino.query.filter(Nino.estado.in_(['pendiente', 'rechazado'])).order_by(Nino.fecha.asc()).all()
+    videos = VideoMensaje.query.filter(VideoMensaje.estado.in_(['pendiente', 'rechazado'])).order_by(VideoMensaje.fecha.asc()).all()
+    return jsonify({
+        'cartas': [_nino_privado(n) for n in cartas],
+        'videos': [_video_admin(v) for v in videos],
+    })
+
+def primer_nombre(nombre):
+    partes = (nombre or '').strip().split()
+    return partes[0] if partes else ''
+
+def _roles_por_nino(ids):
+    if not ids:
+        return {}
+    rows = Padrino.query.filter(Padrino.nino_id.in_(list(ids))).all()
+    out = {}
+    for p in rows:
+        if p.nino_id and p.nino_id not in out:
+            out[p.nino_id] = p.rol if p.rol in ('padrino', 'madrina') else 'padrino'
+    return out
+
+def _puede_ver_reserva(nino):
+    # La familia dueña y los admins pueden abrir una carta que aún no es pública.
+    email = correo_sesion()
+    if not email or not nino:
+        return False
+    if es_admin(email):
+        return True
+    return (nino.owner_email or '').lower() == email
+
+def _nino_publico(n, rol=None):
+    # Lo que ve cualquiera: primer nombre, sin teléfono y sin foto familiar.
+    if n.tiene_padrino:
+        if rol is None:
+            rol = _roles_por_nino([n.id]).get(n.id)
+        if rol not in ('padrino', 'madrina'):
+            rol = 'padrino'
+    else:
+        rol = None
     return {
-        'id':n.id,'nombre':n.nombre,'edad':n.edad,'provincia':n.provincia,'region':n.region,
-        'carta_texto':n.carta_texto,'carta_foto':n.carta_foto,'foto_familia':n.foto_familia,
-        'video_url':n.video_url,'whatsapp':n.whatsapp,'tiene_padrino':n.tiene_padrino,
+        'id': n.id,
+        'nombre': primer_nombre(n.nombre),
+        'edad': n.edad,
+        'provincia': n.provincia or '',
+        'region': n.region or '',
+        'carta_texto': n.carta_texto or '',
+        'carta_foto': n.carta_foto or '',
+        'video_url': n.video_url or '',
+        'tiene_padrino': bool(n.tiene_padrino),
+        'rol_padrino': rol,
         'likes': n.likes or 0,
         'num_comentarios': len(n.comentarios),
-        'fecha':n.fecha.strftime('%Y-%m-%d')
+        'fecha': n.fecha.strftime('%Y-%m-%d') if n.fecha else '',
+        'estado': n.estado or 'pendiente',
+        'motivo_rechazo': n.motivo_rechazo or '',
     }
+
+def _nino_privado(n, rol=None):
+    # Panel de la familia y panel admin: nombre completo, teléfono y foto familiar.
+    d = _nino_publico(n, rol)
+    d['nombre'] = n.nombre
+    d['whatsapp'] = n.whatsapp or ''
+    d['foto_familia'] = n.foto_familia or ''
+    d['owner_email'] = n.owner_email or ''
+    return d
+
+def _video_publico(v):
+    autor = v.autor or ''
+    if v.de == 'nino':
+        autor = primer_nombre(autor)
+    return {
+        'id': v.id, 'autor': autor, 'de': v.de, 'pais': v.pais or '',
+        'video_url': v.video_url, 'texto': v.texto or '', 'likes': v.likes or 0,
+        'estado': v.estado or 'pendiente',
+        'fecha': v.fecha.strftime('%d/%m/%Y %H:%M') if v.fecha else '',
+    }
+
+def _video_admin(v):
+    n = Nino.query.get(v.nino_id)
+    d = _video_publico(v)
+    d['autor'] = v.autor or ''
+    d['nino_id'] = v.nino_id
+    d['nino_nombre'] = n.nombre if n else 'Eliminado'
+    d['motivo_rechazo'] = v.motivo_rechazo or ''
+    return d
 
 def seed_data():
     if Nino.query.count() == 0:
         ninos = [
-            Nino(nombre='Lucía', edad=8, provincia='Anta', region='Cusco',
+            Nino(nombre='Lucía', edad=8, provincia='Anta', region='Cusco', estado='aprobado',
                  carta_texto='Estimado Papá Noel, soy Lucía tengo 8 años. Vivo en Anta con mi mamá y mis 3 hermanos. Mi mamá vende verduras en el mercado. Quisiera que me regales una mochila nueva y colores para el colegio. Te quiero mucho.',
-                 foto_familia='https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?auto=compress&cs=tinysrgb&w=400',
                  whatsapp='984123456', likes=12),
-            Nino(nombre='Josué', edad=10, provincia='Azángaro', region='Puno',
+            Nino(nombre='Josué', edad=10, provincia='Azángaro', region='Puno', estado='aprobado',
                  carta_texto='Hola Papá Noel, mi nombre es Josué, tengo 10 años y vivo en Azángaro. Camino 1 hora para llegar al colegio. Mi sueño es ser doctor. Por favor regálame zapatillas porque las mías ya están rotas.',
-                 foto_familia='https://images.pexels.com/photos/1648377/pexels-photo-1648377.jpeg?auto=compress&cs=tinysrgb&w=400',
                  whatsapp='976543210', likes=8),
-            Nino(nombre='Milagros', edad=7, provincia='Churcampa', region='Huancavelica',
+            Nino(nombre='Milagros', edad=7, provincia='Churcampa', region='Huancavelica', estado='aprobado',
                  carta_texto='Querido Papá Noel, me llamo Milagros y tengo 7 años. Mi papá se fue y mi mamá trabaja limpiando casas. Quiero un juguete para Navidad y un uniforme nuevo. Gracias por leer mi carta.',
-                 foto_familia='https://images.pexels.com/photos/35537/child-children-girl-happy.jpg?auto=compress&cs=tinysrgb&w=400',
                  whatsapp='965432109', likes=15),
         ]
         for n in ninos:
             db.session.add(n)
         db.session.commit()
 
-def migrate():
-    # Agrega columnas nuevas a tablas existentes (PostgreSQL no las añade solo)
+def _agregar_columna(tabla, columna, definicion):
+    # PostgreSQL y SQLite no comparten la misma sintaxis de "IF NOT EXISTS".
+    # Si la columna ya está, no se toca. El DEFAULT rellena las filas viejas.
+    from sqlalchemy import inspect, text
+    try:
+        existentes = {c['name'] for c in inspect(db.engine).get_columns(tabla)}
+    except Exception as e:
+        print(f"[migrate omitido] {e}")
+        return
+    if columna in existentes:
+        return
+    try:
+        with db.engine.connect() as conn:
+            conn.execute(text(f"ALTER TABLE {tabla} ADD COLUMN {columna} {definicion}"))
+            conn.commit()
+    except Exception as e:
+        print(f"[migrate omitido] {e}")
+
+def aprobar_registros_previos():
+    # Decisión de migración: lo que ya estaba publicado sigue visible (aprobado).
+    # Los padrinazgos viejos, que no tenían la elección, quedan como 'padrino'.
+    # Las cartas y videos nuevos se guardan como 'pendiente' al crearlos.
     from sqlalchemy import text
     stmts = [
-        "ALTER TABLE nino ADD COLUMN IF NOT EXISTS owner_email VARCHAR(120)",
-        "ALTER TABLE nino ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0",
-        "ALTER TABLE comentario ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0",
-        "ALTER TABLE comentario ADD COLUMN IF NOT EXISTS parent_id INTEGER",
+        "UPDATE nino SET estado = 'aprobado' WHERE estado IS NULL OR estado = ''",
+        "UPDATE video_mensaje SET estado = 'aprobado' WHERE estado IS NULL OR estado = ''",
+        "UPDATE padrino SET rol = 'padrino' WHERE rol IS NULL OR rol = ''",
     ]
     for s in stmts:
         try:
             with db.engine.connect() as conn:
                 conn.execute(text(s)); conn.commit()
         except Exception as e:
-            print(f"[migrate omitido] {e}")
+            print(f"[migrate datos omitido] {e}")
+
+def migrate():
+    # Agrega columnas nuevas a tablas que ya existían.
+    # estado y rol nacen como 'aprobado' / 'padrino' para no esconder lo ya publicado.
+    _agregar_columna('nino', 'owner_email', 'VARCHAR(120)')
+    _agregar_columna('nino', 'likes', 'INTEGER DEFAULT 0')
+    _agregar_columna('nino', 'estado', "VARCHAR(20) DEFAULT 'aprobado'")
+    _agregar_columna('nino', 'motivo_rechazo', 'VARCHAR(300)')
+    _agregar_columna('comentario', 'likes', 'INTEGER DEFAULT 0')
+    _agregar_columna('comentario', 'parent_id', 'INTEGER')
+    _agregar_columna('video_mensaje', 'estado', "VARCHAR(20) DEFAULT 'aprobado'")
+    _agregar_columna('video_mensaje', 'motivo_rechazo', 'VARCHAR(300)')
+    _agregar_columna('padrino', 'rol', "VARCHAR(20) DEFAULT 'padrino'")
+    aprobar_registros_previos()
 
 # Crear tablas y datos iniciales al arrancar (funciona con gunicorn y en local)
 with app.app_context():

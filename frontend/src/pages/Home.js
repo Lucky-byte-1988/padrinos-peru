@@ -2,14 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { API, cld } from '../config';
-import { LangContext } from '../App';
+import { LangContext, textoApadrinamiento } from '../i18n';
 import Reveal from '../Reveal';
 import StoryViewer from '../StoryViewer';
 import Modal from '../Modal';
 import Comments from '../Comments';
 import PadrinoForm from '../PadrinoForm';
-import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, WhatsAppIcon, GiftIcon } from '../Icons';
-import Foto from '../Foto';
+import { HeartIcon, CommentIcon, ShareIcon, LetterIcon, GiftIcon } from '../Icons';
+import { CartaPortada } from '../Foto';
 
 function StepAnim({ type }) {
   if (type === 'carta') {
@@ -114,9 +114,9 @@ function StepAnim({ type }) {
 
 function HowItWorks() {
   const pasos = [
-    { n: '01', anim: 'carta', t: 'El niño escribe su carta', d: 'La familia registra al niño y comparte su carta a Papá Noel, con foto y video.' },
-    { n: '02', anim: 'mundo', t: 'El mundo la descubre', d: 'Personas de todo el planeta leen su historia, la comparten y dejan mensajes de aliento.' },
-    { n: '03', anim: 'regalo', t: 'Un padrino la hace realidad', d: 'Alguien se convierte en su padrino y coordina directamente para cumplir su sueño de Navidad.' },
+    { n: '01', anim: 'carta', t: 'El niño escribe su carta', d: 'La familia registra la carta. Un administrador la revisa antes de publicarla.' },
+    { n: '02', anim: 'mundo', t: 'El mundo la descubre', d: 'Personas de todo el planeta leen su carta, la comparten y dejan mensajes de aliento.' },
+    { n: '03', anim: 'regalo', t: 'Un padrino o una madrina', d: 'Alguien elige ser su padrino o su madrina. El equipo coordina con la familia, sin publicar teléfonos.' },
   ];
   return (
     <section className="how">
@@ -138,9 +138,9 @@ function HowItWorks() {
 
 function Testimonios() {
   const items = [
-    { ini: 'M', color: '#e11d48', texto: 'Apadrinar a Lucía fue la mejor decisión de mi Navidad. Ver su carita al recibir su mochila no tiene precio.', nombre: 'María G.', rol: 'Madrina · Madrid, España' },
+    { ini: 'M', color: '#e11d48', texto: 'Apadrinar a Lucía fue la mejor decisión de mi Navidad. Saber que recibió su mochila no tiene precio.', nombre: 'María G.', rol: 'Madrina · Madrid, España' },
     { ini: 'C', color: '#2563eb', texto: 'Como familia agradecemos esta plataforma. Mi hijo Josué recibió sus zapatillas y un mensaje hermoso de su padrino.', nombre: 'Carmen M.', rol: 'Mamá · Azángaro, Puno' },
-    { ini: 'J', color: '#f59e0b', texto: 'Vivo en USA y siempre quise ayudar en mi país. Aquí puedo ver al niño, su carta y coordinar directo. Transparente y real.', nombre: 'Jorge R.', rol: 'Padrino · Nueva Jersey, EE.UU.' },
+    { ini: 'J', color: '#f59e0b', texto: 'Vivo en USA y siempre quise ayudar en mi país. Leo la carta y el equipo me pone en contacto con la familia, sin exponer sus datos.', nombre: 'Jorge R.', rol: 'Padrino · Nueva Jersey, EE.UU.' },
   ];
   return (
     <section className="testi">
@@ -205,6 +205,7 @@ function PostCard({ n, t }) {
   const [liked, setLiked] = useState(false);
   const [modal, setModal] = useState(null); // 'carta' | 'comentarios' | 'padrino' | null
   const [tienePadrino, setTienePadrino] = useState(n.tiene_padrino);
+  const [rolPadrino, setRolPadrino] = useState(n.rol_padrino);
 
   const handleLike = () => {
     if (liked) return;
@@ -216,19 +217,17 @@ function PostCard({ n, t }) {
     <div className="post">
       {/* Header */}
       <div className="post-header">
-        <Foto className="post-avatar" src={cld(n.foto_familia, 'w_120,h_120,q_auto,f_auto,c_fill,g_face')} alt={n.nombre}
-          fallback={<div className="post-avatar-placeholder">🎁</div>} />
+        <div className="post-avatar-placeholder" aria-hidden="true">{(n.nombre || '?')[0]}</div>
         <div className="post-meta">
           <div className="post-name">{n.nombre}</div>
           <div className="post-location">{[n.provincia, n.region].filter(Boolean).join(', ')}{n.edad ? ` · ${n.edad} años` : ''}</div>
         </div>
         <span className={`post-badge ${tienePadrino ? 'con' : 'sin'}`}>
-          {tienePadrino ? '✓ Apadrinado' : 'Busca padrino'}
+          {textoApadrinamiento(t, tienePadrino, rolPadrino)}
         </span>
       </div>
 
-      {/* Imagen */}
-      <Foto className="post-img" src={cld(n.foto_familia)} alt={n.nombre} loading="lazy" />
+      <CartaPortada className="post-img" nombre={n.nombre} carta={n.carta_texto} foto={n.carta_foto} />
 
       {/* Preview carta */}
       {n.carta_texto && (
@@ -250,11 +249,6 @@ function PostCard({ n, t }) {
             <button className="ig-btn" onClick={() => setModal('padrino')} aria-label="Ser padrino" title="Ser su padrino">
               <GiftIcon />
             </button>
-          )}
-          {n.whatsapp && (
-            <a href={`https://wa.me/51${n.whatsapp}`} target="_blank" rel="noreferrer" className="ig-btn" aria-label="Contactar por WhatsApp">
-              <WhatsAppIcon />
-            </a>
           )}
           <a href={`https://api.whatsapp.com/send?text=🎅 Ayuda a ${n.nombre} esta Navidad: ${window.location.origin}/carta/${n.id}`}
             target="_blank" rel="noreferrer" className="ig-btn" aria-label="Compartir">
@@ -290,8 +284,8 @@ function PostCard({ n, t }) {
         <Comments ninoId={n.id} />
       </Modal>
 
-      <Modal open={modal==='padrino'} onClose={()=>setModal(null)} title={`Ser padrino de ${n.nombre}`}>
-        <PadrinoForm ninoId={n.id} ninoNombre={n.nombre} onSuccess={()=>setTienePadrino(true)} />
+      <Modal open={modal==='padrino'} onClose={()=>setModal(null)} title={`${t.godfather_title} · ${n.nombre}`} sheet>
+        <PadrinoForm ninoId={n.id} ninoNombre={n.nombre} onSuccess={(rol) => { setRolPadrino(rol); setTienePadrino(true); }} />
       </Modal>
 
       {/* Conteo de me gusta */}
@@ -360,16 +354,15 @@ export default function Home() {
           <a href="#feed" className="btn-gold">{t.hero_btn}</a>
           <Link to="/registrar" className="btn-outline">{t.hero_btn2} &rsaquo;</Link>
         </div>
-        <Reveal className="hero-visual">
-          <img
-            src={ninos[0]?.foto_familia
-              ? cld(ninos[0].foto_familia, 'w_1600,h_1000,q_auto,f_auto,c_fill,g_auto')
-              : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=1600'}
-            alt={ninos[0] ? `${ninos[0].nombre}, ${ninos[0].region}` : 'Niños de los Andes peruanos'}
-            width="1600" height="1000" fetchPriority="high"
+        <Reveal className={`hero-visual ${ninos[0]?.carta_foto ? '' : 'papel'}`}>
+          <CartaPortada
+            className="hero-portada"
+            nombre={ninos[0]?.nombre || 'Papá Noel'}
+            carta={ninos[0]?.carta_texto || 'Cada carta espera a alguien que la lea.'}
+            foto={ninos[0]?.carta_foto}
           />
           <div className="hero-visual-caption">
-            {ninos[0] ? `${ninos[0].provincia}, ${ninos[0].region} · Perú` : 'Andes peruanos'}
+            {ninos[0] ? `${ninos[0].provincia}, ${ninos[0].region} · Perú` : 'Cartas del Perú'}
           </div>
         </Reveal>
         <CountdownNavidad />
@@ -402,19 +395,20 @@ export default function Home() {
           </Reveal>
           <div className="tv-row" role="list">
             {ninos.slice(0, 10).map((n, i) => (
-              <Link to={`/carta/${n.id}`} className="tv-card" key={n.id} role="listitem" style={{animationDelay: `${i * 60}ms`}}>
-                <img
-                  src={n.foto_familia
-                    ? cld(n.foto_familia, 'w_700,h_440,q_auto,f_auto,c_fill,g_auto')
-                    : 'https://images.pexels.com/photos/2862135/pexels-photo-2862135.jpeg?auto=compress&cs=tinysrgb&w=700'}
-                  alt={`${n.nombre}, ${n.region}`} loading="lazy" width="700" height="440"
-                />
+              <Link to={`/carta/${n.id}`} className={`tv-card ${n.carta_foto ? '' : 'tv-letter-card'}`} key={n.id} role="listitem" style={{animationDelay: `${i * 60}ms`}}>
+                {n.carta_foto ? (
+                  <img src={cld(n.carta_foto, 'w_700,h_440,q_auto,f_auto,c_fill')} alt={`Carta de ${n.nombre}`} loading="lazy" width="700" height="440" />
+                ) : (
+                  <div className="tv-letter"><p>“{(n.carta_texto || '').slice(0, 140)}{(n.carta_texto || '').length > 140 ? '…' : ''}”</p></div>
+                )}
                 <div className="tv-card-shade" />
                 <div className="tv-card-info">
-                  <span className="tv-card-name">{n.nombre}, {n.edad} años</span>
+                  <span className="tv-card-name">{n.nombre}{n.edad ? `, ${n.edad} años` : ''}</span>
                   <span className="tv-card-loc">{n.provincia} · {n.region}</span>
                 </div>
-                {!n.tiene_padrino && <span className="tv-card-tag">Busca padrino</span>}
+                <span className={`tv-card-tag ${n.tiene_padrino ? 'con' : ''}`}>
+                  {textoApadrinamiento(t, n.tiene_padrino, n.rol_padrino)}
+                </span>
               </Link>
             ))}
           </div>
@@ -439,8 +433,7 @@ export default function Home() {
             {ninos.slice(0, 12).map((n, i) => (
               <button type="button" className="story" key={n.id} onClick={() => setStoryIdx(i)}>
                 <div className="story-ring">
-                  <img src={cld(n.foto_familia, 'w_140,h_140,q_auto,f_auto,c_fill,g_face') || 'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'}
-                    alt={n.nombre} onError={e => { e.target.onerror = null; e.target.src='https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?w=60'; }} />
+                  <span className="story-initial">{(n.nombre || '?')[0]}</span>
                 </div>
                 <span className="story-name">{n.nombre}</span>
               </button>
@@ -486,7 +479,7 @@ export default function Home() {
           <div className="sidebar-card">
             <h3>¿Quieres ayudar?</h3>
             <p style={{color:'var(--ink-soft)', fontSize:'0.83rem', marginBottom:'0.8rem', lineHeight:1.6}}>
-              Elige un niño que busca padrino y coordina directamente con su familia.
+              Elige un niño y escribe a su familia desde la página. El equipo hace de puente, sin mostrar teléfonos.
             </p>
             <button type="button" className="sidebar-cta" onClick={() => { setFiltro('sin'); setRegion('Todas'); setBusqueda(''); }}>
               Ver quién busca padrino ({sinPadrino})

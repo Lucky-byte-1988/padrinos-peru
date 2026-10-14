@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import achicarFoto, { mensajeError } from '../achicarFoto';
 import axios from 'axios';
 import { API } from '../config';
-import { LangContext } from '../App';
+import { LangContext } from '../i18n';
 
 const REGIONES = ['Amazonas','Áncash','Apurímac','Arequipa','Ayacucho','Cajamarca','Callao','Cusco','Huancavelica','Huánuco','Ica','Junín','La Libertad','Lambayeque','Lima','Loreto','Madre de Dios','Moquegua','Pasco','Piura','Puno','San Martín','Tacna','Tumbes','Ucayali'];
 
@@ -95,10 +95,10 @@ export default function RegisterFamily() {
         <circle cx="12" cy="12" r="10"/>
         <path d="m8.5 12.5 2.5 2.5 5-6"/>
       </svg>
-      <h2 style={{marginBottom:'0.6rem'}}>Carta publicada</h2>
+      <h2 style={{marginBottom:'0.6rem'}}>{t.reg_pending_title}</h2>
       <p className="form-desc" style={{marginBottom:'2rem'}}>{t.reg_success}</p>
-      <Link to="/" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
-        Ver las cartas
+      <Link to="/mi-nino" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
+        Ver el estado de mi carta
       </Link>
     </div>
   );
@@ -112,7 +112,8 @@ export default function RegisterFamily() {
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem'}}>
           <div className="form-group">
             <label>{t.field_nombre}</label>
-            <input name="nombre" value={form.nombre} onChange={handleChange} required placeholder="Ej: Lucía" />
+            <input name="nombre" value={form.nombre} onChange={handleChange} required placeholder="Ej: Lucía Quispe" />
+            <p className="field-hint">{t.field_nombre_hint}</p>
           </div>
           <div className="form-group">
             <label>{t.field_edad}</label>
@@ -143,6 +144,7 @@ export default function RegisterFamily() {
             required
             placeholder="Estimado Papá Noel, me llamo... tengo... años. Vivo en... Mi sueño es... Quisiera que me regales..."
           />
+          <p className="field-hint">{t.field_carta_hint}</p>
         </div>
 
         <FileUpload
@@ -155,8 +157,9 @@ export default function RegisterFamily() {
         />
 
         <h3 className="form-sec"><span>3</span>La familia</h3>
+        <p className="priv-note">{t.face_tip}</p>
         <FileUpload
-          label="Foto de la familia"
+          label={t.field_foto}
           name="foto_familia"
           accept="image/*"
           capture="environment"
@@ -165,7 +168,7 @@ export default function RegisterFamily() {
         />
 
         <FileUpload
-          label="Video del niño (opcional)"
+          label="Video del niño (opcional, se publica solo si se aprueba)"
           name="video"
           accept="video/*"
           capture="camcorder"
@@ -176,7 +179,7 @@ export default function RegisterFamily() {
         <div className="form-group">
           <label>{t.field_whatsapp}</label>
           <input name="whatsapp" type="tel" inputMode="numeric" value={form.whatsapp} onChange={handleChange} placeholder="9XXXXXXXX" />
-          <p style={{fontSize:'0.8rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>En la carta aparece un botón de WhatsApp para que el padrino coordine contigo.</p>
+          <p className="field-hint">{t.whatsapp_hint}</p>
         </div>
 
         {error && <div className="auth-error" role="alert">{error}</div>}

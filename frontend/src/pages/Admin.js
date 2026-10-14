@@ -2,7 +2,124 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { API } from '../config';
 import { Link } from 'react-router-dom';
-import { LangContext } from '../App';
+import { LangContext } from '../i18n';
+
+function EstadoBadge({ estado }) {
+  if (estado === 'aprobado') return <span className="badge-si">Publicada</span>;
+  if (estado === 'rechazado') return <span className="badge-no">Rechazada</span>;
+  return <span className="badge-wait">Pendiente</span>;
+}
+
+function primerNombre(nombre) {
+  return ((nombre || '').trim().split(/\s+/)[0]) || '';
+}
+
+function ColaRevision({ cola, moderar }) {
+  const cartas = cola.cartas || [];
+  const videos = cola.videos || [];
+  const pendientesC = cartas.filter(c => c.estado === 'pendiente');
+  const rechazadasC = cartas.filter(c => c.estado === 'rechazado');
+  const pendientesV = videos.filter(v => v.estado === 'pendiente');
+  const rechazadosV = videos.filter(v => v.estado === 'rechazado');
+  return (
+    <div className="mod-queue">
+      <p className="mod-lead">
+        Las cartas, fotos y videos nuevos no aparecen en el sitio hasta que los apruebes.
+        Si rechazas, escribe el motivo: la familia lo ve en su panel. El teléfono y la foto familiar no se publican nunca.
+      </p>
+
+      <h2 className="mod-h">Cartas en espera ({pendientesC.length})</h2>
+      {pendientesC.length === 0 && (
+        <p className="mod-empty">No hay cartas esperando revisión.</p>
+      )}
+      {pendientesC.map(n => (
+        <article className="mod-card" key={`c-${n.id}`}>
+          <header className="mod-head">
+            <div>
+              <strong>{n.nombre}</strong>
+              <EstadoBadge estado="pendiente" />
+            </div>
+            <span>{[n.provincia, n.region].filter(Boolean).join(', ')}{n.edad ? ` · ${n.edad} años` : ''} · {n.fecha}</span>
+          </header>
+          <p className="mod-publico">En el sitio se verá como <strong>{primerNombre(n.nombre)}</strong>. Sin apellido, sin teléfono y sin foto familiar.</p>
+          {n.carta_texto && <p className="mod-carta">“{n.carta_texto}”</p>}
+          {n.carta_foto && (
+            <figure>
+              <figcaption>Foto de la carta · se publica si apruebas</figcaption>
+              <img src={n.carta_foto} alt="Carta escrita a mano" />
+            </figure>
+          )}
+          {n.video_url && (
+            <figure>
+              <figcaption>Video del niño · se publica si apruebas la carta</figcaption>
+              <video src={n.video_url} controls playsInline preload="metadata" />
+            </figure>
+          )}
+          {n.foto_familia && (
+            <figure className="mod-privada">
+              <figcaption>Foto familiar · no se publica</figcaption>
+              <img src={n.foto_familia} alt="Foto familiar, solo para revisión" />
+            </figure>
+          )}
+          <p className="mod-privado">WhatsApp familiar, solo admin: {n.whatsapp || 'no dejó número'}</p>
+          <div className="mod-actions">
+            <button type="button" className="btn-aprobar" onClick={() => moderar('carta', n.id, 'aprobar')}>Aprobar y publicar</button>
+            <button type="button" className="btn-rechazar" onClick={() => moderar('carta', n.id, 'rechazar')}>Rechazar</button>
+            <Link to={`/carta/${n.id}`}>Vista previa</Link>
+          </div>
+        </article>
+      ))}
+
+      <h2 className="mod-h">Videos en espera ({pendientesV.length})</h2>
+      {pendientesV.length === 0 && <p className="mod-empty">No hay videos esperando revisión.</p>}
+      {pendientesV.map(v => (
+        <article className="mod-card" key={`v-${v.id}`}>
+          <header className="mod-head">
+            <div>
+              <strong>{v.autor}</strong>
+              <EstadoBadge estado="pendiente" />
+            </div>
+            <span>{v.de === 'nino' ? 'Del niño' : 'Del padrino o la madrina'} · carta de {v.nino_nombre} · {v.fecha}</span>
+          </header>
+          {v.texto && <p className="mod-carta">{v.texto}</p>}
+          {v.video_url && <video src={v.video_url} controls playsInline preload="metadata" />}
+          <div className="mod-actions">
+            <button type="button" className="btn-aprobar" onClick={() => moderar('video', v.id, 'aprobar')}>Aprobar video</button>
+            <button type="button" className="btn-rechazar" onClick={() => moderar('video', v.id, 'rechazar')}>Rechazar</button>
+          </div>
+        </article>
+      ))}
+
+      {(rechazadasC.length > 0 || rechazadosV.length > 0) && (
+        <>
+          <h2 className="mod-h">Rechazados</h2>
+          {rechazadasC.map(n => (
+            <article className="mod-card mod-card-rech" key={`rc-${n.id}`}>
+              <header className="mod-head">
+                <div><strong>{n.nombre}</strong><EstadoBadge estado="rechazado" /></div>
+                <span>{n.motivo_rechazo}</span>
+              </header>
+              <div className="mod-actions">
+                <button type="button" className="btn-aprobar" onClick={() => moderar('carta', n.id, 'aprobar')}>Publicar de todos modos</button>
+              </div>
+            </article>
+          ))}
+          {rechazadosV.map(v => (
+            <article className="mod-card mod-card-rech" key={`rv-${v.id}`}>
+              <header className="mod-head">
+                <div><strong>Video de {v.autor}</strong><EstadoBadge estado="rechazado" /></div>
+                <span>{v.motivo_rechazo} · {v.nino_nombre}</span>
+              </header>
+              <div className="mod-actions">
+                <button type="button" className="btn-aprobar" onClick={() => moderar('video', v.id, 'aprobar')}>Publicar de todos modos</button>
+              </div>
+            </article>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function Admin() {
   const { t } = useContext(LangContext);
@@ -12,13 +129,31 @@ export default function Admin() {
   const [admins, setAdmins] = useState({ super_admin: '', admins: [] });
   const [nuevoAdmin, setNuevoAdmin] = useState('');
   const [busqueda, setBusqueda] = useState('');
-  const [tab, setTab] = useState('ninos');
+  const [tab, setTab] = useState('revision');
+  const [cola, setCola] = useState({ cartas: [], videos: [] });
 
   const cargar = () => {
     axios.get(API+'/api/admin').then(r => setData(r.data)).catch(() => setData({ error: true }));
+    axios.get(API+'/api/moderacion').then(r => setCola(r.data)).catch(()=>{});
     axios.get(API+'/api/historial').then(r => setHistorial(r.data)).catch(()=>{});
     axios.get(API+'/api/mensajes-privados').then(r => setMensajes(r.data)).catch(()=>{});
     axios.get(API+'/api/admins').then(r => setAdmins(r.data)).catch(()=>{});
+  };
+
+  const moderar = async (tipo, id, accion) => {
+    let motivo = '';
+    if (accion === 'rechazar') {
+      motivo = window.prompt('Motivo del rechazo. La familia lo verá en su panel:');
+      if (motivo === null) return;
+      if (!motivo.trim()) { alert('Escribe el motivo del rechazo.'); return; }
+    }
+    const url = tipo === 'video' ? `${API}/api/videos/${id}/moderar` : `${API}/api/ninos/${id}/moderar`;
+    try {
+      await axios.post(url, { accion, motivo });
+      cargar();
+    } catch (err) {
+      alert(err.response?.data?.error || 'No se pudo guardar la revisión.');
+    }
   };
   useEffect(() => { cargar(); }, []);
 
@@ -89,6 +224,7 @@ export default function Admin() {
         <div className="stat-card"><h3>{data.total_ninos}</h3><p>{t.admin_total}</p></div>
         <div className="stat-card"><h3>{data.total_padrinos}</h3><p>{t.admin_padrinos}</p></div>
         <div className="stat-card"><h3 style={{color:'var(--red)'}}>{data.sin_padrino}</h3><p>{t.admin_sin_padrino}</p></div>
+        <div className="stat-card"><h3>{data.en_revision || 0}</h3><p>{t.admin_revision}</p></div>
         <div className="stat-card">
           <h3 style={{color:'var(--green)'}}>{data.total_ninos > 0 ? Math.round((data.total_padrinos / data.total_ninos) * 100) : 0}%</h3>
           <p>Cobertura</p>
@@ -97,6 +233,9 @@ export default function Admin() {
 
       {/* TABS */}
       <div className="admin-tabs">
+        <button className={`admin-tab ${tab === 'revision' ? 'active' : ''}`} onClick={() => setTab('revision')}>
+          Revisión ({data.en_revision || 0})
+        </button>
         <button className={`admin-tab ${tab === 'ninos' ? 'active' : ''}`} onClick={() => setTab('ninos')}>
           Niños ({data.total_ninos})
         </button>
@@ -114,6 +253,10 @@ export default function Admin() {
         </button>
       </div>
 
+      {tab === 'revision' && (
+        <ColaRevision cola={cola} moderar={moderar} />
+      )}
+
       {tab === 'ninos' && (
         <>
           <div style={{display:'flex', gap:'0.6rem', marginBottom:'1rem', alignItems:'center', flexWrap:'wrap'}}>
@@ -129,7 +272,7 @@ export default function Admin() {
               [
                 {key:'id',label:'ID'},{key:'nombre',label:'Nombre'},{key:'edad',label:'Edad'},
                 {key:'provincia',label:'Provincia'},{key:'region',label:'Región'},
-                {key:'whatsapp',label:'WhatsApp'},{key:'tiene_padrino',label:'Tiene padrino'},
+                {key:'whatsapp',label:'WhatsApp (privado)'},{key:'estado',label:'Estado'},{key:'tiene_padrino',label:'Tiene padrino'},
                 {key:'fecha',label:'Fecha registro'},
               ],
               'ninos_registrados'
@@ -144,7 +287,8 @@ export default function Admin() {
                   <th>Edad</th>
                   <th>Provincia</th>
                   <th>Región</th>
-                  <th>WhatsApp</th>
+                  <th>WhatsApp (privado)</th>
+                  <th>Estado</th>
                   <th>Padrino</th>
                   <th>Fecha</th>
                   <th>Acción</th>
@@ -158,14 +302,8 @@ export default function Admin() {
                     <td>{n.edad}</td>
                     <td>{n.provincia}</td>
                     <td>{n.region}</td>
-                    <td>
-                      {n.whatsapp ? (
-                        <a href={`https://wa.me/51${n.whatsapp}`} target="_blank" rel="noreferrer"
-                          style={{color:'#25d366', textDecoration:'none'}}>
-                          💬 {n.whatsapp}
-                        </a>
-                      ) : '—'}
-                    </td>
+                    <td>{n.whatsapp || '—'}</td>
+                    <td><EstadoBadge estado={n.estado} /></td>
                     <td>
                       <span className={n.tiene_padrino ? 'badge-si' : 'badge-no'}>
                         {n.tiene_padrino ? '✓ Sí' : '✗ No'}
@@ -201,6 +339,7 @@ export default function Admin() {
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>País</th>
+                <th>Figura</th>
                 <th>Niño apadrinado</th>
                 <th>Fecha</th>
                 <th>Acción</th>
@@ -213,6 +352,7 @@ export default function Admin() {
                   <td style={{fontWeight:600}}>{p.nombre}</td>
                   <td>{p.email}</td>
                   <td>{p.pais || '—'}</td>
+                  <td>{p.rol === 'madrina' ? 'Madrina' : 'Padrino'}</td>
                   <td>{p.nino_nombre || '—'}</td>
                   <td>{p.fecha}</td>
                   <td>
