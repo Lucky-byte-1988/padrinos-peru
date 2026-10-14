@@ -65,6 +65,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
   const [enviando, setEnviando] = useState(false);
 
   const [error, setError] = useState('');
+  const [aviso, setAviso] = useState('');
   const cargar = useCallback(() => {
     axios.get(`${API}/api/ninos/${ninoId}/videos`).then(r => setVideos(r.data)).catch(() => {});
   }, [ninoId]);
@@ -93,6 +94,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
       });
       setForm({ autor: '', pais: '', texto: '', de: 'padrino' });
       setFile(null); setPreview(null); setShowForm(false);
+      setAviso('Video enviado. Se publicará cuando un administrador lo apruebe.');
       cargar();
     } catch (err) {
       setError(mensajeError(err, 'publicar el video'));
@@ -106,7 +108,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
         <h4>🎬 Conversación en video con {ninoNombre}</h4>
         <span className="vthread-count">{videos.length + (videoInicial ? 1 : 0)} videos</span>
       </div>
-      <p className="vthread-sub">Responde con tu propio video, como en TikTok 💬</p>
+      <p className="vthread-sub">Responde con tu propio video. Evita mostrar el rostro del niño.</p>
 
       {/* Video inicial del niño */}
       {videoInicial && (
@@ -132,6 +134,8 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
 
       {/* Hilo */}
       {videos.map(v => <VideoCard key={v.id} v={v} />)}
+
+      {aviso && <p className="priv-note">{aviso}</p>}
 
       {videos.length === 0 && !videoInicial && (
         <div className="vthread-empty">
@@ -161,7 +165,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
 
           <div className="vthread-form-row">
             <select value={form.de} onChange={e => setForm({...form, de: e.target.value})}>
-              <option value="padrino">Soy el Padrino 🎅</option>
+              <option value="padrino">Soy el padrino o la madrina</option>
               <option value="nino">Soy el Niño 🧒</option>
             </select>
             <input placeholder="Tu nombre" value={form.autor}
@@ -178,7 +182,7 @@ export default function VideoThread({ ninoId, ninoNombre, videoInicial }) {
               Cancelar
             </button>
             <button type="submit" className="vthread-send" disabled={enviando}>
-              {enviando ? 'Publicando...' : '🚀 Publicar video'}
+              {enviando ? 'Enviando…' : 'Enviar a revisión'}
             </button>
           </div>
         </form>

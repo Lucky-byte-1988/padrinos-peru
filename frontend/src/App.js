@@ -2,7 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
 import { AuthProvider, useAuth } from './AuthContext';
-import { translations } from './i18n';
+import { LangContext, translations } from './i18n';
 import Buscador from './Buscador';
 import './App.css';
 
@@ -45,8 +45,6 @@ function AdminGuard({ children }) {
   }
   return children;
 }
-
-export const LangContext = React.createContext();
 
 function SessionButton() {
   const { user, salir } = useAuth();

@@ -4,18 +4,29 @@ import { Link } from 'react-router-dom';
 import { API, cld } from '../config';
 import { useAuth } from '../AuthContext';
 
-function NinoMini({ n }) {
+function etiquetaEstado(n) {
+  if (n.estado === 'rechazado') return n.motivo_rechazo ? `No publicada: ${n.motivo_rechazo}` : 'No publicada';
+  if (n.estado === 'pendiente') return 'En revisión';
+  return 'Publicada';
+}
+
+function NinoMini({ n, modo }) {
+  const estadoClase = n.estado === 'aprobado' ? 'badge-si' : n.estado === 'rechazado' ? 'badge-no' : 'badge-wait';
   return (
     <Link to={`/carta/${n.id}`} className="mini-card">
-      {n.foto_familia
-        ? <img src={cld(n.foto_familia, 'w_160,h_160,q_auto,f_auto,c_fill,g_face')} alt={n.nombre} />
-        : <div className="mini-ph">🎁</div>}
+      {n.carta_foto
+        ? <img src={cld(n.carta_foto, 'w_160,h_160,q_auto,f_auto,c_fill')} alt={`Carta de ${n.nombre}`} />
+        : <div className="mini-ph">{(n.nombre || '?')[0]}</div>}
       <div className="mini-body">
         <div className="mini-name">{n.nombre}</div>
-        <div className="mini-loc">📍 {n.provincia}, {n.region} · {n.edad} años</div>
-        <span className={`post-badge ${n.tiene_padrino ? 'con' : 'sin'}`} style={{display:'inline-block', marginTop:'0.4rem'}}>
-          {n.tiene_padrino ? '✓ Apadrinado' : 'Busca padrino'}
-        </span>
+        <div className="mini-loc">{n.provincia}, {n.region}{n.edad ? ` · ${n.edad} años` : ''}</div>
+        {modo === 'familia' ? (
+          <span className={estadoClase} style={{display:'inline-block', marginTop:'0.45rem'}}>{etiquetaEstado(n)}</span>
+        ) : (
+          <span className="post-badge con" style={{display:'inline-block', marginTop:'0.45rem'}}>
+            {n.mi_rol === 'madrina' ? 'Eres su madrina' : 'Eres su padrino'}
+          </span>
+        )}
       </div>
     </Link>
   );
@@ -77,7 +88,7 @@ export default function PadrinoPanel() {
                   </Link>
                 </div>
               ) : (
-                <div className="mini-grid">{apadrinados.map(n => <NinoMini key={n.id} n={n} />)}</div>
+                <div className="mini-grid">{apadrinados.map(n => <NinoMini key={n.id} n={n} modo="padrino" />)}</div>
               )}
             </section>
           )}
@@ -94,7 +105,7 @@ export default function PadrinoPanel() {
                   </Link>
                 </div>
               ) : (
-                <div className="mini-grid">{misNinos.map(n => <NinoMini key={n.id} n={n} />)}</div>
+                <div className="mini-grid">{misNinos.map(n => <NinoMini key={n.id} n={n} modo="familia" />)}</div>
               )}
             </section>
           )}
