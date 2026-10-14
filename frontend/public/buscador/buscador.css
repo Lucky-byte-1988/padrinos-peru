@@ -427,6 +427,10 @@ body.sp-foco .sp-lens{animation-play-state:paused}
 @keyframes spGuiaIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 @media (max-width:560px){.sp-guia{grid-template-columns:repeat(2,minmax(0,1fr))}.spot.open.guia .sp-cats{display:none}.sp-g{min-height:60px;padding:10px 11px;gap:10px}.sp-gi{width:34px;height:34px}}
 @media (prefers-reduced-motion:reduce){.sp-g{animation:none}}
+/* Guía ordenada en tres secciones: Ver · Ayudar · Tu cuenta */
+.sp-guia.sec{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding-top:6px}
+.sp-gsec{display:flex;flex-direction:column;gap:8px;min-width:0}
+.sp-gsh{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#86868b;margin:0 4px 2px}
 /* Por encima de la barra de navegación (z-index 100) */
 .sp-orb{z-index:310}
 .sp-ver{z-index:305}
@@ -435,4 +439,7 @@ body.sp-foco .sp-lens{animation-play-state:paused}
   .sp-gt b{white-space:normal;font-size:14.5px;line-height:1.2}
   .sp-gt span{white-space:normal}
   .spot .sp-kfila{display:none}
+  .sp-guia.sec{grid-template-columns:1fr;gap:12px}
+  .sp-gsec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .sp-gsh{grid-column:1/-1}
 }

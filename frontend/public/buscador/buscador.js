@@ -50,7 +50,9 @@ function spPintar(){const el=$('#spot'),box=$('#spRes');if(!box)return;const q=S
   const fila=(t,L,icn)=>L.length?`<div class="sp-sh">${t}</div><div class="sp-rec">${L.map(x=>`<button class="sp-rq" data-spq="${spEsc(x)}">${ic(icn)}<span>${spEsc(x)}</span></button>`).join('')}</div>`:'';
   const yo=decodeURIComponent(location.pathname.split('/').pop()),pg=window.SPOT_SOLO?[]:AN_PG.filter(x=>x[0]!==yo);
   const G=(window.SPOT_GUIA&&window.SPOT_GUIA())||[];SP.ng=G.length;
-  const gh=G.length?`<div class="sp-sh">¿Qué quieres hacer?</div><div class="sp-guia">${G.map((x,n)=>{SP.items.push(x);return `<button class="sp-g ${x.prin?'prin':''} ${n===SP.i?'on':''}" data-spi="${n}" style="animation-delay:${n*35}ms"><span class="sp-gi">${ic(x.ic||'grid')}</span><span class="sp-gt"><b>${spEsc(x.t)}</b>${x.s?`<span>${spEsc(x.s)}</span>`:''}</span></button>`}).join('')}</div>`:'';
+  const gT=(x,n)=>{SP.items.push(x);return `<button class="sp-g ${x.prin?'prin':''} ${n===SP.i?'on':''}" data-spi="${n}" style="animation-delay:${n*35}ms"><span class="sp-gi">${ic(x.ic||'grid')}</span><span class="sp-gt"><b>${spEsc(x.t)}</b>${x.s?`<span>${spEsc(x.s)}</span>`:''}</span></button>`};
+  const gS=[];G.forEach(x=>{const k=x.sec||'';let s=gS.find(z=>z[0]===k);if(!s)gS.push(s=[k,[]]);s[1].push(x)});let gn=0;
+  const gh=G.length?`<div class="sp-guia sec">${gS.map(([k,L])=>`<div class="sp-gsec">${k?`<div class="sp-gsh">${spEsc(k)}</div>`:''}${L.map(x=>gT(x,gn++)).join('')}</div>`).join('')}</div>`:'';
   h=gh+fila('Recientes',rec,'clock')+fila('Sugerencias',sug,'search')+(pg.length?`<div class="sp-sh">Páginas</div><div class="sp-rec">${pg.map(([f,tt,i])=>`<button class="sp-rq pag" data-sppag="${spEsc(f)}">${ic(i)}<span>${spEsc(tt)}</span></button>`).join('')}</div>`:'')+(CATS.length?`<div class="sp-kfila">${CATS.map((c,n)=>`<button data-spcat="${c.k}" title="${spEsc(c.t)}"><kbd>Ctrl ${n+1}</kbd>${spEsc(c.t)}</button>`).join('')}</div>`:'')}
  else if(SP.cat){const D=spCatData(SP.cat);const nq=spN(q).trim();const fil=x=>(!SP.f||x.grp===SP.f)&&(!nq||spN(x.t+' '+(x.sub||'')).includes(nq));
   h=D.chips.length?`<div class="sp-chips">${D.chips.map(c=>`<button class="sp-chip ${SP.f===c?'on':''}" data-spf="${spEsc(c)}">${spEsc(c)}</button>`).join('')}</div>`:'';
@@ -122,10 +124,11 @@ function spAbrir(){let el=$('#spot');if(el&&el.classList.contains('on')&&!el.cla
   spSonPinta();$('#spSon').onclick=()=>{const k=SON_ORD[(SON_ORD.indexOf(spSonV())+1)%SON_ORD.length];spSonSet(k);spSonPinta();spACget();if(k!=='off')setTimeout(()=>spTic('abrir',k),30);$('#spIn').focus()};$('#spTema').onclick=()=>{spTemaPon(spTemaGet()==='claro'?'oscuro':'claro');$('#spIn').focus()};
   $('#spX').onclick=()=>{if(SP.q){SP.q='';$('#spIn').value=''}else{SP.cat=null;SP.f=''}SP.i=0;SP.hint=!SP.cat;spPintar();$('#spIn').focus()};
   const inp=$('#spIn');inp.oninput=()=>{SP.q=inp.value;SP.i=0;SP.hint=!SP.q&&!SP.cat;spPintar()};
-  inp.onkeydown=e=>{const n=SP.items.length;const guia=SP.hint&&!SP.cat&&!SP.q.trim()&&SP.ng;const grid=!!SP.cat||!!guia;const fil=guia?(window.innerWidth<560?2:3):5;
+  inp.onkeydown=e=>{const n=SP.items.length;const guia=SP.hint&&!SP.cat&&!SP.q.trim()&&SP.ng;const grid=!!SP.cat||!!guia;const cel=window.innerWidth<560;const fil=guia?2:5;
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(SP.q){SP.q='';inp.value='';SP.hint=!SP.cat;spPintar()}else if(SP.cat){SP.cat=null;SP.f='';SP.hint=true;spPintar()}else spCerrar();return}
    if(e.key==='Backspace'&&!inp.value&&SP.cat){e.preventDefault();SP.cat=null;SP.f='';SP.hint=true;spPintar();return}
    if(!n)return;const mv=d=>{e.preventDefault();SP.i=(SP.i+d+n)%n;spPintar()};
+   if(guia&&/^Arrow/.test(e.key)){const d={ArrowDown:cel?2:1,ArrowUp:cel?-2:-1,ArrowRight:cel?1:2,ArrowLeft:cel?-1:-2}[e.key];mv(d);return}
    if(e.key==='ArrowDown')mv(grid?Math.min(fil,n-SP.i-1)||1:1);else if(e.key==='ArrowUp')mv(grid?-Math.min(fil,SP.i)||-1:-1);else if(grid&&e.key==='ArrowRight'&&!inp.value)mv(1);else if(grid&&e.key==='ArrowLeft'&&!inp.value)mv(-1);else if(e.key==='Enter'){e.preventDefault();spIr(SP.i)}}}
  SP.cat=SP.cat&&!SP.q?SP.cat:null;SP.f='';SP.i=0;SP.hint=!SP.cat;
  window.__spT=Date.now();el.classList.remove('out','open','orbe');void el.offsetWidth;el.classList.add('on');$$('.sp-box,.sp-cat',el).forEach(b=>{b.style.animation='none';void b.offsetWidth;b.style.animation=''});

@@ -46,15 +46,15 @@ function items(go) {
 function guia(go, user, isAdmin, salir) {
   const sin = NINOS.filter(n => !n.tiene_padrino).length;
   const G = [
-    { t: 'Ver las cartas', s: NINOS.length ? `${NINOS.length} niños` : 'Todos los niños', ic: 'mail', prin: 1, go: () => go('/?f=todos') },
-    { t: 'Apadrinar a un niño', s: sin ? `${sin} buscan padrino` : 'Niños que buscan padrino', ic: 'gift', prin: 1, go: () => go('/?f=sin') },
-    { t: 'Registrar un niño', s: 'Escribir su carta', ic: 'pen', prin: 1, go: () => go('/registrar') },
-    { t: 'Mi niño', s: 'Tus apadrinados o tus cartas', ic: 'heart', go: () => go('/mi-nino') },
-    { t: 'Cómo funciona', s: 'Qué es CartasANoel', ic: 'book', go: () => go('/nosotros') },
+    { t: 'Ver las cartas', s: NINOS.length ? `${NINOS.length} niños` : 'Todos los niños', ic: 'mail', sec: 'Ver', go: () => go('/?f=todos') },
+    { t: 'Cómo funciona', s: 'Qué es CartasANoel', ic: 'book', sec: 'Ver', go: () => go('/nosotros') },
+    { t: 'Apadrinar a un niño', s: sin ? `${sin} buscan padrino` : 'Niños que buscan padrino', ic: 'gift', sec: 'Ayudar', go: () => go('/?f=sin') },
+    { t: 'Registrar un niño', s: 'Escribir su carta', ic: 'pen', sec: 'Ayudar', go: () => go('/registrar') },
+    { t: 'Mi niño', s: 'Tus apadrinados o tus cartas', ic: 'heart', sec: 'Tu cuenta', go: () => go('/mi-nino') },
   ];
-  if (isAdmin) G.push({ t: 'Panel admin', s: 'Niños, padrinos e historial', ic: 'star', go: () => go('/admin') });
-  else if (!user) G.push({ t: 'Iniciar sesión', s: 'Para apadrinar o ver tu niño', ic: 'user', go: () => go('/login') });
-  else G.push({ t: 'Cerrar sesión', s: user.email, ic: 'user', go: () => { salir(); go('/'); } });
+  if (isAdmin) G.push({ t: 'Panel admin', s: 'Niños, padrinos e historial', ic: 'star', sec: 'Tu cuenta', go: () => go('/admin') });
+  else if (!user) G.push({ t: 'Iniciar sesión', s: 'Para apadrinar o ver tu niño', ic: 'user', sec: 'Tu cuenta', go: () => go('/login') });
+  else G.push({ t: 'Cerrar sesión', s: user.email, ic: 'user', sec: 'Tu cuenta', go: () => { salir(); go('/'); } });
   return G;
 }
 
