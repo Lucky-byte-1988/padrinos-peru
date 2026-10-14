@@ -97,7 +97,7 @@ export default function RegisterFamily() {
       </svg>
       <h2 style={{marginBottom:'0.6rem'}}>Carta publicada</h2>
       <p className="form-desc" style={{marginBottom:'2rem'}}>{t.reg_success}</p>
-      <Link to="/" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
+      <Link to="/cartas" className="btn-gold" style={{display:'inline-block', textDecoration:'none'}}>
         Ver las cartas
       </Link>
     </div>

@@ -72,7 +72,7 @@ export default function PadrinoPanel() {
               {apadrinados.length === 0 ? (
                 <div className="panel-empty">
                   <p>Aún no apadrinas a ningún niño.</p>
-                  <Link to="/" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.8rem 1.6rem', marginTop:'0.6rem'}}>
+                  <Link to="/cartas" className="auth-submit" style={{display:'inline-block', textDecoration:'none', padding:'0.8rem 1.6rem', marginTop:'0.6rem'}}>
                     Ver cartas y apadrinar
                   </Link>
                 </div>
