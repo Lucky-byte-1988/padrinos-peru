@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API } from './config';
+import { useAuth } from './AuthContext';
 
 // Buscador (Ctrl+K) con la esfera flotante, el mismo Spotlight de sicac.
 // El motor vive en public/buscador; aquí solo se le da el índice y la navegación.
@@ -41,19 +42,39 @@ function items(go) {
   return out;
 }
 
+// Accesos directos que aparecen al abrir el buscador: es una guía, no solo búsqueda.
+function guia(go, user, isAdmin, salir) {
+  const sin = NINOS.filter(n => !n.tiene_padrino).length;
+  const G = [
+    { t: 'Ver las cartas', s: NINOS.length ? `${NINOS.length} niños` : 'Todos los niños', ic: 'mail', prin: 1, go: () => go('/?f=todos') },
+    { t: 'Apadrinar a un niño', s: sin ? `${sin} buscan padrino` : 'Niños que buscan padrino', ic: 'gift', prin: 1, go: () => go('/?f=sin') },
+    { t: 'Registrar un niño', s: 'Escribir su carta', ic: 'pen', prin: 1, go: () => go('/registrar') },
+    { t: 'Mi niño', s: 'Tus apadrinados o tus cartas', ic: 'heart', go: () => go('/mi-nino') },
+    { t: 'Cómo funciona', s: 'Qué es CartasANoel', ic: 'book', go: () => go('/nosotros') },
+  ];
+  if (isAdmin) G.push({ t: 'Panel admin', s: 'Niños, padrinos e historial', ic: 'star', go: () => go('/admin') });
+  else if (!user) G.push({ t: 'Iniciar sesión', s: 'Para apadrinar o ver tu niño', ic: 'user', go: () => go('/login') });
+  else G.push({ t: 'Cerrar sesión', s: user.email, ic: 'user', go: () => { salir(); go('/'); } });
+  return G;
+}
+
 export default function Buscador() {
   const navigate = useNavigate();
+  const { user, isAdmin, salir } = useAuth();
+  const salirRef = useRef(salir);
+  salirRef.current = salir;
 
   useEffect(() => {
     const go = h => navigate(h);
     window.SPOT_TIT = 'CartasANoel';
-    window.SPOT_PH = 'Buscar niños, regiones o ayuda';
+    window.SPOT_PH = 'Busca un niño, una región o una duda';
     window.SPOT_PIPH = 'Escribe un nombre, una provincia o una pregunta.';
     window.SPOT_SOLO = 1;
     window.SPOT_CATS = [{ k: 'nin', g: 'Niños', t: 'Niños', ic: 'user' }, { k: 'reg', g: 'Regiones', t: 'Regiones', ic: 'pin' }, { k: 'ayu', g: 'Ayuda', t: 'Ayuda', ic: 'book' }];
     window.SPOT_ORDER = ['Ir a', 'Niños', 'Regiones', 'Ayuda'];
-    window.SPOT_SUG = ['Busca padrino', 'Cusco', '¿Se maneja dinero?', 'Registrar niño'];
+    window.SPOT_SUG = ['Cusco', '¿Se maneja dinero?', '¿Cómo apadrino?'];
     window.SPOT_ITEMS = () => items(go);
+    window.SPOT_GUIA = () => guia(go, user, isAdmin, () => salirRef.current());
     window.SPOT_STATE = { get: () => ({}), set: () => {} };
     window.SPOT_ACCIONES = () => [
       { t: 'Cartas', i: 'mail', f: () => go('/?f=todos') },
@@ -77,7 +98,7 @@ export default function Buscador() {
       document.body.appendChild(s);
     }
     return () => window.removeEventListener('keydown', alAbrir, true);
-  }, [navigate]);
+  }, [navigate, user, isAdmin]);
 
   return null;
 }
